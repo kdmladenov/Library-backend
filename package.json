@@ -1,19 +1,28 @@
 {
-  "name": "end-to-end-project",
+  "name": "library-project",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/index.js",
+    "start:dev": "nodemon src/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/preset-env": "^7.13.12",
+    "@types/nodemon": "^1.19.0",
+    "@types/regenerator-runtime": "^0.13.0",
+    "babel-eslint": "^10.1.0",
+    "babel-jest": "^26.6.3",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "helmet": "^4.4.1"
+    "helmet": "^4.4.1",
+    "nodemon": "^2.0.7",
+    "regenerator-runtime": "^0.13.7"
   },
   "devDependencies": {
     "eslint": "^7.23.0",
