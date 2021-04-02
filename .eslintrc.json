@@ -1,14 +1,35 @@
 {
-  "parser": "babel-eslint",
   "env": {
-      "browser": true
+      "es6": true,
+      "node": true
   },
   "extends": [
-      "google"
+      "airbnb-base"
   ],
+  "globals": {
+      "Atomics": "readonly",
+      "SharedArrayBuffer": "readonly",      
+      "require": false,
+      "describe": false,
+      "it": false,
+      "Promise": false,
+      "beforeEach": false,
+      "afterEach": false,
+      "before": false,
+      "after": false,
+      "module": false
+  },
+  "parserOptions": {
+      "ecmaVersion": 2018,
+      "sourceType": "module"
+  },
   "rules": {
-      // overrides
-      "require-jsdoc": 0,
+      "arrow-parens": "off",
+      "no-return-assign": "off", // disallow use of assignment in return statement
+      "no-plusplus": "off",
+      "quotes": "off",
+      "consistent-return": "off", // require return statements to either always or never specify values
+      "import/extensions": "off","require-jsdoc": 0,
       "object-curly-spacing": [
           "error",
           "always"
@@ -17,7 +38,6 @@
       "semi": 2,
       "no-undef": 2,
       "no-use-before-define": 0,
-      "quotes": 2,
       "no-cond-assign": 2, // disallow assignment in conditional expressions
       "no-console": 0, // disallow use of console (off by default in the node environment)
       "no-constant-condition": 2, // disallow use of constant expressions in conditions
@@ -47,7 +67,6 @@
       "block-scoped-var": 2, // treat var statements as if they were block scoped (off by default)
       "prefer-const": 2,
       "complexity": 2, // specify the maximum cyclomatic complexity allowed in a program (off by default)
-      "consistent-return": "off", // require return statements to either always or never specify values
       "curly": 2, // specify curly brace conventions for all control statements
       "default-case": 2, // require default case in switch statements (off by default)
       "dot-notation": 2, // encourages use of dot notation whenever possible
@@ -79,7 +98,6 @@
       "no-process-env": 2, // disallow use of process.env (off by default)
       "no-proto": 2, // disallow usage of __proto__ property
       "no-redeclare": 2, // disallow declaring the same variable more then once
-      "no-return-assign": "off", // disallow use of assignment in return statement
       "no-script-url": 2, // disallow use of javascript: urls.
       "no-self-compare": 2, // disallow comparisons where both sides are exactly the same (off by default)
       "no-sequences": 2, // disallow use of comma operator
@@ -99,23 +117,6 @@
       "no-shadow-restricted-names": 2, // disallow shadowing of names such as arguments
       "no-undef-init": 0, // disallow use of undefined when initializing variables
       "no-undefined": 2, // disallow use of undefined variable (off by default)
-      "no-unused-vars": 1, // disallow declaration of variables that are not used in the code
-      "arrow-parens": "off",
-      "comma-dangle": "never"
-  },
-  "globals": {
-      "require": false,
-      "describe": false,
-      "it": false,
-      "Promise": false,
-      "beforeEach": false,
-      "afterEach": false,
-      "before": false,
-      "after": false,
-      "module": false
-  },
-  "parserOptions": {
-        "ecmaVersion": 6,
-        "sourceType": "module"
+      "no-unused-vars": 1 // disallow declaration of variables that are not used in the code
   }
 }
