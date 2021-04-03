@@ -1,17 +1,14 @@
 // emojipedia.org
-const reactions = {
-  Thumbs_Up: '👍',
-  Thumbs_Down: '👎',
-  Red_Heart: '❤️',
-  Smiling_Face: '☺️',
-  Winking_Face: '😉',
-  Neutral_Face: '😐',
-  Unamused_Face: '😒',
-  Fearful_Face: '😨',
-  Crying_Face: '😢',
-  Frowning_Face: '☹️',
-};
-
 export default {
-  reactions,
+  THUMBS_UP: '👍',
+  THUMBS_DOWN: '👎',
+  RED_HEART: '❤️',
+  SMILING_FACE: '🙂',
+  LAUGHING_FACE: '😂',
+  WINKING_FACE: '😉',
+  NEUTRAL_FACE: '😐',
+  UNAMUSED_FACE: '😒',
+  FEARFUL_FACE: '😨',
+  CRYING_FACE: '😢',
+  FROWNING_FACE: '☹️',
 };

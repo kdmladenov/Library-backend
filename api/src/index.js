@@ -1,6 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import transformBody from './middleware/transform-body.js';
+import validateBody from './middleware/validate-body.js';
+import createUserScheme from './validator/create-user-scheme.js';
 
 const PORT = 5555;
 const app = express();
@@ -12,7 +15,7 @@ app.use(express.json());
 app.listen(PORT, () => console.log(`Listening on port ${PORT}...`));
 
 // USERS - PUBLIC
-app.post('/users', (req, res) => {
+app.post('/users', transformBody(createUserScheme), validateBody('user', createUserScheme) (req, res) => {
 
 });
 
