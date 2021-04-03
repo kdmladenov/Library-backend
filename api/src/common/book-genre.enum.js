@@ -1,4 +1,4 @@
-const genre = {
+const bookGenre = {
   Arts_Photography: 'Arts & Photography',
   Biographies_Memoirs: 'Biographies & Memoirs',
   Business_Money: 'Business & Money',
@@ -34,5 +34,5 @@ const genre = {
 };
 
 export default {
-  genre,
+  bookGenre,
 };
