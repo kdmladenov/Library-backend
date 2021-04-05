@@ -15,7 +15,7 @@ app.use(express.json());
 app.listen(PORT, () => console.log(`Listening on port ${PORT}...`));
 
 // USERS - PUBLIC
-app.post('/users', transformBody(createUserScheme), validateBody('user', createUserScheme) (req, res) => {
+app.post('/users', transformBody(createUserScheme), validateBody('user', createUserScheme), (req, res) => {
 
 });
 

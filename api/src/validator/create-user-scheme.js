@@ -1,5 +1,5 @@
-import { user } from '../common/property-length-constraints.js'
-import userGender from '../common/user-gender.enum.js'
+import { user } from '../common/property-length-constraints.js';
+import userGender from '../common/user-gender.enum.js';
 
 /**
     username: `Expected string with length in the range [2-20]`,

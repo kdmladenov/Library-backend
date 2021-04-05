@@ -1,5 +1,5 @@
 export default {
-  MEN: 'Men',
-  WOMEN: 'Women',
-  OTHER: 'Other',
+  MALE: 'male',
+  FEMALE: 'female',
+  OTHER: 'other',
 };
