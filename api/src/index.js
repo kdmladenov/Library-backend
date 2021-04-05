@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import transformBody from './middleware/transform-body.js';
 import validateBody from './middleware/validate-body.js';
 import createUserScheme from './validator/create-user-scheme.js';
+import { books } from './data/books.js';
 
 const PORT = 5555;
 const app = express();
@@ -25,20 +26,29 @@ app.post('/users', transformBody(createUserScheme), validateBody('user', createU
 
 // BOOKS
 app.get('/books', (req, res) => {
-  // title
-  // author
-  // language
-  // genre
-  // available
-  // isbn ???
+  if (req.query.title) {
+    return res.status(200).json(books.filter(b => b.title.toLowerCase().includes(req.query.title.toLowerCase()) && !b.isDeleted));
+  }
+
+  res.status(200).json(books.filter(b => !b.isDeleted));
 });
 
 app.get('/books/:isbn', (req, res) => {
+  const book = books.find(book => book.ISBN === +req.params.isbn && !book.isDeleted);
+  if (!book) {
+    return res.status(404).json({ message: `The book with ISBN ${req.params.isbn} was not found!` });
+  }
 
+  res.status(200).json(book);
 });
 
 app.get('/books/:id', (req, res) => {
+  const book = books.find(book => book.id === +req.params.id && !book.isDeleted);
+  if (!book) {
+    return res.status(404).json({ message: `The book with id ${req.params.id} was not found!` });
+  }
 
+  res.status(200).json(book);
 });
 
 // borrow/return a book

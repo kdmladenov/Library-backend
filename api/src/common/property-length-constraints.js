@@ -12,5 +12,9 @@ export const user = {
 };
 
 export const book = {
-
+  MIN_TITLE_LENGTH: 2,
+  MAX_TITLE_LENGTH: 50,
+  MIN_AUTHOR_LENGTH: 6,
+  MAX_AUTHOR_LENGTH: 60,
+  ISBN_LENGTH: 10,
 };
