@@ -3,8 +3,10 @@ import cors from 'cors';
 import helmet from 'helmet';
 import transformBody from './middleware/transform-body.js';
 import validateBody from './middleware/validate-body.js';
-import createUserScheme from './validator/create-user-scheme.js';
-import { books } from './data/books.js';
+import createUserScheme from './validator/create-user-schema.js';
+import updateBookSchema from './validator/update-book-schema.js';
+import { books, updateBook } from './data/books.js';
+import { createUser } from './data/users.js';
 
 const PORT = 5555;
 const app = express();
@@ -17,7 +19,9 @@ app.listen(PORT, () => console.log(`Listening on port ${PORT}...`));
 
 // USERS - PUBLIC
 app.post('/users', transformBody(createUserScheme), validateBody('user', createUserScheme), (req, res) => {
+  const user = createUser(req.body);
 
+  res.json(user);
 });
 
 // USERS - LOGIN - PUBLIC
@@ -52,8 +56,12 @@ app.get('/books/:id', (req, res) => {
 });
 
 // borrow/return a book
-app.patch('/book/:id', (req, res) => {
+app.patch('/book/:id', transformBody(updateBookSchema), validateBody('user', updateBookSchema), (req, res) => {
+  const { id } = req.params;
+  const { isBorrowed } = req.body;
+  updateBook(id, isBorrowed);
 
+  res.json({ message: `Book updated` });
 });
 
 // like a book
@@ -99,7 +107,7 @@ app.put('/reviews/:id/reviewVotes', (req, res) => {
 
 });
 
-// Administration Part: CRUD a book, CRUD a review, 
+// Administration Part: CRUD a book, CRUD a review,
 // read all books
 app.get('/admin/books', (res, req) => {
 
