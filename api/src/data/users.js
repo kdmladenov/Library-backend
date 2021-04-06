@@ -1,3 +1,4 @@
+const users = [];
 export const getUserById = () => {
 
 };
@@ -5,9 +6,9 @@ export const getAllUsers = () => {
 
 };
 
-export const createUser = (data) => {
+export const createUser = (req, res) => {
   const user = {
-    ...data,
+    ...req.body,
     readingPoints: 0,
     isBanned: false,
     isAdmin: false,
@@ -15,7 +16,10 @@ export const createUser = (data) => {
   };
   // check if username exists in the DB => if true return null
   // check if email exists in the DB => if true return
+  // check if phone exists in the DB => if true return
   // write user to the DB
+
+  users.push(user);
 
   return user;
 };
