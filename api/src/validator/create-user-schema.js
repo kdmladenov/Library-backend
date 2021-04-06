@@ -13,11 +13,11 @@ import userGender from '../common/user-gender.enum.js';
  */
 
 export default {
-  username: (value) => typeof value === 'string' && value.length > user.MIN_USERNAME_LENGTH && value < user.MAX_USERNAME_LENGTH,
-  password: (value) => typeof value === 'string' && value.length > user.MIN_PASSWORD_LENGTH && value < user.MAX_PASSWORD_LENGTH,
-  firstName: (value) => typeof value === 'string' && value.length > user.MIN_FIRSTNAME_LENGTH && value < user.MAX_FIRSTNAME_LENGTH,
-  lastName: (value) => typeof value === 'string' && value.length > user.MIN_LASTNAME_LENGTH && value < user.MAX_LASTNAME_LENGTH,
-  email: (value) => typeof value === 'string' && value.length > user.MIN_EMAIL_LENGTH && value < user.MAX_EMAIL_LENGTH,
+  username: (value) => typeof value === 'string' && value.length > user.MIN_USERNAME_LENGTH && value.length < user.MAX_USERNAME_LENGTH,
+  password: (value) => typeof value === 'string' && value.length > user.MIN_PASSWORD_LENGTH && value.length < user.MAX_PASSWORD_LENGTH,
+  firstName: (value) => typeof value === 'string' && value.length > user.MIN_FIRSTNAME_LENGTH && value.length < user.MAX_FIRSTNAME_LENGTH,
+  lastName: (value) => typeof value === 'string' && value.length > user.MIN_LASTNAME_LENGTH && value.length < user.MAX_LASTNAME_LENGTH,
+  email: (value) => typeof value === 'string' && value.length > user.MIN_EMAIL_LENGTH && value.length < user.MAX_EMAIL_LENGTH,
   birthDate: (value) => !(new Date(value) === 'Invalid Date') && typeof value === 'string' && value.length > 0,
   gender: (value) => Object.values(userGender).includes(value),
   // isAdmin: (value) => typeof value === 'boolean',
