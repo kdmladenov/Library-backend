@@ -1,7 +1,4 @@
 // dummy data
-<<<<<<< HEAD
-export const books = [];
-=======
 export const books = [
   {
     id: 1,
@@ -148,7 +145,6 @@ export const books = [
     ageRecommendation: 'All ages',
   },
 ];
->>>>>>> c9c6eca050de9428dc21715cae1ffc51f933666b
 
 let id = 1;
 
