@@ -23,7 +23,7 @@ app.listen(PORT, () => console.log(`Listening on port ${PORT}...`));
 
 // USERS - PUBLIC
 app.post('/users', transformBody(createUserScheme), validateBody('user', createUserScheme), (req, res) => {
-  const user = createUser(req.body);
+  const user = createUser(req, res);
 
   res.json(user);
 });
