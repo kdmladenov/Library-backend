@@ -18,8 +18,8 @@ import { book } from '../common/property-length-constraints.js';
  */
 
 export default {
-  title: (value) => typeof value === 'string' && value.length > book.MIN_TITLE_LENGTH && value < book.MAX_TITLE_LENGTH,
-  author: (value) => typeof value === 'string' && value.length > book.MIN_AUTHOR_LENGTH && value < book.MAX_AUTHOR_LENGTH,
+  title: (value) => typeof value === 'string' && value.length >= book.MIN_TITLE_LENGTH && value.length <= book.MAX_TITLE_LENGTH,
+  author: (value) => typeof value === 'string' && value.length >= book.MIN_AUTHOR_LENGTH && value.length <= book.MAX_AUTHOR_LENGTH,
   datePublished: (value) => typeof value === 'string' && !(new Date(value).toString()).includes('Invalid'),
   genre: (value) => Object.values(bookGenre).includes(value),
   ISBN: (value) => typeof value === 'number' && value.toString().length === book.ISBN_LENGTH,

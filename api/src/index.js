@@ -141,7 +141,7 @@ app.get('/admin/books/:id', (req, res) => {
 
 // create a book
 app.post('/admin/books', transformBody(createBookScheme), validateBody('book', createBookScheme), (req, res) => {
-  const book = createBook(req.body);
+  const book = createBook(req, res);
 
   res.json(book);
 });
