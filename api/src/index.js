@@ -10,7 +10,7 @@ import createUserScheme from './validator/create-user-schema.js';
 import createBookScheme from './validator/create-book-schema.js';
 import updateBookSchema from './validator/update-book-schema.js';
 import { books, createBook, updateBook } from './data/books.js';
-import { createUser } from './data/users.js';
+import { createUser, users } from './data/users.js';
 
 const PORT = 5555;
 const app = express();
@@ -27,6 +27,10 @@ app.post('/users', transformBody(createUserScheme), validateBody('user', createU
 
   res.json(user);
 });
+
+// app.get('/users', (req, res) => {
+//   res.status(200).json(users);
+// });
 
 // USERS - LOGIN - PUBLIC
 
