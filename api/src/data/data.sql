@@ -1,3 +1,5 @@
+CREATE DATABASE  IF NOT EXISTS `library` /*!40100 DEFAULT CHARACTER SET latin1 */;
+USE `library`;
 -- MariaDB dump 10.17  Distrib 10.4.10-MariaDB, for Win64 (AMD64)
 --
 -- Host: 127.0.0.1    Database: library
@@ -99,7 +101,7 @@ CREATE TABLE `book_likes` (
   `user_id` int(11) NOT NULL,
   `book_id` int(11) NOT NULL,
   `reactions_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`,`user_id`,`book_id`,`reactions_id`),
+  PRIMARY KEY (`id`),
   KEY `fk_Book_likes_Users1_idx` (`user_id`),
   KEY `fk_Book_likes_Books1_idx` (`book_id`),
   KEY `fk_book_likes_reactions1_idx` (`reactions_id`),
@@ -131,7 +133,7 @@ CREATE TABLE `book_ratings` (
   `is_deleted` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `book_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`,`user_id`,`book_id`),
+  PRIMARY KEY (`id`),
   KEY `fk_Book_ratings_Users1_idx` (`user_id`),
   KEY `fk_Book_ratings_Books1_idx` (`book_id`),
   CONSTRAINT `fk_Book_ratings_Books1` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -168,7 +170,7 @@ CREATE TABLE `books` (
   `genre_id` int(11) NOT NULL,
   `age_recommendation_id` int(11) NOT NULL,
   `language_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`,`user_id`,`genre_id`,`age_recommendation_id`,`language_id`),
+  PRIMARY KEY (`id`),
   KEY `fk_Books_Users_idx` (`user_id`),
   KEY `fk_Books_Book_genres1_idx` (`genre_id`),
   KEY `fk_books_book_age_recommendation1_idx` (`age_recommendation_id`),
@@ -228,7 +230,7 @@ CREATE TABLE `records` (
   `date_returned` date NOT NULL,
   `user_id` int(11) NOT NULL,
   `book_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`,`user_id`,`book_id`),
+  PRIMARY KEY (`id`),
   KEY `fk_Records_Users1_idx` (`user_id`),
   KEY `fk_Records_Books1_idx` (`book_id`),
   CONSTRAINT `fk_Records_Books1` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -256,7 +258,7 @@ CREATE TABLE `review_likes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `reaction_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`,`user_id`,`reaction_id`),
+  PRIMARY KEY (`id`),
   KEY `fk_Review_likes_Users1_idx` (`user_id`),
   KEY `fk_review_likes_reactions1_idx` (`reaction_id`),
   CONSTRAINT `fk_Review_likes_Users1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -288,7 +290,7 @@ CREATE TABLE `reviews` (
   `user_id` int(11) NOT NULL,
   `book_id` int(11) NOT NULL,
   `review_like_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`,`user_id`,`book_id`,`review_like_id`),
+  PRIMARY KEY (`id`),
   KEY `fk_Reviews_Users1_idx` (`user_id`),
   KEY `fk_Reviews_Books1_idx` (`book_id`),
   KEY `fk_Reviews_Review_likes1_idx` (`review_like_id`),
@@ -305,6 +307,30 @@ CREATE TABLE `reviews` (
 LOCK TABLES `reviews` WRITE;
 /*!40000 ALTER TABLE `reviews` DISABLE KEYS */;
 /*!40000 ALTER TABLE `reviews` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `user_gender`
+--
+
+DROP TABLE IF EXISTS `user_gender`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `user_gender` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `gender` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user_gender`
+--
+
+LOCK TABLES `user_gender` WRITE;
+/*!40000 ALTER TABLE `user_gender` DISABLE KEYS */;
+INSERT INTO `user_gender` VALUES (1,'male'),(2,'female'),(3,'other');
+/*!40000 ALTER TABLE `user_gender` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -349,4 +375,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-04-06 12:26:26
+-- Dump completed on 2021-04-06 21:22:42
