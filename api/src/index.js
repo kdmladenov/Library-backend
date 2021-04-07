@@ -7,8 +7,9 @@ import helmet from 'helmet';
 import transformBody from './middleware/transform-body.js';
 import validateBody from './middleware/validate-body.js';
 import createUserScheme from './validator/create-user-schema.js';
+import createBookScheme from './validator/create-book-schema.js';
 import updateBookSchema from './validator/update-book-schema.js';
-import { books, updateBook } from './data/books.js';
+import { books, createBook, updateBook } from './data/books.js';
 import { createUser } from './data/users.js';
 
 const PORT = 5555;
@@ -139,8 +140,10 @@ app.get('/admin/books/:id', (req, res) => {
 });
 
 // create a book
-app.post('/admin/books', (req, res) => {
+app.post('/admin/books', transformBody(createBookScheme), validateBody('book', createBookScheme), (req, res) => {
+  const book = createBook(req.body);
 
+  res.json(book);
 });
 
 // update book by id
