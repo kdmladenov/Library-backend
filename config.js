@@ -11,4 +11,4 @@ export const DB_CONFIG = {
   database: config.DATABASE,
 };
 
-export const PORT = config.PORT;
+export const { PORT } = config.PORT;

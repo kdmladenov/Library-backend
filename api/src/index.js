@@ -14,7 +14,6 @@ import { PORT } from '../../config.js';
 // import updateBookSchema from './validator/update-book-schema.js';
 // import { books, createBook, updateBook } from './data/books.js';
 
-
 const app = express();
 
 app.use(cors());
