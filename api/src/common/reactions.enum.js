@@ -1,4 +1,5 @@
 // emojipedia.org
+//TBD
 export default {
   THUMBS_UP: '👍',
   THUMBS_DOWN: '👎',
