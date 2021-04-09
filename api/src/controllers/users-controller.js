@@ -10,9 +10,9 @@ const usersController = express.Router();
 
 usersController
   .post('/', validateBody('user', createUserSchema), async (req, res) => {
-    console.log('usersController is running');
     const data = req.body;
     data.password = await bcrypt.hash(data.password, 10);
+    data.birthday_date = new Date(data.birthday_date).toLocaleDateString('en-US');
 
     const { error, user } = await usersService.createUser(usersData)(data);
 
@@ -27,3 +27,6 @@ usersController
 // USERS - LOGIN - PUBLIC
 // USERS - LOGOUT
 export default usersController;
+
+
+// console.log(new Date('01/01/2020').toISOString().slice(0, 10));

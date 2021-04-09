@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+import mariadb from 'mariadb';
+
 export const DB_CONFIG = {
   host: 'localhost',
   port: 3306,

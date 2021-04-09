@@ -13,6 +13,5 @@ export default (resource, scheme) => async (req, res, next) => {
     return res.status(400).json({ errors });
   }
 
-  console.log('Body-validator is running');
   await next();
 };

@@ -7,12 +7,12 @@ import helmet from 'helmet';
 
 import usersController from './controllers/users-controller.js';
 
-// import transformBody from './middleware/transform-body.js';
-// import validateBody from './middleware/validate-body.js';
-// import createBookScheme from './validator/create-book-schema.js';
-// import updateBookSchema from './validator/update-book-schema.js';
-// import { books, createBook, updateBook } from './data/books.js';
-// import { PORT } from './config.js';
+import transformBody from './middleware/transform-body.js';
+import validateBody from './middleware/validate-body.js';
+import createBookScheme from './validator/create-book-schema.js';
+import updateBookSchema from './validator/update-book-schema.js';
+import { books, createBook, updateBook } from './data/books.js';
+import { PORT } from './config.js';
 
 const app = express();
 
@@ -184,4 +184,4 @@ app.use('/users', usersController);
 
 // // LEVELING SYSTEM
 
-// app.listen(PORT, () => console.log(`Listening on port ${PORT}...`));
+app.listen(PORT, () => console.log(`Listening on port ${PORT}...`));
