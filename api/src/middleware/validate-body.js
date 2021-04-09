@@ -1,6 +1,6 @@
 import errorStrings from '../common/error-strings.js';
 
-export default (resource, scheme) => (req, res, next) => {
+export default (resource, scheme) => async (req, res, next) => {
   const errors = {};
 
   Object.keys(scheme).forEach(key => {
@@ -13,5 +13,5 @@ export default (resource, scheme) => (req, res, next) => {
     return res.status(400).json({ errors });
   }
 
-  next();
+  await next();
 };

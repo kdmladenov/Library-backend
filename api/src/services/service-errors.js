@@ -1,0 +1,5 @@
+export default {
+  RECORD_NOT_FOUND: 1,
+  DUPLICATE_RECORD: 2,
+  OPERATION_NOT_PERMITTED: 3,
+};

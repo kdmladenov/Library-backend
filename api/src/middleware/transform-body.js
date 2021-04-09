@@ -1,9 +1,9 @@
-export default (scheme) => (req, res, next) => {
+export default (scheme) => async (req, res, next) => {
   Object.keys(scheme).forEach(key => {
     if (!scheme[key]) {
       delete req.body[key];
     }
   });
 
-  next();
+  await next();
 };

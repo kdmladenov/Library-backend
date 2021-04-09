@@ -8,6 +8,7 @@ export default {
     firstName: `Expected string with length in the range [${USER.MIN_FIRSTNAME_LENGTH}-${USER.MAX_FIRSTNAME_LENGTH}]`,
     lastName: `Expected string with length in the range [${USER.MIN_LASTNAME_LENGTH}-${USER.MAX_LASTNAME_LENGTH}]`,
     email: `Expected string with length in the range [${USER.MIN_EMAIL_LENGTH}-${USER.MAX_EMAIL_LENGTH}]`,
+    phone: `Expected string... `,
     birthDate: `Expected a valid date string`,
     gender: `Expected "Men", "Women" or "Other"`,
     isBanned: `Expected boolean`,
