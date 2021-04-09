@@ -8,7 +8,7 @@ const getBy = async (column, value) => {
   const sql = `
     SELECT 
       u.user_id, 
-      u.user_name,
+      u.username,
       u.first_name,
       u.last_name,
       g.gender
@@ -29,7 +29,7 @@ const getBy = async (column, value) => {
 const create = async (user) => {
   const sql = `
     INSERT INTO library.users(
-      user_name, -- 1
+      username, -- 1
       password, -- 2
       first_name, -- 3
       last_name, -- 4

@@ -1,5 +1,4 @@
-import { user as USER } from "./property-length-constraints.js";
-import { book as BOOK } from "./property-length-constraints.js";
+import { user as USER, book as BOOK } from "./property-length-constraints.js";
 
 export default {
   user: {
