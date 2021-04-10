@@ -7,6 +7,7 @@ import helmet from 'helmet';
 
 import usersController from './controllers/users-controller.js';
 import { PORT } from '../../config.js';
+import booksController from './controllers/book-controller.js';
 
 // import transformBody from './middleware/transform-body.js';
 // import validateBody from './middleware/validate-body.js';
@@ -22,6 +23,7 @@ app.use(express.json());
 
 // USERS
 app.use('/users', usersController);
+app.use('/admin/books', booksController);
 
 //   // BOOKS
 //   // includes server-side pagination, filtering(searching) or sorting
@@ -55,10 +57,10 @@ app.use('/users', usersController);
 //   res.status(200).json(books.filter(b => !b.isDeleted));
 // });
 
-// /** Get a book by id and ISBN combined */
+// /** Get a book by id and isbn combined */
 // app.get('/books/:id', (req, res) => {
 //   const { id } = req.params;
-//   const book = books.find(b => (b.ISBN === +id || b.id === +id) && !b.isDeleted);
+//   const book = books.find(b => (b.isbn === +id || b.id === +id) && !b.isDeleted);
   
 //   if (!book) {
 //     return res.status(404).json({ message: `The book was not found!` });
