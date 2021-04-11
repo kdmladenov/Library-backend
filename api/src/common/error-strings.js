@@ -21,13 +21,13 @@ export default {
   book: {
     title: `Expected string with length in the range [${BOOK.MIN_TITLE_LENGTH}-${BOOK.MAX_TITLE_LENGTH}]`,
     author: `Expected string with length in the range [${BOOK.MIN_AUTHOR_LENGTH}-${BOOK.MAX_AUTHOR_LENGTH}]`,
-    datePublished: `Expected date string`,
+    datePublished: `Expected date string with year 1900 till current`,
     genre: `Expected a valid book genre`,
-    ISBN: `Expected number with ${BOOK.ISBN_LENGTH} digits`,
+    isbn: `Expected string of 3 and 10 digits separated by a dash in the format XXX-XXXXXXXXXXXX`,
     language: `Expected element of the [Bulgarian, English, French, Russian, Spanish, German or Other]`,
-    isBorrowed: `Expected boolean`,
     isDeleted: `Expected boolean`,
     ageRecommendation: `Expected element of the [All ages, Baby to 2 years, 3 to 5 years, 6 to 8 years or 9 to 12 years]`,
+    summary: `Expected string`,
   },
   review: {
     content: `Expected string with length more than ${REVIEW.MIN_CONTENT_LENGTH} characters.`,

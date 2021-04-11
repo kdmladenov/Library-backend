@@ -16,7 +16,7 @@ export const book = {
   MAX_TITLE_LENGTH: 50,
   MIN_AUTHOR_LENGTH: 6,
   MAX_AUTHOR_LENGTH: 60,
-  ISBN_LENGTH: 10,
+  MIN_DATE_PUBLISHED: '1900-01-01',
 };
 
 export const review = {
