@@ -25,6 +25,30 @@ const createUser = usersData => async user => {
   };
 };
 
+const deleteUser = usersData => async (userId, deletedUserId) => {
+  const existingUser = await usersData.getBy('user_id', deletedUserId);
+  if (!existingUser) {
+    return {
+      error: errors.RECORD_NOT_FOUND,
+      result: null,
+    };
+  }
+
+  if (userId !== deletedUserId) {
+    return {
+      error: errors.OPERATION_NOT_PERMITTED,
+      result: null,
+    };
+  }
+
+  const _ = await usersData.remove(deletedUserId);
+
+  return {
+    error: null,
+    result: existingUser,
+  };
+};
 export default {
   createUser,
+  deleteUser,
 };

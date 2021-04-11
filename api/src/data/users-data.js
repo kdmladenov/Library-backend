@@ -18,7 +18,7 @@ const getBy = async (column, value) => {
       u.reading_points
     FROM users u
     LEFT JOIN gender g USING (gender_id)
-    WHERE ${column} = ?
+    WHERE u.is_deleted = 0 AND ${column} = ?
   `;
 
   const result = await db.query(sql, value);
@@ -57,7 +57,18 @@ const create = async (user) => {
   return getBy('user_id', result.insertId);
 };
 
+const remove = async userId => {
+  const sql = `
+    UPDATE users SET
+      is_deleted = 1
+    WHERE user_id = ?
+  `;
+
+  return db.query(sql, [userId]);
+};
+
 export default {
   create,
   getBy,
+  remove,
 };
