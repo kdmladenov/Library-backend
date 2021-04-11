@@ -1,48 +1,125 @@
 import db from './pool.js';
-
-// const getAll = async () => {
-//   const sql = `
-//         SELECT id, name, age 
-//         FROM books
-//     `;
-
-//   return await db.query(sql);
-// }
-
-const getBookBy = async (column, value) => {
+// OK
+const getAllBooks = async () => {
   const sql = `
-    SELECT *
-    FROM books 
-    WHERE ${column} = ?
+    SELECT 
+      b.book_id,
+      b.title,
+      b.author,
+      b.date_published,
+      b.isbn,
+      b.is_deleted,
+      g.genre,
+      a.age_recommendation,
+      l.language,
+      b.summary
+    FROM books b
+    LEFT JOIN genres g USING (genre_id)
+    LEFT JOIN age_recommendation a USING (age_recommendation_id)
+    LEFT JOIN language l USING (language_id)
+    WHERE is_deleted = 0
   `;
-  const result = await db.query(sql, value);
+
+  return await db.query(sql);
+};
+// OK
+const getBy = async (column, value) => {
+  const sql = `
+    SELECT 
+      b.book_id,
+      b.title,
+      b.author,
+      b.date_published,
+      b.isbn,
+      b.is_deleted,
+      g.genre,
+      a.age_recommendation,
+      l.language,
+      b.summary
+    FROM books b
+    LEFT JOIN genres g USING (genre_id)
+    LEFT JOIN age_recommendation a USING (age_recommendation_id)
+    LEFT JOIN language l USING (language_id)
+    WHERE ${column} = ? AND is_deleted = 0;
+  `;
+
+  const result = await db.query(sql, [value]);
   return result[0];
 };
+// OK
+const searchBy = async (column = 'title', value) => {
+  const sql = `
+        SELECT 
+          b.book_id,
+          b.title,
+          b.author,
+          b.date_published,
+          b.isbn,
+          b.is_deleted,
+          g.genre,
+          a.age_recommendation,
+          l.language,
+          b.summary
+        FROM books b
+        LEFT JOIN genres g USING (genre_id)
+        LEFT JOIN age_recommendation a USING (age_recommendation_id)
+        LEFT JOIN language l USING (language_id)
+        WHERE ${column} LIKE '%${value}%' AND is_deleted = 0
+    `;
 
-// const getBy = async (column, value) => {
-//   const sql = `
-//     SELECT 
-//       b.book_id,
-//       b.title,
-//       b.author,
-//       b.date_published,
-//       b.isbn,
-//       b.is_deleted,
-//       g.genre,
-//       a.age_recommendation,
-//       l.language,
-//       b.summary
-//     FROM books b
-//     JOIN genres g USING (genre_id)
-//     JOIN age_recommendation a USING (age_recommendation_id)
-//     JOIN language l USING (language_id)
-//     WHERE ${column} = ?
-//   `;
+  return await db.query(sql);
+};
 
-//   const result = await db.query(sql, value);
-//   return result[0];
-// };
+const pagingBy = async (take, offset = 0) => {
+  const sql = `
+        SELECT 
+          b.book_id,
+          b.title,
+          b.author,
+          b.date_published,
+          b.isbn,
+          b.is_deleted,
+          g.genre,
+          a.age_recommendation,
+          l.language,
+          b.summary
+        FROM books b
+        LEFT JOIN genres g USING (genre_id)
+        LEFT JOIN age_recommendation a USING (age_recommendation_id)
+        LEFT JOIN language l USING (language_id)
+        WHERE is_deleted = 0
+        LIMIT ?, ?;
+    `;
+    // console.log(take, offset);
 
+  return await db.query(sql, [offset, take]);
+};
+
+const sortBy = async (column = 'title', order = 'ASC') => {
+  const sql = `
+        SELECT 
+          b.book_id,
+          b.title,
+          b.author,
+          b.date_published,
+          b.isbn,
+          b.is_deleted,
+          g.genre,
+          a.age_recommendation,
+          l.language,
+          b.summary
+        FROM books b
+        LEFT JOIN genres g USING (genre_id)
+        LEFT JOIN age_recommendation a USING (age_recommendation_id)
+        LEFT JOIN language l USING (language_id)
+        WHERE is_deleted = 0
+        ORDER BY ${column} ?;
+    `;
+
+  return await db.query(sql, [order]);
+};
+
+// Create - OK
 const create = async (book) => {
   const sql = `
     INSERT INTO books (
@@ -70,99 +147,75 @@ const create = async (book) => {
     book.summary || null,
   ]);
 
-  return getBookBy('book_id', result.insertId);
+  return getBy('book_id', result.insertId);
 };
 
+// Not finished
+const update = async (updated) => {
+  const {
+    title,
+    author,
+    date_published,
+    isbn,
+    is_deleted,
+    genre_id,
+    age_recommendation_id,
+    language_id,
+    summary,
+    id,
+  } = updated;
 
+  const sql = `
+        UPDATE books 
+        SET
+          title = ?,
+          author = ?,
+          date_published = ?,
+          isbn = ?,
+          is_deleted = ?,
+          genre_id = ?,
+          age_recommendation_id = ?,
+          language_id = ?,
+          summary = ?
+        WHERE id = ?
+    `;
 
+  return db.query(sql, [
+    title,
+    author,
+    date_published,
+    isbn,
+    is_deleted,
+    genre_id,
+    age_recommendation_id,
+    language_id,
+    summary,
+    id,
+  ]);
+};
 
+// OK
+const remove = async (bookToDelete) => {
+  const sql = `
+        UPDATE books 
+        SET is_deleted = true
+        WHERE book_id = ?
+    `;
 
+  return await db.query(sql, [bookToDelete.book_id]);
+};
 
+export default {
+  create,
+  searchBy,
+  getAllBooks,
+  update,
+  remove,
+  getBy,
+  sortBy,
+  pagingBy,
+};
 
-
-
-
-
-
-
-
-
-// const getBy = async (column, value) => {
-//     const sql = `
-//         SELECT id, name, age 
-//         FROM people
-//         WHERE ${column} = ?
-//     `;  
-
-//     const result = await db.query(sql, [value]);
-
-//     return result[0];
-// }
-
-// const searchBy = async (column, value) => {
-//     const sql = `
-//         SELECT id, name, age 
-//         FROM people
-//         WHERE ${column} LIKE '%${value}%' 
-//     `; 
-
-//     return await db.query(sql);
-// }
-
-// const create = async (name, age) => {
-//     const sql = `
-//         INSERT INTO people(name, age)
-//         VALUES (?, ?)
-//     `;
-
-//     const result = await db.query(sql, [name, age]);
-
-//     return {
-//         id: result.insertId,
-//         name: name,
-//         age: age
-//     };
-// }
-
-// const update = async (person) => {
-//     const { id, name, age } = person;
-//     const sql = `
-//         UPDATE people SET
-//           name = ?,
-//           age = ?
-//         WHERE id = ?
-//     `;
-
-//     return await db.query(sql, [name, age, id]);
-// }
-
-// const remove = async (person) => {
-//     const sql = `
-//         DELETE FROM people 
-//         WHERE id = ?
-//     `;
-
-//     return await db.query(sql, [person.id]);
-// }
-
-// export default {
-// getAll,
-// searchBy,
-// getBy,
-// create,
-// update,
-// remove
-// }
-
-// export const createBook = (req, res) => {
-//   const book = {
-//     ...req.body,
-//     isBorrowed: false,
-//     isDeleted: false,
-//   };
-//   books.push(book);
-//   return book;
-// };
 
 // export const updateBook = (id, isBorrowed) => {
 //   // 1. Check if book is available in the DB
@@ -170,9 +223,3 @@ const create = async (book) => {
 //   // 3. Write a record in records
 // };
 
-
-export default {
-  create,
-  getBookBy,
-  // getBy,
-};

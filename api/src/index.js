@@ -23,7 +23,7 @@ app.use(express.json());
 
 // USERS
 app.use('/users', usersController);
-app.use('/admin/books', booksController);
+app.use('/', booksController);
 
 //   // BOOKS
 //   // includes server-side pagination, filtering(searching) or sorting
