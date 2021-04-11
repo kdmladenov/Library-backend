@@ -18,3 +18,7 @@ export const book = {
   MAX_AUTHOR_LENGTH: 60,
   ISBN_LENGTH: 10,
 };
+
+export const review = {
+  MIN_CONTENT_LENGTH: 2,
+};

@@ -12,12 +12,12 @@ const getBy = async (column, value) => {
       u.first_name,
       u.last_name,
       g.gender,
-      u.birth_date,
+      DATE_FORMAT(u.birth_date, "%m/%d/%Y") as birth_date,
       u.email,
       u.phone,
       u.reading_points
     FROM users u
-    JOIN gender g USING (gender_id)
+    LEFT JOIN gender g USING (gender_id)
     WHERE ${column} = ?
   `;
 
@@ -36,9 +36,10 @@ const create = async (user) => {
       gender_id, 
       birth_date, 
       email, 
-      phone
+      phone,
+      role_id
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, (SELECT role_id FROM roles WHERE type = ?))
   `;
 
   const result = await db.query(sql, [
@@ -46,10 +47,11 @@ const create = async (user) => {
     user.password,
     user.firstName || null,
     user.lastName || null,
-    +user.gender || null,
+    user.gender || null,
     user.birthDate,
     user.email,
     user.phone || null,
+    user.role,
   ]);
 
   return getBy('user_id', result.insertId);

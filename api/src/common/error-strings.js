@@ -1,4 +1,8 @@
-import { user as USER, book as BOOK } from "./property-length-constraints.js";
+import {
+  user as USER,
+  book as BOOK,
+  review as REVIEW,
+} from "./property-length-constraints.js";
 
 export default {
   user: {
@@ -24,5 +28,8 @@ export default {
     isBorrowed: `Expected boolean`,
     isDeleted: `Expected boolean`,
     ageRecommendation: `Expected element of the [All ages, Baby to 2 years, 3 to 5 years, 6 to 8 years or 9 to 12 years]`,
+  },
+  review: {
+    content: `Expected string with length more than ${REVIEW.MIN_CONTENT_LENGTH} characters.`,
   },
 };

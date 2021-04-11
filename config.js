@@ -1,5 +1,4 @@
 import dotenv from 'dotenv';
-import mariadb from 'mariadb';
 
 const config = dotenv.config().parsed;
 
@@ -11,4 +10,9 @@ export const DB_CONFIG = {
   database: config.DATABASE,
 };
 
-export const PORT = config.PORT;
+export const {
+  PORT,
+  PRIVATE_KEY,
+  TOKEN_LIFETIME,
+  DEFAULT_USER_ROLE,
+} = config;
