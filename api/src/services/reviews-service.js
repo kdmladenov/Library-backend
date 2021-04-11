@@ -1,8 +1,7 @@
-import usersData from '../data/users-data.js';
 import errors from './service-errors.js';
 
-const getAllReviews = reviewsData => async bookId => {
-  const reviews = await reviewsData.getAll(bookId);
+const getAllReviews = reviewsData => async (bookId, sort, page, limit) => {
+  const reviews = await reviewsData.getAll(bookId, sort, page, limit);
 
   if (!reviews) {
     return {
