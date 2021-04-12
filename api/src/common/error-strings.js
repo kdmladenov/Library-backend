@@ -1,9 +1,8 @@
-import { user as USER, book as BOOK, record as RECORD} from "./property-length-constraints.js";
-
 import {
   user as USER,
   book as BOOK,
   review as REVIEW,
+  record as RECORD,
 } from "./property-length-constraints.js";
 
 export default {
