@@ -9,7 +9,6 @@ import usersController from './controllers/users-controller.js';
 import { PORT } from '../../config.js';
 import reviewsController from './controllers/reviews-controller.js';
 import booksController from './controllers/book-controller.js';
-import recordsController from './controllers/records-controller.js';
 import adminController from './controllers/admin-controller.js';
 
 // import transformBody from './middleware/transform-body.js';
@@ -27,66 +26,8 @@ app.use(express.json());
 // USERS
 app.use('/users', usersController);
 app.use('/reviews', reviewsController);
-app.use('/books', booksController);// /books/:bookId
-// BORROW & RETURN BOOK
-app.use('/', recordsController);// /books/:bookId
+app.use('/books', booksController);
 app.use('/admin', adminController);
-
-
-//   // BOOKS
-//   // includes server-side pagination, filtering(searching) or sorting
-//   app.get('/books', (req, res) => {
-//     const { search, sort, take, offset = 0 } = req.query;
-
-//     if (search) {
-//       return res
-//       .status(200)
-//       .json(books.filter(b => b.title.toLowerCase().includes(search.toLowerCase()) && !b.isDeleted));
-//     }
-
-//     if (sort) {
-//       const [ sortKey, sortDirection ] = sort.split(',');
-//       if (['asc', 'desc'].includes(sortDirection)) {
-//         return res
-//         .status(200)
-//         .json(books
-//           .filter(b => !b.isDeleted)
-//           .sort((a, b) => a[sortKey].localeCompare(b[sortKey])
-//           * ((sortDirection === 'asc') ? 1 : -1)));
-//         }
-//       }
-
-//   if (take && offset >= 0) {
-//     return res
-//     .status(200)
-//     .json(books.filter(b => !b.isDeleted).slice(+offset, +take + (+offset)));
-//   }
-
-//   res.status(200).json(books.filter(b => !b.isDeleted));
-// });
-
-// /** Get a book by id and isbn combined */
-// app.get('/books/:id', (req, res) => {
-//   const { id } = req.params;
-//   const book = books.find(b => (b.ISBN === +id || b.id === +id) && !b.isDeleted);
-
-//   const book = books.find(b => (b.isbn === +id || b.id === +id) && !b.isDeleted);
-  
-//   if (!book) {
-//     return res.status(404).json({ message: `The book was not found!` });
-//   }
-
-//   res.status(200).json(book);
-// });
-
-// // borrow/return a book
-// app.patch('/book/:id', transformBody(updateBookSchema), validateBody('user', updateBookSchema), (req, res) => {
-//   const { id } = req.params;
-//   const { isBorrowed } = req.body;
-//   updateBook(id, isBorrowed);
-
-//   res.json({ message: `Book updated` });
-// });
 
 // // like a book
 // app.put('/books/:id/bookVotes', (req, res) => {
