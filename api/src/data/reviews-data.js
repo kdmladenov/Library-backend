@@ -1,9 +1,9 @@
 import db from './pool.js';
 
 const getAll = async (bookId, sort, page, limit) => {
-  const direction = sort || 'ASC';
-  const resultsPerPage = limit || 10;
-  const offset = page ? (page - 1) * resultsPerPage : 0;
+  const direction = (sort === 'desc') ? 'DESC' : 'ASC';
+  const resultsPerPage = (typeof limit === 'number') ? limit : 10;
+  const offset = (typeof page === 'number') ? (page - 1) * resultsPerPage : 0;
 
   const sql = `
     SELECT 

@@ -32,7 +32,7 @@ booksController
     }
   })
 
-  .get('/books/:id', async (req, res) => {
+  .get('/:id', async (req, res) => {
     const { id } = req.params;
 
     const identifier = isbnRegex.test(id) ? id : +id;
@@ -45,7 +45,7 @@ booksController
     }
   })
 
-  .get('/books', async (req, res) => {
+  .get('/', async (req, res) => {
     const data = req.query;
     const book = await booksServices.getAllBooks(booksData)(data);
 
@@ -66,7 +66,7 @@ booksController
   })
 
   // read review
-  .get('/books/:bookId/reviews', async (req, res) => {
+  .get('/:bookId/reviews', async (req, res) => {
     const { bookId } = req.params;
     const { sort, page, limit } = req.query;
 
@@ -80,7 +80,7 @@ booksController
   })
 
 // create review
-  .post('/books/:bookId/reviews', validateBody('review', createReviewSchema), async (req, res) => {
+  .post('/:bookId/reviews', validateBody('review', createReviewSchema), async (req, res) => {
     const { bookId } = req.params;
     const { content } = req.body;
     const { userId } = req.user;
@@ -94,5 +94,4 @@ booksController
     }
   });
 
-  
 export default booksController;
