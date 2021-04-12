@@ -20,12 +20,28 @@ usersController
     }
   })
 
-  .get('/:userId', injectUser, async (req, res) => {
+  .get('/:userId', async (req, res) => {
+    const { userId } = req.params;
+    const { error, result } = await usersService.getUser(usersData)(userId);
 
+    if (error === errors.RECORD_NOT_FOUND) {
+      res.status(404).send({ message: 'User is not found.' });
+    } else {
+      res.status(200).send(result);
+    }
   })
 
-  .patch('/:userId', injectUser, async (req, res) => {
+  .put('/:userId', injectUser, async (req, res) => {
+    const { userId } = req.params;
+    const userUpdate = req.body;
 
+    const { error, result } = await usersService.updateUser(usersData)(userUpdate, userId);
+
+    if (error === errors.RECORD_NOT_FOUND) {
+      res.status(404).send({ message: 'User is not found.' });
+    } else {
+      res.status(200).send(result);
+    }
   })
 
   .delete('/:userId', injectUser, async (req, res) => {
@@ -37,11 +53,11 @@ usersController
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({ message: `User with id = ${userToDeleteId} is not found.` });
     } else if (error === errors.OPERATION_NOT_PERMITTED) {
-      res.status(403).send({ message: 'No rights to delete the user.' })
+      res.status(403).send({ message: 'No rights to delete the user.' });
     } else {
       res.status(200).send(result);
     }
-  })
+  });
 
 // .get('/:id', )
 // USERS - LOGIN - PUBLIC

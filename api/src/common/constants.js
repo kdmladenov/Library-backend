@@ -9,6 +9,10 @@ export const user = {
   MAX_LASTNAME_LENGTH: 20,
   MIN_EMAIL_LENGTH: 4,
   MAX_EMAIL_LENGTH: 50,
+  EMAIL_REGEX: /^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,4})$/,
+  // need further validation of the phone - regex!!!
+  PHONE_REGEX: /0-9/,
+  PASSWORD_REGEX: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{6,}$/, // letters, numbers and at least 1 uppercase
 };
 
 export const book = {
@@ -17,6 +21,7 @@ export const book = {
   MIN_AUTHOR_LENGTH: 6,
   MAX_AUTHOR_LENGTH: 60,
   MIN_DATE_PUBLISHED: '1900-01-01',
+  ISBN_REGEX: /^\(?([0-9]{3})\)?[-]([0-9]{10})$/,
 };
 
 export const review = {

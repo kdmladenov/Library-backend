@@ -2,7 +2,8 @@ import express from 'express';
 import booksData from '../data/books-data.js';
 import validateBody from '../middleware/validate-body.js';
 import errors from '../services/service-errors.js';
-import createBookSchema, { isbnRegex } from '../validator/create-book-schema.js';
+import createBookSchema from '../validator/create-book-schema.js';
+import { book as BOOK } from '../common/constants.js';
 import booksServices from '../services/books-services.js';
 import bookGenreEnum from '../common/book-genre.enum.js';
 import bookLanguageEnum from '../common/book-language.enum.js';
@@ -35,7 +36,7 @@ booksController
   .get('/:id', async (req, res) => {
     const { id } = req.params;
 
-    const identifier = isbnRegex.test(id) ? id : +id;
+    const identifier = BOOK.ISBN_REGEX.test(id) ? id : +id;
     const { error, book } = await booksServices.getBookById(booksData)(identifier);
 
     if (error === errors.RECORD_NOT_FOUND) {
@@ -55,7 +56,7 @@ booksController
   .delete('/admin/books/:id', async (req, res) => {
     const { id } = req.params;
 
-    const identifier = isbnRegex.test(id) ? id : +id;
+    const identifier = BOOK.ISBN_REGEX.test(id) ? id : +id;
     const { error, book } = await booksServices.deleteBook(booksData)(identifier);
 
     if (error === errors.RECORD_NOT_FOUND) {

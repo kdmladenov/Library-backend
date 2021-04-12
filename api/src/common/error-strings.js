@@ -3,7 +3,7 @@ import {
   book as BOOK,
   review as REVIEW,
   record as RECORD,
-} from "./property-length-constraints.js";
+} from "./constants.js";
 
 export default {
   user: {

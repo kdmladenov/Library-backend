@@ -1,9 +1,5 @@
 import db from './pool.js';
 
-const getAll = async () => {
-
-};
-
 const getBy = async (column, value) => {
   const sql = `
     SELECT 
@@ -15,9 +11,14 @@ const getBy = async (column, value) => {
       DATE_FORMAT(u.birth_date, "%m/%d/%Y") as birth_date,
       u.email,
       u.phone,
-      u.reading_points
+      u.reading_points,
+      b.is_banned,
+      b.banned_date,
+      b.exp_date as bann_exp_date,
+      b.description as bann_description
     FROM users u
     LEFT JOIN gender g USING (gender_id)
+    LEFT JOIN bann_status b USING (user_id)
     WHERE u.is_deleted = 0 AND ${column} = ?
   `;
 
@@ -57,6 +58,32 @@ const create = async (user) => {
   return getBy('user_id', result.insertId);
 };
 
+const update = async (user) => {
+  
+  const sql = `
+    UPDATE users SET 
+      password = ?, 
+      first_name = ?, 
+      last_name = ?, 
+      gender_id = ?, 
+      birth_date = ?, 
+      email = ?, 
+      phone = ?,
+    WHERE user_id = ?
+  `;
+
+  return db.query(sql, [
+    user.password,
+    user.firstName,
+    user.lastName,
+    user.gender,
+    user.birthDate,
+    user.email,
+    user.phone,
+    user.userId,
+  ]);
+};
+
 const remove = async userId => {
   const sql = `
     UPDATE users SET
@@ -68,7 +95,8 @@ const remove = async userId => {
 };
 
 export default {
-  create,
   getBy,
+  create,
+  update,
   remove,
 };
