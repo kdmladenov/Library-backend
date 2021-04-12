@@ -8,6 +8,7 @@ import helmet from 'helmet';
 import usersController from './controllers/users-controller.js';
 import { PORT } from '../../config.js';
 import booksController from './controllers/book-controller.js';
+import recordsController from './controllers/records-controller.js';
 
 // import transformBody from './middleware/transform-body.js';
 // import validateBody from './middleware/validate-body.js';
@@ -23,7 +24,10 @@ app.use(express.json());
 
 // USERS
 app.use('/users', usersController);
+// BOOKS
 app.use('/', booksController);
+// BORROW & RETURN BOOK
+app.use('/', recordsController);
 
 //   // BOOKS
 //   // includes server-side pagination, filtering(searching) or sorting

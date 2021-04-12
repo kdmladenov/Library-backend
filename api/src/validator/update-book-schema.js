@@ -1,3 +1,3 @@
-export default {
-  isBorrowed: (value) => typeof value === 'boolean',
-};
+// export default {
+//   isBorrowed: (value) => typeof value === 'boolean',
+// };

@@ -18,3 +18,8 @@ export const book = {
   MAX_AUTHOR_LENGTH: 60,
   MIN_DATE_PUBLISHED: '1900-01-01',
 };
+
+export const record = {
+  MIN_USER_ID_VALUE: 0,
+  MAX_USER_ID_VALUE: 10000,
+};

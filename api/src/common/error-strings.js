@@ -1,4 +1,4 @@
-import { user as USER, book as BOOK } from "./property-length-constraints.js";
+import { user as USER, book as BOOK, record as RECORD} from "./property-length-constraints.js";
 
 export default {
   user: {
@@ -24,5 +24,8 @@ export default {
     isDeleted: `Expected boolean`,
     ageRecommendation: `Expected element of the [All ages, Baby to 2 years, 3 to 5 years, 6 to 8 years or 9 to 12 years]`,
     summary: `Expected string`,
+  },
+  record: {
+    userId: `Expected number in the range [${RECORD.MAX_USER_ID_VALUE}-${RECORD.MAX_USER_ID_VALUE}]`,
   },
 };
