@@ -22,3 +22,8 @@ export const book = {
 export const review = {
   MIN_CONTENT_LENGTH: 2,
 };
+
+export const record = {
+  MIN_USER_ID_VALUE: 0,
+  MAX_USER_ID_VALUE: 10000,
+};
