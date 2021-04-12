@@ -1,5 +1,11 @@
 import { user as USER, book as BOOK, record as RECORD} from "./property-length-constraints.js";
 
+import {
+  user as USER,
+  book as BOOK,
+  review as REVIEW,
+} from "./property-length-constraints.js";
+
 export default {
   user: {
     username: `Expected string with length in the range [${USER.MIN_USERNAME_LENGTH}-${USER.MAX_USERNAME_LENGTH}]`,
@@ -27,5 +33,8 @@ export default {
   },
   record: {
     userId: `Expected number in the range [${RECORD.MAX_USER_ID_VALUE}-${RECORD.MAX_USER_ID_VALUE}]`,
+  },
+  review: {
+    content: `Expected string with length more than ${REVIEW.MIN_CONTENT_LENGTH} characters.`,
   },
 };

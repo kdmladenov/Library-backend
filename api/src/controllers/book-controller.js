@@ -18,7 +18,6 @@ booksController
     data.genre = bookGenreEnum[data.genre];
     data.language = bookLanguageEnum[data.language];
     data.ageRecommendation = bookAgeRecommendationEnum[data.ageRecommendation];
-
     // data.date_published = new Date(data.date_published).toISOString().slice(0, 10);
 
     const { error, book } = await booksServices.createBook(booksData)(data);
