@@ -3,14 +3,14 @@ import db from './pool.js';
 const getAllBooks = async () => {
   const sql = `
     SELECT 
-      b.book_id,
+      b.book_id as bookId,
       b.title,
       b.author,
-      b.date_published,
+      b.date_published as datePublished,
       b.isbn,
-      b.is_deleted,
+      b.is_deleted as isDeleted,
       g.genre,
-      a.age_recommendation,
+      a.age_recommendation as ageRecommendation,
       l.language,
       b.summary
     FROM books b
@@ -26,14 +26,14 @@ const getAllBooks = async () => {
 const getBy = async (column, value) => {
   const sql = `
     SELECT 
-      b.book_id,
+      b.book_id as bookId,
       b.title,
       b.author,
-      b.date_published,
+      b.date_published as datePublished,
       b.isbn,
-      b.is_deleted,
+      b.is_deleted as isDeleted,
       g.genre,
-      a.age_recommendation,
+      a.age_recommendation as ageRecommendation,
       l.language,
       b.summary
     FROM books b
@@ -47,17 +47,17 @@ const getBy = async (column, value) => {
   return result[0];
 };
 // OK
-const searchBy = async (column = 'title', value) => {
+const searchBy = async (column = "title", value) => {
   const sql = `
         SELECT 
-          b.book_id,
+          b.book_id as bookId,
           b.title,
           b.author,
-          b.date_published,
+          b.date_published as datePublished,
           b.isbn,
-          b.is_deleted,
+          b.is_deleted as isDeleted,
           g.genre,
-          a.age_recommendation,
+          a.age_recommendation as ageRecommendation,
           l.language,
           b.summary
         FROM books b
@@ -67,20 +67,20 @@ const searchBy = async (column = 'title', value) => {
         WHERE ${column} LIKE '%${value}%' AND is_deleted = 0
     `;
 
-  return await db.query(sql);
+  return db.query(sql);
 };
-
+// To fix ? problem!!
 const pagingBy = async (take, offset = 0) => {
   const sql = `
         SELECT 
-          b.book_id,
+          b.book_id as bookId,
           b.title,
           b.author,
-          b.date_published,
+          b.date_published as datePublished,
           b.isbn,
-          b.is_deleted,
+          b.is_deleted as isDeleted,
           g.genre,
-          a.age_recommendation,
+          a.age_recommendation as ageRecommendation,
           l.language,
           b.summary
         FROM books b
@@ -88,24 +88,24 @@ const pagingBy = async (take, offset = 0) => {
         LEFT JOIN age_recommendation a USING (age_recommendation_id)
         LEFT JOIN language l USING (language_id)
         WHERE is_deleted = 0
-        LIMIT ?, ?;
+        LIMIT ${offset}, ${take};
     `;
-    // console.log(take, offset);
+    // console.log(take, offset)${offset}, ${take};
 
-  return await db.query(sql, [offset, take]);
+  return db.query(sql, [offset, take]);
 };
-
-const sortBy = async (column = 'title', order = 'ASC') => {
+  // To fix ? problem!!
+const sortBy = async (column, order = "ASC") => {
   const sql = `
         SELECT 
-          b.book_id,
+          b.book_id as bookId,
           b.title,
           b.author,
-          b.date_published,
+          b.date_published as datePublished,
           b.isbn,
-          b.is_deleted,
+          b.is_deleted as isDeleted,
           g.genre,
-          a.age_recommendation,
+          a.age_recommendation as ageRecommendation,
           l.language,
           b.summary
         FROM books b
@@ -113,10 +113,10 @@ const sortBy = async (column = 'title', order = 'ASC') => {
         LEFT JOIN age_recommendation a USING (age_recommendation_id)
         LEFT JOIN language l USING (language_id)
         WHERE is_deleted = 0
-        ORDER BY ${column} ?;
+        ORDER BY ${column} ${order};
     `;
-
-  return await db.query(sql, [order]);
+  // console.log(column, order);
+  return db.query(sql);
 };
 
 // Create - OK
@@ -138,11 +138,11 @@ const create = async (book) => {
   const result = await db.query(sql, [
     book.title,
     book.author,
-    book.date_published || null,
-    +book.isbn || null,
-    +book.is_deleted || 0,
+    book.datePublished || null,
+    book.isbn,
+    +book.isDeleted || 0,
     +book.genre || null,
-    +book.age_recommendation || null,
+    +book.ageRecommendation || null,
     +book.language || null,
     book.summary || null,
   ]);
@@ -202,7 +202,7 @@ const remove = async (bookToDelete) => {
         WHERE book_id = ?
     `;
 
-  return await db.query(sql, [bookToDelete.book_id]);
+  return await db.query(sql, [bookToDelete.bookId]);
 };
 
 export default {

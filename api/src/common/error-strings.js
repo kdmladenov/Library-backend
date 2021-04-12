@@ -17,7 +17,7 @@ export default {
   book: {
     title: `Expected string with length in the range [${BOOK.MIN_TITLE_LENGTH}-${BOOK.MAX_TITLE_LENGTH}]`,
     author: `Expected string with length in the range [${BOOK.MIN_AUTHOR_LENGTH}-${BOOK.MAX_AUTHOR_LENGTH}]`,
-    datePublished: `Expected date string`,
+    datePublished: `Expected date string with year 1900 till current`,
     genre: `Expected a valid book genre`,
     isbn: `Expected string of 3 and 10 digits separated by a dash in the format XXX-XXXXXXXXXXXX`,
     language: `Expected element of the [Bulgarian, English, French, Russian, Spanish, German or Other]`,

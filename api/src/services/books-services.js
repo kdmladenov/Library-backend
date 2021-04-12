@@ -2,6 +2,7 @@ import errors from './service-errors.js';
 
 const createBook = booksData => async (data) => {
   const { title, isbn } = data;
+
   const existingBook = await booksData.getBy('isbn', isbn)
                     || await booksData.getBy('title', title);
 
