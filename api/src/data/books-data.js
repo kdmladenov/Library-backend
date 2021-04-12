@@ -20,7 +20,7 @@ const getAllBooks = async () => {
     WHERE is_deleted = 0
   `;
 
-  return await db.query(sql);
+  return db.query(sql);
 };
 // OK
 const getBy = async (column, value) => {
@@ -151,48 +151,48 @@ const create = async (book) => {
 };
 
 // Not finished
-const update = async (updated) => {
-  const {
-    title,
-    author,
-    date_published,
-    isbn,
-    is_deleted,
-    genre_id,
-    age_recommendation_id,
-    language_id,
-    summary,
-    id,
-  } = updated;
+// const update = async (updated) => {
+//   const {
+//     title,
+//     author,
+//     date_published,
+//     isbn,
+//     is_deleted,
+//     genre_id,
+//     age_recommendation_id,
+//     language_id,
+//     summary,
+//     id,
+//   } = updated;
 
-  const sql = `
-        UPDATE books 
-        SET
-          title = ?,
-          author = ?,
-          date_published = ?,
-          isbn = ?,
-          is_deleted = ?,
-          genre_id = ?,
-          age_recommendation_id = ?,
-          language_id = ?,
-          summary = ?
-        WHERE id = ?
-    `;
+//   const sql = `
+//         UPDATE books
+//         SET
+//           title = ?,
+//           author = ?,
+//           date_published = ?,
+//           isbn = ?,
+//           is_deleted = ?,
+//           genre_id = ?,
+//           age_recommendation_id = ?,
+//           language_id = ?,
+//           summary = ?
+//         WHERE id = ?
+//     `;
 
-  return db.query(sql, [
-    title,
-    author,
-    date_published,
-    isbn,
-    is_deleted,
-    genre_id,
-    age_recommendation_id,
-    language_id,
-    summary,
-    id,
-  ]);
-};
+//   return db.query(sql, [
+//     title,
+//     author,
+//     date_published,
+//     isbn,
+//     is_deleted,
+//     genre_id,
+//     age_recommendation_id,
+//     language_id,
+//     summary,
+//     id,
+//   ]);
+// };
 
 // OK
 const remove = async (bookToDelete) => {
@@ -202,24 +202,22 @@ const remove = async (bookToDelete) => {
         WHERE book_id = ?
     `;
 
-  return await db.query(sql, [bookToDelete.bookId]);
+  return db.query(sql, [bookToDelete.bookId]);
 };
 
 export default {
   create,
   searchBy,
   getAllBooks,
-  update,
+  // update,
   remove,
   getBy,
   sortBy,
   pagingBy,
 };
 
-
 // export const updateBook = (id, isBorrowed) => {
 //   // 1. Check if book is available in the DB
 //   // 2. Update isBorrowed value in the DB
 //   // 3. Write a record in records
 // };
-

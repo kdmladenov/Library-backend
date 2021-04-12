@@ -8,7 +8,6 @@ import bookGenreEnum from '../common/book-genre.enum.js';
 import bookLanguageEnum from '../common/book-language.enum.js';
 import bookAgeRecommendationEnum from '../common/book-age-recommendation.enum.js';
 
-
 const adminController = express.Router();
 // To Do: Authorization, Authentication, ?
 
@@ -19,7 +18,6 @@ adminController
     data.genre = bookGenreEnum[data.genre];
     data.language = bookLanguageEnum[data.language];
     data.ageRecommendation = bookAgeRecommendationEnum[data.ageRecommendation];
-    // data.date_published = new Date(data.date_published).toISOString().slice(0, 10);
 
     const { error, book } = await booksServices.createBook(booksData)(data);
 
@@ -41,7 +39,6 @@ adminController
     } else {
       res.status(200).send(book);
     }
-  })
-
+  });
 
 export default adminController;
