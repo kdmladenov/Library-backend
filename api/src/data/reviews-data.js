@@ -3,9 +3,8 @@ import db from './pool.js';
 const getAll = async (bookId, sort, page, limit) => {
   const direction = sort || 'ASC';
   const resultsPerPage = limit || 10;
-  const start = page ? page - 1 : 0;
+  const offset = page ? (page - 1) * resultsPerPage : 0;
 
-  console.log(direction, resultsPerPage, start, page);
   const sql = `
     SELECT 
       r.review_id, 
@@ -21,7 +20,7 @@ const getAll = async (bookId, sort, page, limit) => {
     LEFT JOIN books b USING (book_id)
     WHERE r.is_deleted = 0 AND b.book_id = ?
     ORDER BY r.date_created ${direction}
-    LIMIT ${start}, ${resultsPerPage}
+    LIMIT ${offset}, ${resultsPerPage}
   `;
   // paging and sorting !!! Why the ? placeholders are not working !!!!
   return db.query(sql, [bookId]);

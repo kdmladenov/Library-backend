@@ -25,8 +25,8 @@ const createUser = usersData => async user => {
   };
 };
 
-const deleteUser = usersData => async (userId, deletedUserId) => {
-  const existingUser = await usersData.getBy('user_id', deletedUserId);
+const deleteUser = usersData => async (userId, userToDeleteId) => {
+  const existingUser = await usersData.getBy('user_id', userToDeleteId);
   if (!existingUser) {
     return {
       error: errors.RECORD_NOT_FOUND,
@@ -34,14 +34,14 @@ const deleteUser = usersData => async (userId, deletedUserId) => {
     };
   }
 
-  if (userId !== deletedUserId) {
+  if (userId !== userToDeleteId) {
     return {
       error: errors.OPERATION_NOT_PERMITTED,
       result: null,
     };
   }
 
-  const _ = await usersData.remove(deletedUserId);
+  const _ = await usersData.remove(userToDeleteId);
 
   return {
     error: null,

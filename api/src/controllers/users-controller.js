@@ -30,12 +30,12 @@ usersController
 
   .delete('/:userId', injectUser, async (req, res) => {
     const { userId } = req.user;
-    const { userId: deletedUserId } = req.params;
+    const { userId: userToDeleteId } = req.params;
 
-    const { error, result } = await usersService.deleteUser(usersData)(userId, +deletedUserId);
+    const { error, result } = await usersService.deleteUser(usersData)(userId, +userToDeleteId);
 
     if (error === errors.RECORD_NOT_FOUND) {
-      res.status(404).send({ message: `User with id = ${deletedUserId} is not found.` });
+      res.status(404).send({ message: `User with id = ${userToDeleteId} is not found.` });
     } else if (error === errors.OPERATION_NOT_PERMITTED) {
       res.status(403).send({ message: 'No rights to delete the user.' })
     } else {

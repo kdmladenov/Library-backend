@@ -24,7 +24,7 @@ app.use(express.json());
 
 // USERS
 app.use('/users', usersController);
-app.use('/books', reviewsController);
+app.use('/reviews', reviewsController);
 app.use('/', booksController);
 
 //   // BOOKS

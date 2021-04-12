@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import express from 'express';
 import reviewsData from '../data/reviews-data.js';
 import injectUser from '../middleware/inject-user.js';
@@ -9,39 +8,11 @@ import createReviewSchema from '../validator/create-review-schema.js';
 
 const reviewsController = express.Router();
 
+reviewsController.use(injectUser);
+
 reviewsController
-
-// read review
-  .get('/:bookId/reviews', async (req, res) => {
-    const { bookId } = req.params;
-    const { sort, page, limit } = req.query;
-
-    const { error, result } = await reviewsService.getAllReviews(reviewsData)(bookId, sort, page, limit);
-
-    if (error === errors.RECORD_NOT_FOUND) {
-      res.status(404).send({ message: 'The book is not found.' });
-    } else {
-      res.status(200).send(result);
-    }
-  })
-
-// create review
-  .post('/:bookId/reviews', injectUser, validateBody('review', createReviewSchema), async (req, res) => {
-    const { bookId } = req.params;
-    const { content } = req.body;
-    const { userId } = req.user;
-
-    const { error, result } = await reviewsService.createReview(reviewsData)(content, userId, bookId);
-
-    if (error === errors.RECORD_NOT_FOUND) {
-      res.status(404).send({ message: 'The book is not found.' });
-    } else {
-      res.status(200).send(result);
-    }
-  })
-
 // update review
-  .patch('/:bookId/reviews/:reviewId', injectUser, validateBody('review', createReviewSchema), async (req, res) => {
+  .patch('/:reviewId', validateBody('review', createReviewSchema), async (req, res) => {
     const { content } = req.body;
     const { reviewId } = req.params;
     const { userId } = req.user;
@@ -58,7 +29,7 @@ reviewsController
   })
 
 // delete review
-  .delete('/:bookId/reviews/:reviewId', injectUser, async (req, res) => {
+  .delete('/:reviewId', async (req, res) => {
     const { userId } = req.user;
     const { reviewId } = req.params;
 
