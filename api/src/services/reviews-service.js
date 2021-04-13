@@ -23,7 +23,7 @@ const createReview = reviewsData => async (content, userId, bookId) => {
 };
 
 const updateReview = reviewsData => async (content, reviewId, userId) => {
-  const existingReview = await reviewsData.getBy('r.review_id', reviewId);
+  const existingReview = await reviewsData.getBy('review_id', reviewId);
 
   if (!existingReview) {
     return {
@@ -33,7 +33,7 @@ const updateReview = reviewsData => async (content, reviewId, userId) => {
   }
 
   // checks if the user who attempt to update the review is the author of the review
-  if (userId !== existingReview.user_id) {
+  if (userId !== existingReview.userId) {
     return {
       error: errors.OPERATION_NOT_PERMITTED,
       result: null,

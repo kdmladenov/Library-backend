@@ -4,6 +4,7 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import passport from 'passport';
 
 import usersController from './controllers/users-controller.js';
 import { PORT } from '../../config.js';
@@ -11,6 +12,7 @@ import reviewsController from './controllers/reviews-controller.js';
 import booksController from './controllers/book-controller.js';
 import adminController from './controllers/admin-controller.js';
 import authController from './controllers/auth-controller.js';
+import jwtStrategy from './authentication/strategy.js';
 
 // import transformBody from './middleware/transform-body.js';
 // import validateBody from './middleware/validate-body.js';
@@ -20,9 +22,12 @@ import authController from './controllers/auth-controller.js';
 
 const app = express();
 
+passport.use(jwtStrategy);
+
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
+app.use(passport.initialize());
 
 // USERS
 app.use('/auth', authController);

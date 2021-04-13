@@ -28,14 +28,14 @@ const getAll = async (bookId, order, page, pageSize) => {
 const getBy = async (column, value) => {
   const sql = `
     SELECT
-      r.review_id,
-      r.content, 
-      r.date_created,
-      u.user_id,
-      u.username,
-      b.book_id,
-      b.title,
-      b.author
+      r.review_id as reviewId,
+      r.content as content, 
+      r.date_created as dateCreated,
+      u.user_id as userId,
+      u.username as username,
+      b.book_id as bookId,
+      b.title as bookTitle,
+      b.author as bookAuthor
     FROM reviews r
     LEFT JOIN users u USING (user_id)
     LEFT JOIN books b USING (book_id)

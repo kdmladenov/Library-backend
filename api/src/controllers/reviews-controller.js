@@ -5,14 +5,14 @@ import validateBody from '../middleware/validate-body.js';
 import reviewsService from '../services/reviews-service.js';
 import errors from '../services/service-errors.js';
 import createReviewSchema from '../validator/create-review-schema.js';
+import { authMiddleware } from '../authentication/auth.middleware.js';
 
 const reviewsController = express.Router();
 
-reviewsController.use(injectUser);
-
 reviewsController
 // update review
-  .patch('/:reviewId', validateBody('review', createReviewSchema), async (req, res) => {
+  .patch('/:reviewId', authMiddleware, validateBody('review', createReviewSchema), async (req, res) => {
+    console.log(req.user);
     const { content } = req.body;
     const { reviewId } = req.params;
     const { userId } = req.user;
@@ -29,7 +29,7 @@ reviewsController
   })
 
 // delete review
-  .delete('/:reviewId', async (req, res) => {
+  .delete('/:reviewId', authMiddleware, async (req, res) => {
     const { userId } = req.user;
     const { reviewId } = req.params;
 
