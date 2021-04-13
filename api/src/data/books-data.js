@@ -1,9 +1,10 @@
 import db from './pool.js';
 // OK
-const getAllBooks = async (search, searchBy, sort, order, pageSize, offset) => {
-  // const direction = ['ASC', 'asc', 'DESC', 'desc'].includes(order) ? order : 'asc';
-  // const direction = (order === 'desc') ? 'DESC' : 'ASC';
-  // SORT NOT WORKING with ??
+const getAllBooks = async (search, searchBy, sort, order, pageSize, page) => {
+  const direction = ['ASC', 'asc', 'DESC', 'desc'].includes(order) ? order : 'asc';
+  const searchColumn = [
+    'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary'].includes(searchBy) ? searchBy : 'title';
+  const offset = page ? (page - 1) * pageSize : 0;
 
   const sql = `
     SELECT 
@@ -21,13 +22,13 @@ const getAllBooks = async (search, searchBy, sort, order, pageSize, offset) => {
     LEFT JOIN genres g USING (genre_id)
     LEFT JOIN age_recommendation a USING (age_recommendation_id)
     LEFT JOIN language l USING (language_id)
-    WHERE is_deleted = 0 AND ${searchBy} Like '%${search}%'
-    ORDER BY ${sort} ${order} 
+    WHERE is_deleted = 0 AND ${searchColumn} Like '%${search}%'
+    ORDER BY ? ${direction} 
     LIMIT ? OFFSET ?
   `;
 
-  // console.log(search, searchBy, sort, order, pageSize, offset);
   return db.query(sql, [
+    sort,
     +pageSize,
     +offset,
   ]);

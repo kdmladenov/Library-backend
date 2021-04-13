@@ -53,9 +53,9 @@ booksController
 
   .get('/', async (req, res) => {
     const {
-      search = '', searchBy = 'title', sort = 'bookId', order = 'ASC', pageSize = 9999999, offset = 0,
+      search = '', searchBy = 'title', sort = 'bookId', order = 'ASC', pageSize = 10, page = 1,
     } = req.query;
-    const book = await booksServices.getAllBooks(booksData)(search, searchBy, sort, order, +pageSize, +offset);
+    const book = await booksServices.getAllBooks(booksData)(search, searchBy, sort, order, +pageSize, +page);
 
     res.status(200).send(book);
   })
@@ -133,10 +133,13 @@ booksController
     const { bookId } = req.params;
     const { rating, userId } = req.body;
 
-    const rate = await booksServices.rateBook(bookRatingData)(+rating, +userId, +bookId);
+    const { error, rate } = await booksServices.rateBook(bookRatingData)(+rating, +userId, +bookId);
 
-    res.status(201).send(rate);
-
+    if (error === errors.OPERATION_NOT_PERMITTED) {
+      res.status(403).send({ message: 'You are not authorized to change this rating!' });
+    } else {
+      res.status(200).send(rate);
+    }
   })
   // .get('/books/rate', (req, res) => {
   //   // bookId

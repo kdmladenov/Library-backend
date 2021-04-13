@@ -75,9 +75,36 @@ const deleteReview = reviewsData => async (reviewId, userId) => {
   };
 };
 
+const voteReview = reviewVoteData => async (reviewId, userId, reactionId) => {
+  const existingReview = await reviewVoteData.getBy('review_id', reviewId);
+
+  if (existingReview && userId !== existingReview.userId) {
+    return {
+      error: errors.OPERATION_NOT_PERMITTED,
+      result: null,
+    };
+  }
+
+  if (existingReview && userId === existingReview.userId) {
+    const result = await reviewVoteData.update(reviewId, userId, reactionId);
+
+    return {
+      error: null,
+      result,
+    };
+  }
+
+  const result = await reviewVoteData.create(reviewId, userId, reactionId);
+
+  return {
+    error: null,
+    result,
+  };
+};
 export default {
   getAllReviews,
   createReview,
   updateReview,
   deleteReview,
+  voteReview,
 };

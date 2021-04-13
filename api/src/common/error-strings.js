@@ -41,7 +41,11 @@ export default {
     content: `Expected string with length more than ${REVIEW.MIN_CONTENT_LENGTH} characters.`,
   },
   rating: {
-    userId: `Expected number in the range [${RECORD.MAX_USER_ID_VALUE}-${RECORD.MAX_USER_ID_VALUE}]`,
+    userId: `Expected a positive number`,
     rating: `Expected a whole number in the range [0 - 5]`,
+  },
+  vote: {
+    userId: `Expected a positive number`,
+    reactionId: `Expected a positive number`,
   },
 };
