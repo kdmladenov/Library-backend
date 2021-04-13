@@ -8,7 +8,7 @@ export default {
   author: (value) => typeof value === 'string' && value.length >= book.MIN_AUTHOR_LENGTH && value.length <= book.MAX_AUTHOR_LENGTH,
   datePublished: (value) => typeof value === 'undefined' || (typeof value === 'string' && !(new Date(value).toString()).includes('Invalid') && new Date(value) > new Date(book.MIN_DATE_PUBLISHED)),
   genre: (value) => typeof value === 'undefined' || Object.keys(bookGenre).includes(value),
-  isbn: (value) => typeof value === 'string' && book.ISBN_REGEX.test(book.ISBN_REGEX),
+  isbn: (value) => typeof value === 'string' && book.ISBN_REGEX.test(value),
   language: (value) => typeof value === 'undefined' || Object.keys(bookLanguage).includes(value),
   isDeleted: (value) => typeof value === 'undefined' || typeof value === 'boolean',
   summary: (value) => typeof value === 'undefined' || typeof value === 'string',

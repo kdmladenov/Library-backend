@@ -22,6 +22,7 @@ export const book = {
   MAX_AUTHOR_LENGTH: 60,
   MIN_DATE_PUBLISHED: '1900-01-01',
   ISBN_REGEX: /^\(?([0-9]{3})\)?[-]([0-9]{10})$/,
+  RATING_REGEX: /^[1-5]$/,
 };
 
 export const review = {

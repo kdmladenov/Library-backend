@@ -36,4 +36,8 @@ export default {
   review: {
     content: `Expected string with length more than ${REVIEW.MIN_CONTENT_LENGTH} characters.`,
   },
+  rating: {
+    userId: `Expected number in the range [${RECORD.MAX_USER_ID_VALUE}-${RECORD.MAX_USER_ID_VALUE}]`,
+    rating: `Expected a whole number in the range [0 - 5]`,
+  },
 };

@@ -14,6 +14,8 @@ import reviewsService from '../services/reviews-service.js';
 import recordsServices from '../services/records-services.js';
 import recordsData from '../data/records-data.js';
 import createRecordSchema from '../validator/create-record-schema.js';
+import rateBookSchema from '../validator/rate-book-schema.js';
+import bookRatingData from '../data/book-rating-data.js';
 
 const booksController = express.Router();
 // To Do: Authorization, Authentication, ?
@@ -50,8 +52,10 @@ booksController
   })
 
   .get('/', async (req, res) => {
-    const data = req.query;
-    const book = await booksServices.getAllBooks(booksData)(data);
+    const {
+      search = '', searchBy = 'title', sort = 'bookId', order = 'ASC', pageSize = 9999999, offset = 0,
+    } = req.query;
+    const book = await booksServices.getAllBooks(booksData)(search, searchBy, sort, order, +pageSize, +offset);
 
     res.status(200).send(book);
   })
@@ -122,6 +126,25 @@ booksController
     } else {
       res.status(200).send(record);
     }
-  });
+  })
+  // // SHOULD
+  // Rate a book
+  .put('/:bookId/rate', validateBody('rating', rateBookSchema), async (req, res) => {
+    const { bookId } = req.params;
+    const { rating, userId } = req.body;
 
+    const rate = await booksServices.rateBook(bookRatingData)(+rating, +userId, +bookId);
+
+    res.status(201).send(rate);
+
+  })
+  // .get('/books/rate', (req, res) => {
+  //   // bookId
+  //   // rating
+  // });
+  ;
+// // like a book
+// app.put('/books/:id/bookVotes', (req, res) => {
+
+// });
 export default booksController;
