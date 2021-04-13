@@ -40,10 +40,33 @@ const createUser = usersData => async user => {
   };
 };
 
-const updateUser = usersData => async (userUpdate, userId) => {
-  console.log(userUpdate);
-  const existingUser = await usersData.getBy('user_id', userId);
+const login = usersData => async (username, password) => {
+  const user = await usersData.getPasswordBy('username', username);
 
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    return {
+      error: errors.INVALID_LOGIN,
+      result: null,
+    };
+  }
+
+  return {
+    error: null,
+    result: user,
+  };
+};
+
+const changePassword = usersData => async (userId, passwordData) => {
+  const { newPassword, reenteredNewPassword, oldPassword } = passwordData;
+
+  if (newPassword !== reenteredNewPassword) {
+    return {
+      error: errors.BAD_REQUEST,
+      result: null,
+    };
+  }
+
+  const existingUser = await usersData.getBy('user_id', userId);
   if (!existingUser) {
     return {
       error: errors.RECORD_NOT_FOUND,
@@ -51,19 +74,58 @@ const updateUser = usersData => async (userUpdate, userId) => {
     };
   }
 
-  if (userUpdate.email && !!(await usersData.getBy('email', userUpdate.email))) {
+  const { password } = await usersData.getPasswordBy(userId);
+  if (!await bcrypt.compare(oldPassword, password)) {
     return {
-      error: errors.DUPLICATE_RECORD,
-      user: null,
+      error: errors.OPERATION_NOT_PERMITTED,
+      result: null,
     };
   }
 
-  const update = { ...existingUser, ...userUpdate };
-  const _ = await usersData.update(update);
+  const update = await bcrypt.hash(newPassword, 10);
+  const _ = await usersData.updatePassword(userId, update);
+  return {
+    error: null,
+    result: { message: 'The password was successfully changed' },
+  };
+};
+const update = usersData => async (userUpdate, userId) => {
+  const { newEmail, reenteredNewEmail } = userUpdate;
+
+  if (newEmail && newEmail !== reenteredNewEmail) {
+    return {
+      error: errors.BAD_REQUEST,
+      result: null,
+    };
+  }
+
+  const existingUser = await usersData.getBy('user_id', userId);
+  if (!existingUser) {
+    return {
+      error: errors.RECORD_NOT_FOUND,
+      result: null,
+    };
+  }
+
+  if (newEmail && !!(await usersData.getBy('email', newEmail))) {
+    return {
+      error: errors.DUPLICATE_RECORD,
+      result: null,
+    };
+  }
+
+  if (newEmail) {
+    existingUser.email = newEmail;
+  }
+
+  const updatedUser = { ...existingUser, ...userUpdate, userId };
+  updatedUser.birthDate = new Date(updatedUser.birthDate).toLocaleDateString('af-ZA');
+
+  const _ = await usersData.updateData(updatedUser);
 
   return {
     error: null,
-    result: update,
+    result: updatedUser,
   };
 };
 
@@ -94,6 +156,8 @@ const deleteUser = usersData => async (userId, userToDeleteId) => {
 export default {
   getUser,
   createUser,
-  updateUser,
+  login,
+  changePassword,
+  update,
   deleteUser,
 };

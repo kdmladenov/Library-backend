@@ -1,11 +1,9 @@
 import db from './pool.js';
 
-const getAll = async (bookId, sort, page, limit) => {
-  const direction = (sort === 'desc') ? 'DESC' : 'ASC';
-  const resultsPerPage = limit ? +limit : 9;
-  const offset = page ? (page - 1) * resultsPerPage : 0;
+const getAll = async (bookId, order, page, pageSize) => {
+  const direction = ['ASC', 'asc', 'DESC', 'desc'].includes(order) ? order : 'ASC';
+  const offset = (page - 1) * pageSize;
 
-  console.log(resultsPerPage, limit);
   const sql = `
     SELECT 
       r.review_id, 
@@ -24,7 +22,7 @@ const getAll = async (bookId, sort, page, limit) => {
     LIMIT ?, ?
   `;
   // paging and sorting !!! Why the ? placeholders are not working !!!!
-  return db.query(sql, [bookId, offset, resultsPerPage]);
+  return db.query(sql, [+bookId, offset, pageSize]);
 };
 
 const getBy = async (column, value) => {

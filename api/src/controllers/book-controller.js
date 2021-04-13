@@ -76,9 +76,9 @@ booksController
   // read review
   .get('/:bookId/reviews', async (req, res) => {
     const { bookId } = req.params;
-    const { sort, page, limit } = req.query;
+    const { order = 'ASC', page = 1, pageSize = 10 } = req.query;
 
-    const { error, result } = await reviewsService.getAllReviews(reviewsData)(bookId, sort, page, limit);
+    const { error, result } = await reviewsService.getAllReviews(reviewsData)(+bookId, order, +page, +pageSize);
 
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({ message: 'The book is not found.' });
