@@ -18,7 +18,7 @@ export default {
     reenteredNewEmail: `Expected valid e-mail string with length in the range [${USER.MIN_EMAIL_LENGTH}-${USER.MAX_EMAIL_LENGTH}]`,
     phone: `Expected string... `,
     birthDate: `Expected a valid date string`,
-    gender: `Expected "Men", "Women" or "Other"`,
+    gender: `Expected "male", "female" or "other"`,
     isBanned: `Expected boolean`,
     isDeleted: `Expected boolean`,
     isAdmin: `Expected boolean`,

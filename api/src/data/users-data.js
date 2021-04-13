@@ -58,13 +58,13 @@ const create = async (user) => {
   return getBy('user_id', result.insertId);
 };
 
-const getPasswordById = async (userId) => {
+const getPasswordBy = async (column, value) => {
   const sql = `
     SELECT password
     FROM users
-    WHERE user_id = ?
+    WHERE ${column} = ?
   `;
-  const result = await db.query(sql, [userId]);
+  const result = await db.query(sql, [value]);
   return result[0];
 };
 
@@ -114,7 +114,7 @@ const remove = async userId => {
 export default {
   getBy,
   create,
-  getPasswordById,
+  getPasswordBy,
   updatePassword,
   updateData,
   remove,

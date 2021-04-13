@@ -40,9 +40,25 @@ const createUser = usersData => async user => {
   };
 };
 
+const login = usersData => async (username, password) => {
+  const user = await usersData.getPasswordBy('username', username);
+
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    return {
+      error: errors.INVALID_LOGIN,
+      result: null,
+    };
+  }
+
+  return {
+    error: null,
+    result: user,
+  };
+};
+
 const changePassword = usersData => async (userId, passwordData) => {
   const { newPassword, reenteredNewPassword, oldPassword } = passwordData;
-  
+
   if (newPassword !== reenteredNewPassword) {
     return {
       error: errors.BAD_REQUEST,
@@ -58,7 +74,7 @@ const changePassword = usersData => async (userId, passwordData) => {
     };
   }
 
-  const { password } = await usersData.getPasswordById(userId);
+  const { password } = await usersData.getPasswordBy(userId);
   if (!await bcrypt.compare(oldPassword, password)) {
     return {
       error: errors.OPERATION_NOT_PERMITTED,
@@ -140,6 +156,7 @@ const deleteUser = usersData => async (userId, userToDeleteId) => {
 export default {
   getUser,
   createUser,
+  login,
   changePassword,
   update,
   deleteUser,
