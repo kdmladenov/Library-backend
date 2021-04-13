@@ -36,12 +36,14 @@ const createUser = usersData => async user => {
 
   return {
     error: null,
-    result: await usersData.create({ ...user, password, birthDate, gender, role }),
+    result: await usersData.create({
+      ...user, password, birthDate, gender, role,
+    }),
   };
 };
 
 const login = usersData => async (username, password) => {
-  const user = await usersData.getPasswordBy('username', username);
+  const user = await usersData.loginUser(username);
 
   if (!user || !(await bcrypt.compare(password, user.password))) {
     return {

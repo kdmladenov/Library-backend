@@ -111,6 +111,22 @@ const remove = async userId => {
   return db.query(sql, [userId]);
 };
 
+const loginUser = async username => {
+  const sql = `
+    SELECT 
+      u.username as username, 
+      u.password as password,
+      u.user_id as userId,
+      r.type as role
+    FROM users u
+    LEFT JOIN roles r USING (role_id)
+    WHERE username = ?
+  `;
+
+  const result = await db.query(sql, [username]);
+  return result[0];
+};
+
 export default {
   getBy,
   create,
@@ -118,4 +134,5 @@ export default {
   updatePassword,
   updateData,
   remove,
+  loginUser,
 };

@@ -8,12 +8,11 @@ const authController = express.Router();
 
 authController
   .post('/login', async (req, res) => {
-    console.log('login controller');
     const { username, password } = req.body;
     const { error, result } = await usersService.login(usersData)(username, password);
 
     if (error === errors.INVALID_LOGIN) {
-      res.status(400).send({ message: 'Invalid username/password.' });
+      res.status(401).send({ message: 'Invalid username/password.' });
     } else {
       const payload = {
         userId: result.userId,
