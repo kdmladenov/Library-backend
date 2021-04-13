@@ -42,6 +42,11 @@ reviewsController
     } else {
       res.status(200).send(result);
     }
-  });
+  })
+  // like review
+  // .put('/reviews/:id/reviewVotes', (req, res) => {
+
+  // });
+  ;
 
 export default reviewsController;

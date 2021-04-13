@@ -41,5 +41,54 @@ adminController
       res.status(200).send(book);
     }
   })
+  // // Administration Part: CRUD a book, CRUD a review,
+  // // read all books
+  // .get('/admin/books', (res, req) => {
 
+  // });
+
+  // // read book by id
+  // .get('/admin/books/:id', (req, res) => {
+
+  // });
+
+  // // update book by id
+  // .put('/admin/books/:id', (req, res) => {
+
+  // });
+
+  // // read all reviews by book id
+  // .get('/admin/books/:id/reviews', (req, res) => {
+
+  // });
+
+  // // read book review by id
+  // .get('/admin/reviews/:id', (req, res) => {
+
+  // });
+
+  // // create book review
+  // .post('/admin/reviews', (req, res) => {
+
+  // });
+
+  // // update book review
+  // .put('/admin/books/:id/reviews/:id', (req, res) => {
+
+  // });
+
+  // // delete book review
+  // .delete('/admin/books/:id/reviews/:id', (req, res) => {
+
+  // });
+
+  // // bann an user
+  // .put('/admin/users/:id', (req, res) => {
+
+  // });
+
+  // // delete an user
+  // .delete('/admin/users/:id', (req, res) => {
+
+  // });
 export default adminController;

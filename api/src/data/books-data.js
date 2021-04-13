@@ -1,6 +1,10 @@
 import db from './pool.js';
 // OK
-const getAllBooks = async () => {
+const getAllBooks = async (search, searchBy, sort, order, pageSize, offset) => {
+  // const direction = ['ASC', 'asc', 'DESC', 'desc'].includes(order) ? order : 'asc';
+  // const direction = (order === 'desc') ? 'DESC' : 'ASC';
+  // SORT NOT WORKING with ??
+
   const sql = `
     SELECT 
       b.book_id as bookId,
@@ -17,10 +21,16 @@ const getAllBooks = async () => {
     LEFT JOIN genres g USING (genre_id)
     LEFT JOIN age_recommendation a USING (age_recommendation_id)
     LEFT JOIN language l USING (language_id)
-    WHERE is_deleted = 0
+    WHERE is_deleted = 0 AND ${searchBy} Like '%${search}%'
+    ORDER BY ${sort} ${order} 
+    LIMIT ? OFFSET ?
   `;
 
-  return db.query(sql);
+  // console.log(search, searchBy, sort, order, pageSize, offset);
+  return db.query(sql, [
+    +pageSize,
+    +offset,
+  ]);
 };
 // OK
 const getBy = async (column, value) => {
@@ -45,78 +55,6 @@ const getBy = async (column, value) => {
 
   const result = await db.query(sql, [value]);
   return result[0];
-};
-// OK
-const searchBy = async (column = "title", value) => {
-  const sql = `
-        SELECT 
-          b.book_id as bookId,
-          b.title,
-          b.author,
-          b.date_published as datePublished,
-          b.isbn,
-          b.is_deleted as isDeleted,
-          g.genre,
-          a.age_recommendation as ageRecommendation,
-          l.language,
-          b.summary
-        FROM books b
-        LEFT JOIN genres g USING (genre_id)
-        LEFT JOIN age_recommendation a USING (age_recommendation_id)
-        LEFT JOIN language l USING (language_id)
-        WHERE ${column} LIKE '%${value}%' AND is_deleted = 0
-    `;
-
-  return db.query(sql);
-};
-// To fix ? problem!!
-const pagingBy = async (take, offset = 0) => {
-  const sql = `
-        SELECT 
-          b.book_id as bookId,
-          b.title,
-          b.author,
-          b.date_published as datePublished,
-          b.isbn,
-          b.is_deleted as isDeleted,
-          g.genre,
-          a.age_recommendation as ageRecommendation,
-          l.language,
-          b.summary
-        FROM books b
-        LEFT JOIN genres g USING (genre_id)
-        LEFT JOIN age_recommendation a USING (age_recommendation_id)
-        LEFT JOIN language l USING (language_id)
-        WHERE is_deleted = 0
-        LIMIT ${offset}, ${take};
-    `;
-    // console.log(take, offset)${offset}, ${take};
-
-  return db.query(sql, [offset, take]);
-};
-  // To fix ? problem!!
-const sortBy = async (column, order = "ASC") => {
-  const sql = `
-        SELECT 
-          b.book_id as bookId,
-          b.title,
-          b.author,
-          b.date_published as datePublished,
-          b.isbn,
-          b.is_deleted as isDeleted,
-          g.genre,
-          a.age_recommendation as ageRecommendation,
-          l.language,
-          b.summary
-        FROM books b
-        LEFT JOIN genres g USING (genre_id)
-        LEFT JOIN age_recommendation a USING (age_recommendation_id)
-        LEFT JOIN language l USING (language_id)
-        WHERE is_deleted = 0
-        ORDER BY ${column} ${order};
-    `;
-  // console.log(column, order);
-  return db.query(sql);
 };
 
 // Create - OK
@@ -207,13 +145,11 @@ const remove = async (bookToDelete) => {
 
 export default {
   create,
-  searchBy,
   getAllBooks,
   // update,
   remove,
   getBy,
-  sortBy,
-  pagingBy,
+
 };
 
 // export const updateBook = (id, isBorrowed) => {
