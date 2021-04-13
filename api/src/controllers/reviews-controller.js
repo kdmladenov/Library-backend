@@ -1,10 +1,12 @@
 import express from 'express';
+import reviewVoteData from '../data/review-vote-data.js';
 import reviewsData from '../data/reviews-data.js';
 import injectUser from '../middleware/inject-user.js';
 import validateBody from '../middleware/validate-body.js';
 import reviewsService from '../services/reviews-service.js';
 import errors from '../services/service-errors.js';
 import createReviewSchema from '../validator/create-review-schema.js';
+import voteReviewSchema from '../validator/vote-review-schema.js';
 
 const reviewsController = express.Router();
 
@@ -43,10 +45,18 @@ reviewsController
       res.status(200).send(result);
     }
   })
-  // like review
-  // .put('/reviews/:id/reviewVotes', (req, res) => {
+  // Vote Review - status codes mixed
+  .put('/:reviewId/votes', validateBody('vote', voteReviewSchema), async (req, res) => {
+    const { reviewId } = req.params;
+    const { userId, reactionId } = req.body;
 
-  // });
-  ;
+    const { error, result } = await reviewsService.voteReview(reviewVoteData)(+reviewId, +userId, +reactionId);
+
+    if (error === errors.OPERATION_NOT_PERMITTED) {
+      res.status(403).send({ message: 'You have no rights to update the vote.' });
+    } else {
+      res.status(200).send(result);
+    }
+  });
 
 export default reviewsController;

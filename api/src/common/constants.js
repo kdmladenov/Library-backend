@@ -31,5 +31,9 @@ export const review = {
 
 export const record = {
   MIN_USER_ID_VALUE: 0,
-  MAX_USER_ID_VALUE: 10000,
+};
+
+export const vote = {
+  MIN_REACTION_ID_VALUE: 0,
+  MIN_REVIEW_ID_VALUE: 0,
 };
