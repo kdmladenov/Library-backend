@@ -1,7 +1,7 @@
 import errors from './service-errors.js';
 
-const getAllReviews = reviewsData => async (bookId, sort, page, limit) => {
-  const reviews = await reviewsData.getAll(bookId, sort, page, limit);
+const getAllReviews = reviewsData => async (bookId, order, page, pageSize) => {
+  const reviews = await reviewsData.getAll(bookId, order, page, pageSize);
 
   if (!reviews) {
     return {

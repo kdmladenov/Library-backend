@@ -3,19 +3,19 @@ import db from './pool.js';
 const getBy = async (column, value) => {
   const sql = `
     SELECT 
-      u.user_id, 
-      u.username,
-      u.first_name,
-      u.last_name,
-      g.gender,
-      DATE_FORMAT(u.birth_date, "%m/%d/%Y") as birth_date,
-      u.email,
-      u.phone,
-      u.reading_points,
-      b.is_banned,
-      b.banned_date,
-      b.exp_date as bann_exp_date,
-      b.description as bann_description
+      u.user_id as userId, 
+      u.username as username,
+      u.first_name as firstName,
+      u.last_name as lastName,
+      g.gender as gender,
+      DATE_FORMAT(u.birth_date, "%m/%d/%Y") as birthDate,
+      u.email as email,
+      u.phone as phone,
+      u.reading_points as readingPoints,
+      b.is_banned as isBanned,
+      b.banned_date as bannDate,
+      b.exp_date as bannExpDate,
+      b.description as bannDescription
     FROM users u
     LEFT JOIN gender g USING (gender_id)
     LEFT JOIN bann_status b USING (user_id)
@@ -58,22 +58,39 @@ const create = async (user) => {
   return getBy('user_id', result.insertId);
 };
 
-const update = async (user) => {
-  
+const getPasswordById = async (userId) => {
   const sql = `
-    UPDATE users SET 
-      password = ?, 
+    SELECT password
+    FROM users
+    WHERE user_id = ?
+  `;
+  const result = await db.query(sql, [userId]);
+  return result[0];
+};
+
+const updatePassword = async (userId, password) => {
+  const sql = `
+  UPDATE users SET  
+    password = ?
+  WHERE user_id = ?
+  `;
+
+  return db.query(sql, [password, userId]);
+};
+
+const updateData = async (user) => {
+  const sql = `
+    UPDATE users SET
       first_name = ?, 
       last_name = ?, 
       gender_id = ?, 
       birth_date = ?, 
       email = ?, 
-      phone = ?,
+      phone = ?
     WHERE user_id = ?
   `;
 
   return db.query(sql, [
-    user.password,
     user.firstName,
     user.lastName,
     user.gender,
@@ -97,6 +114,8 @@ const remove = async userId => {
 export default {
   getBy,
   create,
-  update,
+  getPasswordById,
+  updatePassword,
+  updateData,
   remove,
 };
