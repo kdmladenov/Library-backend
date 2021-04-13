@@ -22,7 +22,7 @@ const createReview = reviewsData => async (content, userId, bookId) => {
 // check if user is banned
 };
 
-const updateReview = reviewsData => async (content, reviewId, userId) => {
+const updateReview = reviewsData => async (content, reviewId, userId, role) => {
   const existingReview = await reviewsData.getBy('review_id', reviewId);
 
   if (!existingReview) {
@@ -33,7 +33,7 @@ const updateReview = reviewsData => async (content, reviewId, userId) => {
   }
 
   // checks if the user who attempt to update the review is the author of the review
-  if (userId !== existingReview.userId) {
+  if (userId !== existingReview.userId && role !== 'admin') {
     return {
       error: errors.OPERATION_NOT_PERMITTED,
       result: null,
@@ -49,7 +49,7 @@ const updateReview = reviewsData => async (content, reviewId, userId) => {
   };
 };
 
-const deleteReview = reviewsData => async (reviewId, userId) => {
+const deleteReview = reviewsData => async (reviewId, userId, role) => {
   const existingReview = await reviewsData.getBy('review_id', reviewId);
 
   if (!existingReview) {
@@ -60,7 +60,7 @@ const deleteReview = reviewsData => async (reviewId, userId) => {
   }
 
   // checks if the user who attempt to delete the review is the author of the review
-  if (userId !== existingReview.user_id) {
+  if (userId !== existingReview.user_id && role !== 'admin') {
     return {
       error: errors.OPERATION_NOT_PERMITTED,
       result: null,

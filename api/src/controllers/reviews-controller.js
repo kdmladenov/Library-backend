@@ -16,9 +16,9 @@ reviewsController
     console.log(req.user);
     const { content } = req.body;
     const { reviewId } = req.params;
-    const { userId } = req.user;
+    const { userId, role } = req.user;
 
-    const { error, result } = await reviewsService.updateReview(reviewsData)(content, +reviewId, +userId);
+    const { error, result } = await reviewsService.updateReview(reviewsData)(content, +reviewId, +userId, role);
 
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({ message: 'The review is not found.' });
@@ -31,10 +31,10 @@ reviewsController
 
 // delete review
   .delete('/:reviewId', authMiddleware, async (req, res) => {
-    const { userId } = req.user;
+    const { userId, role } = req.user;
     const { reviewId } = req.params;
 
-    const { error, result } = await reviewsService.deleteReview(reviewsData)(+reviewId, +userId);
+    const { error, result } = await reviewsService.deleteReview(reviewsData)(+reviewId, +userId, role);
 
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({ message: 'The review is not found.' });
@@ -45,7 +45,7 @@ reviewsController
     }
   })
   // Vote Review - status codes mixed
-  .put('/:reviewId/votes', validateBody('vote', voteReviewSchema), async (req, res) => {
+  .put('/:reviewId/votes', authMiddleware, validateBody('vote', voteReviewSchema), async (req, res) => {
     const { reviewId } = req.params;
     const { userId, reactionId } = req.body;
 
