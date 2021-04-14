@@ -140,6 +140,18 @@ const ban = async (userId, duration, description) => {
   return db.query(sql, [userId, duration, description]);
 };
 
+const getBanRecordsByUserId = async (userId) =>{
+  const sql = `
+    SELECT * FROM ban_status
+    WHERE user_id = ?
+    ORDER BY exp_date DESC      
+  `;
+
+  const result = await db.query(sql, [userId]);
+
+  return result;
+};
+
 export default {
   getBy,
   create,
@@ -149,4 +161,5 @@ export default {
   remove,
   loginUser,
   ban,
+  getBanRecordsByUserId,
 };

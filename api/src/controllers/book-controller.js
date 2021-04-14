@@ -17,6 +17,7 @@ import createRecordSchema from '../validator/create-record-schema.js';
 import rateBookSchema from '../validator/rate-book-schema.js';
 import bookRatingData from '../data/book-rating-data.js';
 import { authMiddleware, roleMiddleware } from '../authentication/auth.middleware.js';
+import banGuard from '../middleware/banGuard.js';
 
 const booksController = express.Router();
 // To Do: Authorization, Authentication, ?
@@ -109,7 +110,7 @@ booksController
     }
   })
 // create review
-  .post('/:bookId/reviews', authMiddleware, validateBody('review', createReviewSchema), async (req, res) => {
+  .post('/:bookId/reviews', authMiddleware, banGuard, validateBody('review', createReviewSchema), async (req, res) => {
     const { bookId } = req.params;
     const { content } = req.body;
     const { userId } = req.user;
