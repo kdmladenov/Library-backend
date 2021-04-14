@@ -53,10 +53,10 @@ reviewsController
   })
   // Vote Review - status codes mixed
   .put('/:reviewId/votes', authMiddleware, validateBody('vote', voteReviewSchema), async (req, res) => {
-    const { reviewId } = req.params;
+    const { reviewId, role } = req.params;
     const { userId, reactionId } = req.body;
 
-    const { error, result } = await reviewsService.voteReview(reviewVoteData)(+reviewId, +userId, +reactionId);
+    const { error, result } = await reviewsService.voteReview(reviewVoteData)(+reviewId, +userId, +reactionId, role);
 
     if (error === errors.OPERATION_NOT_PERMITTED) {
       res.status(403).send({
