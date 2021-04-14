@@ -10,7 +10,6 @@ import usersController from './controllers/users-controller.js';
 import { PORT } from '../../config.js';
 import reviewsController from './controllers/reviews-controller.js';
 import booksController from './controllers/book-controller.js';
-import adminController from './controllers/admin-controller.js';
 import authController from './controllers/auth-controller.js';
 import jwtStrategy from './authentication/strategy.js';
 
@@ -34,7 +33,6 @@ app.use('/auth', authController);
 app.use('/users', usersController);
 app.use('/reviews', reviewsController);
 app.use('/books', booksController);
-app.use('/admin', adminController);
 
 // // LEVELING SYSTEM
 

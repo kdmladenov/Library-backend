@@ -119,4 +119,9 @@ usersController
     }
   });
 
+    // // bann an user
+  // .put('/admin/users/:id', (req, res) => {
+
+  // });
+  
 export default usersController;
