@@ -75,16 +75,24 @@ booksController
     res.status(200).send(book);
   })
   // change book
-  .put('/:bookId', authMiddleware, roleMiddleware('admin'), validateBody('rating', rateBookSchema), async (req, res) => {
+  .put('/:bookId', authMiddleware, roleMiddleware('admin'), validateBody('book', createBookSchema), async (req, res) => {
     const { bookId } = req.params;
-    const { rating, userId } = req.body;
+    const data = req.body;
+    data.genre = bookGenreEnum[data.genre];
+    data.language = bookLanguageEnum[data.language];
+    data.ageRecommendation = bookAgeRecommendationEnum[data.ageRecommendation];
+    console.log(bookId, data, 'c');
 
-    const { error, rate } = await booksServices.rateBook(bookRatingData)(+rating, +userId, +bookId);
+    const { error, result } = await booksServices.updateBook(booksData)(+bookId, data);
+    console.log(error, result, 'c2');
 
-    if (error === errors.OPERATION_NOT_PERMITTED) {
-      res.status(403).send({ message: 'You are not authorized to change this rating!' });
+
+    if (error === errors.RECORD_NOT_FOUND) {
+      res.status(404).send({ message: 'The book is not found.' });
+    } else if (error === errors.DUPLICATE_RECORD) {
+      res.status(409).send({ message: 'A book with this title and/or isbn already exist.' });
     } else {
-      res.status(200).send(rate);
+      res.status(200).send(result);
     }
   })
   // read review
