@@ -12,7 +12,6 @@ const createBook = booksData => async (data) => {
       book: null,
     };
   }
-
   return {
     error: null,
     book: await booksData.create(data),
@@ -41,34 +40,38 @@ const getBookById = booksData => async (id) => {
     book,
   };
 };
-// Not finished
-// const updateBook = booksData => async (id, updateData) => {
-//   const book = await booksData.getBy('isbn', id)
-//             || await booksData.getBy('book_id', id);
+// Decide on duplicates
+const updateBook = booksData => async (bookId, updatedData) => {
+  const existingBook = await booksData.getBy('isbn', +bookId)
+            || await booksData.getBy('book_id', +bookId);
+  if (!existingBook) {
+    return {
+      error: errors.RECORD_NOT_FOUND,
+      book: null,
+    };
+  }
+  // checks if the updated title or isbn exist in other book
+  if ((updatedData.title && ((await booksData.getBy('title', updatedData.title)))
+      && ((await booksData.getBy('title', updatedData.title)).bookId !== bookId))
+        || (updatedData.isbn && ((await booksData.getBy('isbn', updatedData.isbn)))
+          && ((await booksData.getBy('isbn', updatedData.isbn)).bookId !== bookId))) {
+    return {
+      error: errors.DUPLICATE_RECORD,
+      book: null,
+    };
+  }
 
-//   if (!book) {
-//     return {
-//       error: errors.RECORD_NOT_FOUND,
-//       book: null,
-//     };
-//   }
+  const updated = { ...existingBook, ...updatedData };
+  console.log(bookId, updated, 's');
 
-//   if ((updateData.title && !(await booksData.getBy('title', updateData.title)))
-//     || (updateData.isdn && !(await booksData.getBy('isdn', updateData.isdn)))) {
-//     return {
-//       error: errors.DUPLICATE_RECORD,
-//       book: null,
-//     };
-//   }
+  const result = await booksData.update(updated);
+  console.log(bookId, result, 's3');
 
-//   const updated = { ...book, ...updateData };
-//   const _ = await booksData.update(updated);
-
-//   return {
-//     error: null,
-//     book: updated,
-//   };
-// };
+  return {
+    error: null,
+    result,
+  };
+};
 
 const deleteBook = booksData => async (id) => {
   const bookToDelete = await booksData.getBy('isbn', id)
@@ -87,7 +90,8 @@ const deleteBook = booksData => async (id) => {
     error: null,
     book: bookToDelete,
   };
-}
+};
+
 const rateBook = bookRatingData => async (rating, userId, bookId) => {
   const existingRating = await bookRatingData.getBy(userId, bookId);
 
@@ -113,14 +117,12 @@ const rateBook = bookRatingData => async (rating, userId, bookId) => {
     error: null,
     rate: result,
   };
-}
-
-;
+};
 export default {
   createBook,
   getBookById,
   getAllBooks,
   rateBook,
-  // updateBook,
+  updateBook,
   deleteBook,
 };

@@ -89,49 +89,39 @@ const create = async (book) => {
   return getBy('book_id', result.insertId);
 };
 
-// Not finished
-// const update = async (updated) => {
-//   const {
-//     title,
-//     author,
-//     date_published,
-//     isbn,
-//     is_deleted,
-//     genre_id,
-//     age_recommendation_id,
-//     language_id,
-//     summary,
-//     id,
-//   } = updated;
+const update = async (updatedBook) => {
+  console.log(updatedBook, 'd1');
 
-//   const sql = `
-//         UPDATE books
-//         SET
-//           title = ?,
-//           author = ?,
-//           date_published = ?,
-//           isbn = ?,
-//           is_deleted = ?,
-//           genre_id = ?,
-//           age_recommendation_id = ?,
-//           language_id = ?,
-//           summary = ?
-//         WHERE id = ?
-//     `;
+  const sql = `
+        UPDATE books
+        SET
+          title = ?,
+          author = ?,
+          date_published = ?,
+          isbn = ?,
+          is_deleted = ?,
+          genre_id = ?,
+          age_recommendation_id = ?,
+          language_id = ?,
+          summary = ?
+        WHERE book_id = ?
+    `;
 
-//   return db.query(sql, [
-//     title,
-//     author,
-//     date_published,
-//     isbn,
-//     is_deleted,
-//     genre_id,
-//     age_recommendation_id,
-//     language_id,
-//     summary,
-//     id,
-//   ]);
-// };
+  const _ = await db.query(sql, [
+    updatedBook.title,
+    updatedBook.author,
+    updatedBook.datePublished,
+    updatedBook.isbn,
+    +updatedBook.isDeleted,
+    +updatedBook.genre,
+    +updatedBook.ageRecommendation,
+    +updatedBook.language,
+    updatedBook.summary,
+    updatedBook.bookId,
+  ]);
+
+  return getBy('book_id', updatedBook.bookId);
+};
 
 // OK
 const remove = async (bookToDelete) => {
@@ -147,10 +137,9 @@ const remove = async (bookToDelete) => {
 export default {
   create,
   getAllBooks,
-  // update,
+  update,
   remove,
   getBy,
-
 };
 
 // export const updateBook = (id, isBorrowed) => {
