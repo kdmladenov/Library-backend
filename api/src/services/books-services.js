@@ -43,7 +43,8 @@ const getBookById = booksData => async (id) => {
 // Decide on duplicates
 const updateBook = booksData => async (bookId, updatedData) => {
   const existingBook = await booksData.getBy('isbn', +bookId)
-            || await booksData.getBy('book_id', +bookId);
+                    || await booksData.getBy('book_id', +bookId);
+
   if (!existingBook) {
     return {
       error: errors.RECORD_NOT_FOUND,
@@ -75,7 +76,7 @@ const updateBook = booksData => async (bookId, updatedData) => {
 
 const deleteBook = booksData => async (id) => {
   const bookToDelete = await booksData.getBy('isbn', id)
-            || await booksData.getBy('book_id', id);
+                    || await booksData.getBy('book_id', id);
 
   if (!bookToDelete) {
     return {
@@ -103,7 +104,7 @@ const rateBook = bookRatingData => async (rating, userId, bookId) => {
   }
 
   if (existingRating) {
-    const result = await bookRatingData.update(rating, userId, bookId)
+    const result = await bookRatingData.update(rating, userId, bookId);
 
     return {
       error: null,

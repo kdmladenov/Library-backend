@@ -7,7 +7,7 @@ import createUserSchema from '../validator/create-user-schema.js';
 import updateUserSchema from '../validator/update-user-schema.js';
 import updatePasswordSchema from '../validator/update-password-schema.js';
 import { authMiddleware, roleMiddleware } from '../authentication/auth.middleware.js';
-import roles from '../common/roles.enum.js'
+import roles from '../common/roles.enum.js';
 
 const usersController = express.Router();
 
@@ -31,7 +31,7 @@ usersController
   })
 
   // get a single user
-  .get('/:userId', async (req, res) => {
+  .get('/:userId', authMiddleware, async (req, res) => {
     const { userId } = req.params;
     const { error, result } = await usersService.getUser(usersData)(userId);
 
@@ -69,6 +69,7 @@ usersController
     }
   })
 
+  // Update user
   .put('/:userId', authMiddleware, validateBody('user', updateUserSchema), async (req, res) => {
     const { userId: loggedUserId, role } = req.user;
     const { userId } = req.params;
@@ -97,6 +98,7 @@ usersController
     }
   })
 
+  // Delete user
   .delete('/:userId', authMiddleware, async (req, res) => {
     const { userId: loggedUserId, role } = req.user;
     const { userId } = req.params;
@@ -116,6 +118,7 @@ usersController
     }
   })
 
+  // Ban user
   .post('/:userId/ban', authMiddleware, roleMiddleware(roles.admin), async (req, res) => {
     const { userId } = req.params;
     const { duration, description } = req.body;
@@ -125,7 +128,7 @@ usersController
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
         message: `User ${userId} is not found.`,
-      })
+      });
     } else {
       res.status(200).send(result);
     }

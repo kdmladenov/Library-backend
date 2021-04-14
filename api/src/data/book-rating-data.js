@@ -38,9 +38,7 @@ const create = async (rating, userId, bookId) => {
     )
     VALUES (?, ?, ?)
   `;
-  const result = await db.query(sql, [
-    +userId, +bookId, +rating
-  ]);
+  const _ = await db.query(sql, [+userId, +bookId, +rating]);
 
   return getBy(+userId, +bookId);
 };
@@ -60,5 +58,4 @@ export default {
   create,
   update,
   getBy,
-
 };

@@ -8,7 +8,7 @@ const getBy = async (column, value) => {
     rl.user_id as userId,
     r.review_id as reviewId,
     ra.reaction_id as reactionId,
-    ra.reaction_name as reactioName
+    ra.reaction_name as reactionName
   FROM review_likes rl
   LEFT JOIN users u USING(user_id)
   LEFT JOIN reactions ra USING(reaction_id)
@@ -51,5 +51,4 @@ export default {
   create,
   update,
   getBy,
-
 };

@@ -14,7 +14,9 @@ authController
     const { error, result } = await usersService.login(usersData)(username, password);
 
     if (error === errors.INVALID_LOGIN) {
-      res.status(401).send({ message: 'Invalid username/password.' });
+      res.status(401).send({
+        message: 'Invalid username/password.',
+      });
     } else {
       const payload = {
         userId: result.userId,
