@@ -1,5 +1,5 @@
 export default {
-  basic: 1,
-  admin: 2,
-  guest: 3,
+  basic: 'basic',
+  admin: 'admin',
+  guest: 'guest',
 };

@@ -6,7 +6,8 @@ import usersService from '../services/users-service.js';
 import createUserSchema from '../validator/create-user-schema.js';
 import updateUserSchema from '../validator/update-user-schema.js';
 import updatePasswordSchema from '../validator/update-password-schema.js';
-import { authMiddleware } from '../authentication/auth.middleware.js';
+import { authMiddleware, roleMiddleware } from '../authentication/auth.middleware.js';
+import roles from '../common/roles.enum.js'
 
 const usersController = express.Router();
 
@@ -36,7 +37,7 @@ usersController
 
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
-        message: 'User is not found.',
+        message: `User ${userId} is not found.`,
       });
     } else {
       res.status(200).send(result);
@@ -61,7 +62,7 @@ usersController
       });
     } else if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
-        message: 'User is not found.',
+        message: `User ${userId} is not found.`,
       });
     } else {
       res.status(200).send(result);
@@ -85,7 +86,7 @@ usersController
       });
     } else if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
-        message: 'User is not found.',
+        message: `User ${userId} is not found.`,
       });
     } else if (error === errors.DUPLICATE_RECORD) {
       res.status(409).send({
@@ -104,20 +105,30 @@ usersController
 
     if (error === errors.OPERATION_NOT_PERMITTED) {
       res.status(403).send({
-        message: 'No rights to delete the user.',
+        message: `No rights to delete user ${userId}.`,
       });
     } else if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
-        message: `User with id = ${userId} is not found.`,
+        message: `User ${userId} is not found.`,
       });
     } else {
       res.status(200).send(result);
     }
+  })
+
+  .post('/:userId/ban', authMiddleware, roleMiddleware(roles.admin), async (req, res) => {
+    const { userId } = req.params;
+    const { duration, description } = req.body;
+
+    const { error, result } = await usersService.banUser(usersData)(+userId, +duration, description);
+
+    if (error === errors.RECORD_NOT_FOUND) {
+      res.status(404).send({
+        message: `User ${userId} is not found.`,
+      })
+    } else {
+      res.status(200).send(result);
+    }
   });
-
-// // bann an user
-// .put('/admin/users/:id', (req, res) => {
-
-// });
 
 export default usersController;

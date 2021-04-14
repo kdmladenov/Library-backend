@@ -18,7 +18,6 @@ import rateBookSchema from '../validator/rate-book-schema.js';
 import bookRatingData from '../data/book-rating-data.js';
 import { authMiddleware, roleMiddleware } from '../authentication/auth.middleware.js';
 
-
 const booksController = express.Router();
 // To Do: Authorization, Authentication, ?
 

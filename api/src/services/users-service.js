@@ -169,6 +169,25 @@ const deleteUser = usersData => async (userId, loggedUserId, role) => {
     result: existingUser,
   };
 };
+
+const banUser = usersData => async (userId, duration, description) => {
+  const user = await usersData.getBy('user_id', userId);
+
+  if (!user) {
+    return {
+      error: errors.RECORD_NOT_FOUND,
+      result: null,
+    };
+  }
+
+  const _ = await usersData.ban(userId, duration, description);
+
+  return {
+    error: null,
+    result: { message: `Successfully banned user ${userId}.` },
+  };
+};
+
 export default {
   getUser,
   createUser,
@@ -176,4 +195,5 @@ export default {
   changePassword,
   update,
   deleteUser,
+  banUser,
 };

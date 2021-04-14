@@ -12,13 +12,12 @@ const getBy = async (column, value) => {
       u.email as email,
       u.phone as phone,
       u.reading_points as readingPoints,
-      b.is_banned as isBanned,
-      b.banned_date as bannDate,
-      b.exp_date as bannExpDate,
-      b.description as bannDescription
+      b.ban_date as banDate,
+      b.exp_date as banExpDate,
+      b.description as banDescription
     FROM users u
     LEFT JOIN gender g USING (gender_id)
-    LEFT JOIN bann_status b USING (user_id)
+    LEFT JOIN ban_status b USING (user_id)
     WHERE u.is_deleted = 0 AND ${column} = ?
   `;
 
@@ -127,6 +126,20 @@ const loginUser = async username => {
   return result[0];
 };
 
+const ban = async (userId, duration, description) => {
+  const sql = `
+    INSERT INTO ban_status (
+      user_id,
+      ban_date,
+      exp_date,
+      description
+    )
+    VALUES(?, CURRENT_TIMESTAMP(), DATE_ADD(CURRENT_TIMESTAMP, INTERVAL ? DAY), ?)
+  `;
+
+  return db.query(sql, [userId, duration, description]);
+};
+
 export default {
   getBy,
   create,
@@ -135,4 +148,5 @@ export default {
   updateData,
   remove,
   loginUser,
+  ban,
 };
