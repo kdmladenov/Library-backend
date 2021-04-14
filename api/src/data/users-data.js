@@ -120,7 +120,7 @@ const loginUser = async username => {
       r.type as role
     FROM users u
     LEFT JOIN roles r USING (role_id)
-    WHERE username = ?
+    WHERE u.is_deleted = 0 AND username = ?
   `;
 
   const result = await db.query(sql, [username]);

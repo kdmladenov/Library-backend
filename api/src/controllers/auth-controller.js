@@ -3,11 +3,13 @@ import usersData from '../data/users-data.js';
 import errors from '../services/service-errors.js';
 import usersService from '../services/users-service.js';
 import createToken from '../authentication/create-token.js';
+import validateBody from '../middleware/validate-body.js';
+import loginUserSchema from '../validator/login-user-schema.js';
 
 const authController = express.Router();
 
 authController
-  .post('/login', async (req, res) => {
+  .post('/login', validateBody(loginUserSchema), async (req, res) => {
     const { username, password } = req.body;
     const { error, result } = await usersService.login(usersData)(username, password);
 
