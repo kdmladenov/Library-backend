@@ -21,9 +21,13 @@ reviewsController
     const { error, result } = await reviewsService.updateReview(reviewsData)(content, +reviewId, +userId, role);
 
     if (error === errors.RECORD_NOT_FOUND) {
-      res.status(404).send({ message: 'The review is not found.' });
+      res.status(404).send({
+        message: 'The review is not found.',
+      });
     } else if (error === errors.OPERATION_NOT_PERMITTED) {
-      res.status(403).send({ message: 'No rights to update the review.' });
+      res.status(403).send({
+        message: 'No rights to update the review.',
+      });
     } else {
       res.status(200).send(result);
     }
@@ -37,9 +41,13 @@ reviewsController
     const { error, result } = await reviewsService.deleteReview(reviewsData)(+reviewId, +userId, role);
 
     if (error === errors.RECORD_NOT_FOUND) {
-      res.status(404).send({ message: 'The review is not found.' });
+      res.status(404).send({
+        message: 'The review is not found.',
+      });
     } else if (error === errors.OPERATION_NOT_PERMITTED) {
-      res.status(403).send({ message: 'No rights to delete the review.' });
+      res.status(403).send({
+        message: 'No rights to delete the review.',
+      });
     } else {
       res.status(200).send(result);
     }
@@ -52,7 +60,9 @@ reviewsController
     const { error, result } = await reviewsService.voteReview(reviewVoteData)(+reviewId, +userId, +reactionId);
 
     if (error === errors.OPERATION_NOT_PERMITTED) {
-      res.status(403).send({ message: 'You have no rights to update the vote.' });
+      res.status(403).send({
+        message: 'You have no rights to update the vote.',
+      });
     } else {
       res.status(200).send(result);
     }

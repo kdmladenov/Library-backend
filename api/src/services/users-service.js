@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import genderEnum from '../common/gender.enum.js';
 import errors from './service-errors.js';
-import { DEFAULT_USER_ROLE as role } from '../../../config.js';
+import { DEFAULT_USER_ROLE as basicRole } from '../../../config.js';
 
 const getUser = usersData => async userId => {
   const user = await usersData.getBy('user_id', userId);
@@ -37,7 +37,7 @@ const createUser = usersData => async user => {
   return {
     error: null,
     result: await usersData.create({
-      ...user, password, birthDate, gender, role,
+      ...user, password, birthDate, gender, basicRole,
     }),
   };
 };
@@ -58,9 +58,16 @@ const login = usersData => async (username, password) => {
   };
 };
 
-const changePassword = usersData => async (userId, passwordData) => {
-  const { newPassword, reenteredNewPassword, oldPassword } = passwordData;
+const changePassword = usersData => async (userId, passwordData, loggedUserId, role) => {
+  // checks if the user who attempt to update the password is the owner of the user profile
+  if (userId !== loggedUserId && role !== 'admin') {
+    return {
+      error: errors.OPERATION_NOT_PERMITTED,
+      result: null,
+    };
+  }
 
+  const { newPassword, reenteredNewPassword, oldPassword } = passwordData;
   if (newPassword !== reenteredNewPassword) {
     return {
       error: errors.BAD_REQUEST,
@@ -91,9 +98,16 @@ const changePassword = usersData => async (userId, passwordData) => {
     result: { message: 'The password was successfully changed' },
   };
 };
-const update = usersData => async (userUpdate, userId) => {
-  const { newEmail, reenteredNewEmail } = userUpdate;
+const update = usersData => async (userUpdate, userId, loggedUserId, role) => {
+  // checks if the user who attempt to update the profile is the owner of it
+  if (userId !== loggedUserId && role !== 'admin') {
+    return {
+      error: errors.OPERATION_NOT_PERMITTED,
+      result: null,
+    };
+  }
 
+  const { newEmail, reenteredNewEmail } = userUpdate;
   if (newEmail && newEmail !== reenteredNewEmail) {
     return {
       error: errors.BAD_REQUEST,
@@ -131,19 +145,19 @@ const update = usersData => async (userUpdate, userId) => {
   };
 };
 
-const deleteUser = usersData => async (userId, userToDeleteId) => {
-  const existingUser = await usersData.getBy('user_id', userToDeleteId);
-
-  if (!existingUser) {
+const deleteUser = usersData => async (userId, loggedUserId, role) => {
+  // checks if the user who attempt to delete the profile is the owner of it
+  if (userId !== loggedUserId && role !== 'admin') {
     return {
-      error: errors.RECORD_NOT_FOUND,
+      error: errors.OPERATION_NOT_PERMITTED,
       result: null,
     };
   }
 
-  if (userId !== userToDeleteId) {
+  const existingUser = await usersData.getBy('user_id', userId);
+  if (!existingUser) {
     return {
-      error: errors.OPERATION_NOT_PERMITTED,
+      error: errors.RECORD_NOT_FOUND,
       result: null,
     };
   }

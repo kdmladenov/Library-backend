@@ -7,82 +7,113 @@ import createUserSchema from '../validator/create-user-schema.js';
 import updateUserSchema from '../validator/update-user-schema.js';
 import updatePasswordSchema from '../validator/update-password-schema.js';
 import injectUser from '../middleware/inject-user.js';
+import {
+  authMiddleware
+} from '../authentication/auth.middleware.js';
 
 const usersController = express.Router();
 
 usersController
 
-// .get('/:id', )
-// USERS - LOGIN - PUBLIC
-// USERS - LOGOUT
+  // .get('/:id', )
+  // USERS - LOGIN - PUBLIC
+  // USERS - LOGOUT
 
+  // register
   .post('/', validateBody('user', createUserSchema), async (req, res) => {
     const user = req.body;
     const { error, result } = await usersService.createUser(usersData)(user);
 
     if (error === errors.DUPLICATE_RECORD) {
-      res.status(409).send({ message: 'User with same username or email already exists.' });
+      res.status(409).send({
+        message: 'User with same username or email already exists.'
+      });
     } else {
       res.status(201).send(result);
     }
   })
 
+  // get a single user
   .get('/:userId', async (req, res) => {
     const { userId } = req.params;
     const { error, result } = await usersService.getUser(usersData)(userId);
 
     if (error === errors.RECORD_NOT_FOUND) {
-      res.status(404).send({ message: 'User is not found.' });
+      res.status(404).send({
+        message: 'User is not found.',
+      });
     } else {
       res.status(200).send(result);
     }
   })
 
   // Change password
-  .patch('/:userId/change-password', injectUser, validateBody('user', updatePasswordSchema), async (req, res) => {
+  .patch('/:userId/change-password', authMiddleware, validateBody('user', updatePasswordSchema), async (req, res) => {
+    const { userId: loggedUserId, role } = req.user;
     const { userId } = req.params;
     const passwordData = req.body;
 
-    const { error, result } = await usersService.changePassword(usersData)(+userId, passwordData);
+    const { error, result } = await usersService.changePassword(usersData)(+userId, passwordData, +loggedUserId, role);
 
-    if (error === errors.BAD_REQUEST) {
-      res.status(400).send({ message: 'The request was invalid. Passwords do not match.' });
+    if (error === errors.OPERATION_NOT_PERMITTED) {
+      res.status(403).send({
+        message: 'No rights to update the password.',
+      });
+    } else if (error === errors.BAD_REQUEST) {
+      res.status(400).send({
+        message: 'The request was invalid. Passwords do not match.',
+      });
     } else if (error === errors.RECORD_NOT_FOUND) {
-      res.status(404).send({ message: 'User is not found.' });
-    } else if (error === errors.OPERATION_NOT_PERMITTED) {
-      res.status(403).send({ message: 'No rights to update the password.' });
+      res.status(404).send({
+        message: 'User is not found.',
+      });
     } else {
       res.status(200).send(result);
     }
   })
 
-  .put('/:userId', injectUser, validateBody('user', updateUserSchema), async (req, res) => {
+  .put('/:userId', authMiddleware, validateBody('user', updateUserSchema), async (req, res) => {
+    const { userId: loggedUserId, role } = req.user;
     const { userId } = req.params;
     const userUpdate = req.body;
 
-    const { error, result } = await usersService.update(usersData)(userUpdate, +userId);
+    const { error, result } = await usersService.update(usersData)(userUpdate, +userId, +loggedUserId, role);
 
-    if (error === errors.BAD_REQUEST) {
-      res.status(400).send({ message: 'The request was invalid. Emails do not match.' });
+    if (error === errors.OPERATION_NOT_PERMITTED) {
+      res.status(403).send({
+        message: 'No rights to update the password.',
+      });
+    } else if (error === errors.BAD_REQUEST) {
+      res.status(400).send({
+        message: 'The request was invalid. Emails do not match.',
+      });
     } else if (error === errors.RECORD_NOT_FOUND) {
-      res.status(404).send({ message: 'User is not found.' });
+      res.status(404).send({
+        message: 'User is not found.',
+      });
     } else if (error === errors.DUPLICATE_RECORD) {
-      res.status(409).send({ message: 'User with same email already exists.' });
+      res.status(409).send({
+        message: 'User with same email already exists.',
+      });
     } else {
       res.status(200).send(result);
     }
   })
 
   .delete('/:userId', injectUser, async (req, res) => {
-    const { userId } = req.user;
-    const { userId: userToDeleteId } = req.params;
+    const { loggedUserId, role } = req.user;
+    const { userId } = req.params;
 
-    const { error, result } = await usersService.deleteUser(usersData)(userId, +userToDeleteId);
+    const { error, result } = await usersService.deleteUser(usersData)(+userId, +loggedUserId, role);
 
     if (error === errors.RECORD_NOT_FOUND) {
-      res.status(404).send({ message: `User with id = ${userToDeleteId} is not found.` });
+      res.status(404).send({
+        message: `User with id = ${userId} is not found.`,
+      });
     } else if (error === errors.OPERATION_NOT_PERMITTED) {
-      res.status(403).send({ message: 'No rights to delete the user.' });
+      res.status(403).send({
+        message: 'No rights to delete the user.',
+      });
     } else {
       res.status(200).send(result);
     }
