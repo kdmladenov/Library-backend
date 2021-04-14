@@ -65,10 +65,15 @@ booksController
     }
   })
   // get all - search, sort, paging
+  // Hardcoded?
   .get('/', authMiddleware, async (req, res) => {
-    const {
+    let {
       search = '', searchBy = 'title', sort = 'bookId', order = 'ASC', pageSize = 10, page = 1,
     } = req.query;
+
+    if (+pageSize > 15) pageSize = 15;
+    if (+pageSize < 5) pageSize = 5;
+    if (page < 1) page = 1;
 
     const book = await booksServices.getAllBooks(booksData)(search, searchBy, sort, order, +pageSize, +page);
 
