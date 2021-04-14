@@ -7,7 +7,8 @@ import createUserSchema from '../validator/create-user-schema.js';
 import updateUserSchema from '../validator/update-user-schema.js';
 import updatePasswordSchema from '../validator/update-password-schema.js';
 import { authMiddleware, roleMiddleware } from '../authentication/auth.middleware.js';
-import roles from '../common/roles.enum.js';
+import rolesEnum from '../common/roles.enum.js';
+import banUserSchema from '../validator/ban-user-schema.js';
 
 const usersController = express.Router();
 
@@ -119,7 +120,7 @@ usersController
   })
 
   // Ban user
-  .post('/:userId/ban', authMiddleware, roleMiddleware(roles.admin), async (req, res) => {
+  .post('/:userId/ban', authMiddleware, roleMiddleware(rolesEnum.admin), validateBody('ban', banUserSchema), async (req, res) => {
     const { userId } = req.params;
     const { duration, description } = req.body;
 

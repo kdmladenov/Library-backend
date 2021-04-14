@@ -37,3 +37,9 @@ export const vote = {
   MIN_REACTION_ID_VALUE: 0,
   MIN_REVIEW_ID_VALUE: 0,
 };
+
+export const ban = {
+  MIN_BAN_DURATION: 1,
+  MAX_BAN_DURATION: 30,
+  MIN_DESCRIPTION_LENGTH: 2,
+};
