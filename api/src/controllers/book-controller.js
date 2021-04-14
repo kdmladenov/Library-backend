@@ -198,16 +198,6 @@ booksController
     }
   });
 
-// .get('/books/rate', (req, res) => {
-//   // bookId
-//   // rating
-// });
-
-// // like a book
-// app.put('/books/:id/bookVotes', (req, res) => {
-
-// });
-
 // // read all books
 // .get('/admin/books', (res, req) => {
 
