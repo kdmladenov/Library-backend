@@ -13,7 +13,6 @@ const reviewsController = express.Router();
 reviewsController
 // update review
   .patch('/:reviewId', authMiddleware, validateBody('review', createReviewSchema), async (req, res) => {
-    console.log(req.user);
     const { content } = req.body;
     const { reviewId } = req.params;
     const { userId, role } = req.user;

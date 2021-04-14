@@ -83,7 +83,7 @@ const updateData = async (user) => {
     UPDATE users SET
       first_name = ?, 
       last_name = ?, 
-      gender_id = ?, 
+      gender_id = (SELECT gender_id FROM gender WHERE gender = ?), 
       birth_date = ?, 
       email = ?, 
       phone = ?

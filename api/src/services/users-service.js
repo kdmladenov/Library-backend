@@ -83,7 +83,7 @@ const changePassword = usersData => async (userId, passwordData, loggedUserId, r
     };
   }
 
-  const { password } = await usersData.getPasswordBy(userId);
+  const { password } = await usersData.getPasswordBy('user_id', userId);
   if (!await bcrypt.compare(oldPassword, password)) {
     return {
       error: errors.OPERATION_NOT_PERMITTED,
