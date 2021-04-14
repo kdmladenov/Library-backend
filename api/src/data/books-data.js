@@ -17,12 +17,17 @@ const getAllBooks = async (search, searchBy, sort, order, pageSize, page) => {
       g.genre,
       a.age_recommendation as ageRecommendation,
       l.language,
-      b.summary
+      b.summary,
+      r.bookRating
     FROM books b
+    LEFT JOIN (SELECT AVG(rating) as bookRating, book_id, is_deleted
+                FROM book_ratings
+                GROUP BY book_id
+                HAVING is_deleted = 0) as r using (book_id)
     LEFT JOIN genres g USING (genre_id)
     LEFT JOIN age_recommendation a USING (age_recommendation_id)
     LEFT JOIN language l USING (language_id)
-    WHERE is_deleted = 0 AND ${searchColumn} Like '%${search}%'
+    WHERE b.is_deleted = 0 AND ${searchColumn} Like '%${search}%'
     ORDER BY ? ${direction} 
     LIMIT ? OFFSET ?
   `;
