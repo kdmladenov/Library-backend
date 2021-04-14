@@ -100,19 +100,19 @@ usersController
     }
   })
 
-  .delete('/:userId', injectUser, async (req, res) => {
-    const { loggedUserId, role } = req.user;
+  .delete('/:userId', authMiddleware, async (req, res) => {
+    const { userId: loggedUserId, role } = req.user;
     const { userId } = req.params;
 
     const { error, result } = await usersService.deleteUser(usersData)(+userId, +loggedUserId, role);
 
-    if (error === errors.RECORD_NOT_FOUND) {
-      res.status(404).send({
-        message: `User with id = ${userId} is not found.`,
-      });
-    } else if (error === errors.OPERATION_NOT_PERMITTED) {
+    if (error === errors.OPERATION_NOT_PERMITTED) {
       res.status(403).send({
         message: 'No rights to delete the user.',
+      });
+    } else if (error === errors.RECORD_NOT_FOUND) {
+      res.status(404).send({
+        message: `User with id = ${userId} is not found.`,
       });
     } else {
       res.status(200).send(result);
