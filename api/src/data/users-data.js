@@ -140,7 +140,7 @@ const ban = async (userId, duration, description) => {
   return db.query(sql, [userId, duration, description]);
 };
 
-const getBanRecordsByUserId = async (userId) =>{
+const getBanRecordsByUserId = async (userId) => {
   const sql = `
     SELECT * FROM ban_status
     WHERE user_id = ?

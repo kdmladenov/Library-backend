@@ -18,13 +18,14 @@ import rateBookSchema from '../validator/rate-book-schema.js';
 import bookRatingData from '../data/book-rating-data.js';
 import { authMiddleware, roleMiddleware } from '../authentication/auth.middleware.js';
 import banGuard from '../middleware/banGuard.js';
+import rolesEnum from '../common/roles.enum.js';
 
 const booksController = express.Router();
 // To Do: Authorization, Authentication, ?
 
 booksController
   // create book
-  .post('/', authMiddleware, roleMiddleware('admin'), validateBody('book', createBookSchema), async (req, res) => {
+  .post('/', authMiddleware, roleMiddleware(rolesEnum.admin), validateBody('book', createBookSchema), async (req, res) => {
     const data = req.body;
 
     data.genre = bookGenreEnum[data.genre];
@@ -34,24 +35,30 @@ booksController
     const { error, book } = await booksServices.createBook(booksData)(data);
 
     if (error === errors.DUPLICATE_RECORD) {
-      res.status(409).send({ message: 'A book with same title or isbn already exists.' });
+      res.status(409).send({
+        message: 'A book with same title or isbn already exists.',
+      });
     } else {
       res.status(201).send(book);
     }
   })
+
   // delete book
-  .delete('/:id', authMiddleware, roleMiddleware('admin'), async (req, res) => {
+  .delete('/:id', authMiddleware, roleMiddleware(rolesEnum.admin), async (req, res) => {
     const { id } = req.params;
 
     const identifier = BOOK.ISBN_REGEX.test(id) ? id : +id;
     const { error, book } = await booksServices.deleteBook(booksData)(identifier);
 
     if (error === errors.RECORD_NOT_FOUND) {
-      res.status(404).send({ message: 'A book with this id or isbn is not found!' });
+      res.status(404).send({
+        message: 'A book with this id or isbn is not found!',
+      });
     } else {
       res.status(200).send(book);
     }
   })
+
   // get by id
   .get('/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
@@ -60,11 +67,14 @@ booksController
     const { error, book } = await booksServices.getBookById(booksData)(identifier);
 
     if (error === errors.RECORD_NOT_FOUND) {
-      res.status(404).send({ message: 'A book with this number is not found!' });
+      res.status(404).send({
+        message: 'A book with this number is not found!',
+      });
     } else {
       res.status(200).send(book);
     }
   })
+
   // get all - search, sort, paging
   .get('/', authMiddleware, async (req, res) => {
     const {
@@ -75,8 +85,9 @@ booksController
 
     res.status(200).send(book);
   })
+
   // change book
-  .put('/:bookId', authMiddleware, roleMiddleware('admin'), validateBody('book', createBookSchema), async (req, res) => {
+  .put('/:bookId', authMiddleware, roleMiddleware(rolesEnum.admin), validateBody('book', createBookSchema), async (req, res) => {
     const { bookId } = req.params;
     const data = req.body;
     data.genre = bookGenreEnum[data.genre];
@@ -87,15 +98,19 @@ booksController
     const { error, result } = await booksServices.updateBook(booksData)(+bookId, data);
     console.log(error, result, 'c2');
 
-
     if (error === errors.RECORD_NOT_FOUND) {
-      res.status(404).send({ message: 'The book is not found.' });
+      res.status(404).send({
+        message: 'The book is not found.',
+      });
     } else if (error === errors.DUPLICATE_RECORD) {
-      res.status(409).send({ message: 'A book with this title and/or isbn already exist.' });
+      res.status(409).send({
+        message: 'A book with this title and/or isbn already exist.',
+      });
     } else {
       res.status(200).send(result);
     }
   })
+
   // read review
   .get('/:bookId/reviews', authMiddleware, async (req, res) => {
     const { bookId } = req.params;
@@ -104,11 +119,14 @@ booksController
     const { error, result } = await reviewsService.getAllReviews(reviewsData)(+bookId, order, +page, +pageSize);
 
     if (error === errors.RECORD_NOT_FOUND) {
-      res.status(404).send({ message: 'The book is not found.' });
+      res.status(404).send({
+        message: 'The book is not found.',
+      });
     } else {
       res.status(200).send(result);
     }
   })
+
 // create review
   .post('/:bookId/reviews', authMiddleware, banGuard, validateBody('review', createReviewSchema), async (req, res) => {
     const { bookId } = req.params;
@@ -133,19 +151,23 @@ booksController
       res.status(201).send(result);
     }
   })
+
   // Borrow a book
-  .post('/:bookId/records', authMiddleware, validateBody('record', createRecordSchema), async (req, res) => {
+  .post('/:bookId/records', authMiddleware, banGuard, validateBody('record', createRecordSchema), async (req, res) => {
     const { userId } = req.body;
     const { bookId } = req.params;
 
     const { error, record } = await recordsServices.createRecord(recordsData)(+userId, +bookId);
 
     if (error === errors.DUPLICATE_RECORD) {
-      res.status(409).send({ message: 'A book with same title or isbn already borrowed!' });
+      res.status(409).send({
+        message: 'A book with same title or isbn already borrowed!',
+      });
     } else {
       res.status(201).send(record);
     }
   })
+
   // Return a book
   .delete('/:bookId/records', authMiddleware, async (req, res) => {
     const { bookId } = req.params;
@@ -153,24 +175,29 @@ booksController
     const { error, record } = await recordsServices.deleteRecord(recordsData)(+bookId);
 
     if (error === errors.RECORD_NOT_FOUND) {
-      res.status(404).send({ message: 'A book with this id is currently not borrowed!' });
+      res.status(404).send({
+        message: 'A book with this id is currently not borrowed!',
+      });
     } else {
       res.status(200).send(record);
     }
   })
   // Rate a book
-  .put('/:bookId/rate', authMiddleware, validateBody('rating', rateBookSchema), async (req, res) => {
+  .put('/:bookId/rate', authMiddleware, banGuard, validateBody('rating', rateBookSchema), async (req, res) => {
     const { bookId } = req.params;
     const { rating, userId } = req.body;
 
     const { error, rate } = await booksServices.rateBook(bookRatingData)(+rating, +userId, +bookId);
 
     if (error === errors.OPERATION_NOT_PERMITTED) {
-      res.status(403).send({ message: 'You are not authorized to change this rating!' });
+      res.status(403).send({
+        message: 'You are not authorized to change this rating!',
+      });
     } else {
       res.status(200).send(rate);
     }
   });
+
 // .get('/books/rate', (req, res) => {
 //   // bookId
 //   // rating

@@ -27,11 +27,7 @@ const getAllBooks = async (search, searchBy, sort, order, pageSize, page) => {
     LIMIT ? OFFSET ?
   `;
 
-  return db.query(sql, [
-    sort,
-    +pageSize,
-    +offset,
-  ]);
+  return db.query(sql, [sort, +pageSize, +offset]);
 };
 // OK
 const getBy = async (column, value) => {

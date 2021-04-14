@@ -4,7 +4,6 @@ import db from './pool.js';
 
 // };
 
-
 // OK
 const getBorrowedBy = async (column, value) => {
   const sql = `
@@ -59,7 +58,7 @@ const create = async (userId, bookId) => {
 
   const _ = await db.query(sql2);
 
-  return await getBorrowedBy('book_id', bookId);
+  return getBorrowedBy('book_id', bookId);
 };
 
 // OK
@@ -77,7 +76,7 @@ const remove = async (bookToReturn) => {
     WHERE book_id = ${bookToReturn.bookId}
 `;
 
-  return await db.query(sql2);
+  return db.query(sql2);
 };
 
 const getRecordByUserIdAndBookId = async (userId, bookId) => {
