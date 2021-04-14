@@ -6,18 +6,14 @@ import usersService from '../services/users-service.js';
 import createUserSchema from '../validator/create-user-schema.js';
 import updateUserSchema from '../validator/update-user-schema.js';
 import updatePasswordSchema from '../validator/update-password-schema.js';
-import injectUser from '../middleware/inject-user.js';
-import {
-  authMiddleware
-} from '../authentication/auth.middleware.js';
+import { authMiddleware } from '../authentication/auth.middleware.js';
 
 const usersController = express.Router();
 
 usersController
 
-  // .get('/:id', )
-  // USERS - LOGIN - PUBLIC
-  // USERS - LOGOUT
+// USERS - LOGOUT
+// GET - all users
 
   // register
   .post('/', validateBody('user', createUserSchema), async (req, res) => {
@@ -26,7 +22,7 @@ usersController
 
     if (error === errors.DUPLICATE_RECORD) {
       res.status(409).send({
-        message: 'User with same username or email already exists.'
+        message: 'User with same username or email already exists.',
       });
     } else {
       res.status(201).send(result);
@@ -119,9 +115,9 @@ usersController
     }
   });
 
-    // // bann an user
-  // .put('/admin/users/:id', (req, res) => {
+// // bann an user
+// .put('/admin/users/:id', (req, res) => {
 
-  // });
-  
+// });
+
 export default usersController;

@@ -50,17 +50,12 @@ const create = async (content, userId, bookId) => {
   const sql = `
     INSERT INTO reviews (
       content,
-      book_id,
       user_id,
+      book_id
     )
     VALUES (?, ?, ?)
   `;
-
-  const result = db.query(sql, [
-    content,
-    bookId,
-    userId,
-  ]);
+  const result = await db.query(sql, [content, userId, bookId]);
 
   return getBy('review_id', result.insertId);
 };
@@ -84,10 +79,32 @@ const remove = async (reviewId) => {
   return db.query(sql, [reviewId]);
 };
 
+const getByUserIdAndBookId = async (userId, bookId) => {
+  const sql = `
+    SELECT
+      r.review_id as reviewId,
+      r.content as content, 
+      r.date_created as dateCreated,
+      u.user_id as userId,
+      u.username as username,
+      b.book_id as bookId,
+      b.title as bookTitle,
+      b.author as bookAuthor
+    FROM reviews r
+    LEFT JOIN users u USING (user_id)
+    LEFT JOIN books b USING (book_id)
+    WHERE r.is_deleted = 0 AND u.user_id = ? AND b.book_id = ?
+  `;
+  const result = await db.query(sql, [userId, bookId]);
+
+  return result[0];
+};
+
 export default {
   getAll,
   getBy,
   create,
   update,
   remove,
+  getByUserIdAndBookId,
 };
