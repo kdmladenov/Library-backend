@@ -188,6 +188,9 @@ const banUser = usersData => async (userId, duration, description) => {
   };
 };
 
+const logout = usersData => async (token) => {
+  const _ = await usersData.logoutUser(token);
+};
 export default {
   getUser,
   createUser,
@@ -196,4 +199,5 @@ export default {
   update,
   deleteUser,
   banUser,
+  logout,
 };

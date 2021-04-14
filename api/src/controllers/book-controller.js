@@ -19,6 +19,7 @@ import bookRatingData from '../data/book-rating-data.js';
 import { authMiddleware, roleMiddleware } from '../authentication/auth.middleware.js';
 import banGuard from '../middleware/banGuard.js';
 import rolesEnum from '../common/roles.enum.js';
+import loggedUserGuard from '../middleware/loggedUserGuard.js';
 
 const booksController = express.Router();
 // To Do: Authorization, Authentication, ?
@@ -60,7 +61,7 @@ booksController
   })
 
   // get by id
-  .get('/:id', authMiddleware, async (req, res) => {
+  .get('/:id', authMiddleware, loggedUserGuard, async (req, res) => {
     const { id } = req.params;
 
     const identifier = BOOK.ISBN_REGEX.test(id) ? id : +id;
@@ -223,8 +224,5 @@ booksController
 
 // });
 
-// // update book by id
-// .put('/admin/books/:id', (req, res) => {
 
-// });
 export default booksController;

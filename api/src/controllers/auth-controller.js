@@ -5,6 +5,8 @@ import usersService from '../services/users-service.js';
 import createToken from '../authentication/create-token.js';
 import validateBody from '../middleware/validate-body.js';
 import loginUserSchema from '../validator/login-user-schema.js';
+import { authMiddleware } from '../authentication/auth.middleware.js';
+
 
 const authController = express.Router();
 
@@ -27,6 +29,14 @@ authController
 
       res.status(200).send({ token });
     }
+  })
+  .delete('/logout', authMiddleware, async (req, res) => {
+    const token = req.headers.authorization.replace('Bearer ', '');
+    const _ = await usersService.logout(usersData)(token);
+
+    res.status(200).send({
+      message: 'You have logged out successfully!',
+    });
   });
 
 export default authController;

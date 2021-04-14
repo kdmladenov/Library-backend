@@ -151,6 +151,16 @@ const getBanRecordsByUserId = async (userId) => {
 
   return result;
 };
+// tokens table includes blacklisted tokens only
+const logoutUser = async (token) => {
+  const sql = `
+    INSERT INTO tokens (
+      token
+    )
+    VALUES( ? )
+  `;
+  return db.query(sql, [token]);
+};
 
 export default {
   getBy,
@@ -162,4 +172,5 @@ export default {
   loginUser,
   ban,
   getBanRecordsByUserId,
+  logoutUser,
 };
