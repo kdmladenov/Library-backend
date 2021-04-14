@@ -16,13 +16,44 @@ const getAllReviews = reviewsData => async (bookId, order, page, pageSize) => {
   };
 };
 
-const createReview = reviewsData => async (content, userId, bookId) => {
-// check if the user attempting to create review already has made one for the same book
-// check if the user has borrowed and returned the book
-// check if user is banned
+const createReview = (booksData, reviewsData, recordsData) => async (content, userId, bookId) => {
+  // checks if the book exists
+  const existingBook = await booksData.getBy('book_id', bookId);
+  if (!existingBook) {
+    return {
+      error: errors.RECORD_NOT_FOUND,
+      result: null,
+    };
+  }
+
+  // checks if the user has already made a review for the same book
+  const existingReview = await reviewsData.getByUserIdAndBookId(userId, bookId);
+  if (existingReview) {
+    return {
+      error: errors.DUPLICATE_RECORD,
+      result: null,
+    };
+  }
+
+  // checks if the user has borrowed and returned the book
+  const existingRecord = await recordsData.getRecordByUserIdAndBookId(userId, bookId);
+  if (!existingRecord || existingRecord.dateReturned === null) {
+    return {
+      error: errors.OPERATION_NOT_PERMITTED,
+      result: null,
+    };
+  }
+
+  const review = await reviewsData.create(content, userId, bookId);
+
+  return {
+    error: null,
+    result: review,
+  };
 };
 
 const updateReview = reviewsData => async (content, reviewId, userId, role) => {
+  // checks if the review exists
   const existingReview = await reviewsData.getBy('review_id', reviewId);
   if (!existingReview) {
     return {

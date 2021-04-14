@@ -80,9 +80,26 @@ const remove = async (bookToReturn) => {
   return await db.query(sql2);
 };
 
+const getRecordByUserIdAndBookId = async (userId, bookId) => {
+  const sql = `
+    SELECT 
+    user_id as userId,
+    book_id as bookId,
+    date_borrowed as dateBorrowed,
+    date_returned as dateReturned,
+    date_to_return as dateToReturn
+    FROM records
+    WHERE user_id = ? AND book_id = ?
+  `;
+
+  const result = await db.query(sql, [userId, bookId]);
+  return result[0];
+};
+
 export default {
   create,
   // getAllRecords,
   remove,
   getBorrowedBy,
+  getRecordByUserIdAndBookId,
 };

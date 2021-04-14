@@ -17,6 +17,7 @@ import createRecordSchema from '../validator/create-record-schema.js';
 import rateBookSchema from '../validator/rate-book-schema.js';
 import bookRatingData from '../data/book-rating-data.js';
 
+
 const booksController = express.Router();
 // To Do: Authorization, Authentication, ?
 
@@ -88,17 +89,27 @@ booksController
   })
 
 // create review
-  .post('/:bookId/reviews', validateBody('review', createReviewSchema), async (req, res) => {
+  .post('/:bookId/reviews', authMiddleware, validateBody('review', createReviewSchema), async (req, res) => {
     const { bookId } = req.params;
     const { content } = req.body;
     const { userId } = req.user;
 
-    const { error, result } = await reviewsService.createReview(reviewsData)(content, userId, bookId);
+    const { error, result } = await reviewsService.createReview(booksData, reviewsData, recordsData)(content, +userId, +bookId);
 
     if (error === errors.RECORD_NOT_FOUND) {
-      res.status(404).send({ message: 'The book is not found.' });
+      res.status(404).send({
+        message: 'The book is not found.',
+      });
+    } else if (error === errors.DUPLICATE_RECORD) {
+      res.status(409).send({
+        message: `User with userId ${userId} has already reviewed the book.`,
+      });
+    } else if (error === errors.OPERATION_NOT_PERMITTED) {
+      res.status(403).send({
+        message: `Only an user who has borrowed and returned the book is allowed to write a review.`,
+      });
     } else {
-      res.status(200).send(result);
+      res.status(201).send(result);
     }
   })
 

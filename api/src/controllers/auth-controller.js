@@ -9,7 +9,7 @@ import loginUserSchema from '../validator/login-user-schema.js';
 const authController = express.Router();
 
 authController
-  .post('/login', validateBody(loginUserSchema), async (req, res) => {
+  .post('/login', validateBody('user', loginUserSchema), async (req, res) => {
     const { username, password } = req.body;
     const { error, result } = await usersService.login(usersData)(username, password);
 
