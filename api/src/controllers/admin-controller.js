@@ -8,12 +8,13 @@ import booksServices from '../services/books-services.js';
 import bookGenreEnum from '../common/book-genre.enum.js';
 import bookLanguageEnum from '../common/book-language.enum.js';
 import bookAgeRecommendationEnum from '../common/book-age-recommendation.enum.js';
+import { authMiddleware, roleMiddleware } from '../authentication/auth.middleware.js';
 
 const adminController = express.Router();
 // To Do: Authorization, Authentication, ?
 
 adminController
-  .post('/books/', validateBody('book', createBookSchema), async (req, res) => {
+  .post('/books/', authMiddleware, roleMiddleware('admin'), validateBody('book', createBookSchema), async (req, res) => {
     const data = req.body;
 
     data.genre = bookGenreEnum[data.genre];
@@ -29,7 +30,7 @@ adminController
     }
   })
 
-  .delete('/books/:id', async (req, res) => {
+  .delete('/books/:id', authMiddleware, roleMiddleware('admin'), async (req, res) => {
     const { id } = req.params;
 
     const identifier = BOOK.ISBN_REGEX.test(id) ? id : +id;
@@ -41,6 +42,7 @@ adminController
       res.status(200).send(book);
     }
   })
+
   // // Administration Part: CRUD a book, CRUD a review,
   // // read all books
   // .get('/admin/books', (res, req) => {
@@ -57,38 +59,20 @@ adminController
 
   // });
 
-  // // read all reviews by book id
-  // .get('/admin/books/:id/reviews', (req, res) => {
 
-  // });
 
-  // // read book review by id
-  // .get('/admin/reviews/:id', (req, res) => {
 
-  // });
 
-  // // create book review
-  // .post('/admin/reviews', (req, res) => {
 
-  // });
 
-  // // update book review
-  // .put('/admin/books/:id/reviews/:id', (req, res) => {
 
-  // });
 
-  // // delete book review
-  // .delete('/admin/books/:id/reviews/:id', (req, res) => {
 
-  // });
 
   // // bann an user
   // .put('/admin/users/:id', (req, res) => {
 
   // });
 
-  // // delete an user
-  // .delete('/admin/users/:id', (req, res) => {
 
-  // });
 export default adminController;

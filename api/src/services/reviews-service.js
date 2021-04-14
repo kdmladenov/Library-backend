@@ -75,17 +75,17 @@ const deleteReview = reviewsData => async (reviewId, userId, role) => {
   };
 };
 
-const voteReview = reviewVoteData => async (reviewId, userId, reactionId) => {
+const voteReview = reviewVoteData => async (reviewId, userId, reactionId, role) => {
   const existingReview = await reviewVoteData.getBy('review_id', reviewId);
 
-  if (existingReview && userId !== existingReview.userId) {
+  if (existingReview && userId !== existingReview.userId && role !== 'admin') {
     return {
       error: errors.OPERATION_NOT_PERMITTED,
       result: null,
     };
   }
 
-  if (existingReview && userId === existingReview.userId) {
+  if (existingReview && (userId === existingReview.userId || role === 'admin')) {
     const result = await reviewVoteData.update(reviewId, userId, reactionId);
 
     return {
