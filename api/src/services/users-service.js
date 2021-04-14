@@ -162,7 +162,7 @@ const deleteUser = usersData => async (userId, loggedUserId, role) => {
     };
   }
 
-  const _ = await usersData.remove(userToDeleteId);
+  const _ = await usersData.remove(userId);
 
   return {
     error: null,
