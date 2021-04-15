@@ -86,7 +86,7 @@ const create = async (user) => {
     user.role,
   ]);
 
-  return getBy('user_id', result.insertId);
+  return getBy('user_id', result.insertId, true);
 };
 
 const getPasswordBy = async (column, value) => {

@@ -11,6 +11,7 @@ import rolesEnum from '../common/roles.enum.js';
 import banUserSchema from '../validator/ban-user-schema.js';
 import loggedUserGuard from '../middleware/loggedUserGuard.js';
 import { paging } from '../common/constants.js';
+import genderEnum from '../common/gender.enum.js';
 
 const usersController = express.Router();
 
@@ -21,8 +22,10 @@ usersController
     const user = req.body;
     user.firstName = user.firstName || null;
     user.lastName = user.lastName || null;
-    user.gender = user.gender || null;
     user.phone = user.phone || null;
+    user.birthDate = user.birthDate ? new Date(user.birthDate).toLocaleDateString('af-ZA') : null; // yyyy/mm/dd
+    user.gender = user.gender ? +genderEnum[user.gender] : null;
+    user.role = rolesEnum.basic;
 
     const { error, result } = await usersService.createUser(usersData)(user);
 
