@@ -24,9 +24,9 @@ const getAllBooks = booksData => async (search, searchBy, sort, order, pageSize,
   return result;
 };
 
-const getBookById = booksData => async (id) => {
-  const book = await booksData.getBy('isbn', id)
-            || await booksData.getBy('book_id', id);
+const getBookById = booksData => async (identifier) => {
+  const book = await booksData.getBy('isbn', identifier)
+            || await booksData.getBy('book_id', identifier);
 
   if (!book) {
     return {
@@ -74,9 +74,9 @@ const updateBook = booksData => async (bookId, updatedData) => {
   };
 };
 
-const deleteBook = booksData => async (id) => {
-  const bookToDelete = await booksData.getBy('isbn', id)
-                    || await booksData.getBy('book_id', id);
+const deleteBook = booksData => async (identifier) => {
+  const bookToDelete = await booksData.getBy('isbn', identifier)
+                    || await booksData.getBy('book_id', identifier);
 
   if (!bookToDelete) {
     return {
@@ -86,10 +86,11 @@ const deleteBook = booksData => async (id) => {
   }
 
   const _ = await booksData.remove(bookToDelete);
+  // const isDeleted = {isDeleted: 1,}
 
   return {
     error: null,
-    book: bookToDelete,
+    book: ({ ...bookToDelete, "isDeleted": 1 }),
   };
 };
 
