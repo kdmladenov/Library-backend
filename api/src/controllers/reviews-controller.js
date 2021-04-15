@@ -9,6 +9,7 @@ import { authMiddleware } from '../authentication/auth.middleware.js';
 import voteReviewSchema from '../validator/vote-review-schema.js';
 import banGuard from '../middleware/banGuard.js';
 import loggedUserGuard from '../middleware/loggedUserGuard.js';
+import rolesEnum from '../common/roles.enum.js';
 
 const reviewsController = express.Router();
 
@@ -50,13 +51,24 @@ reviewsController
   .put('/:reviewId/votes', authMiddleware, loggedUserGuard, banGuard, validateBody('vote', voteReviewSchema), async (req, res) => {
     const { reactionId } = req.body;
     const { reviewId } = req.params;
-    const { userId, role } = req.body.user;
+    const { userId, role } = req.user;
 
-    const { error, result } = await reviewsService.voteReview(reviewVoteData)(+reactionId, +reviewId, +userId, role);
+    const { result } = await reviewsService.voteReview(reviewVoteData)(+reactionId, +reviewId, +userId, role);
 
-    if (error === errors.OPERATION_NOT_PERMITTED) {
+    res.status(200).send(result);
+  })
+
+  .delete('/:reviewId/votes', authMiddleware, loggedUserGuard, banGuard, validateBody('vote', voteReviewSchema), async (req, res) => {
+    const { reactionId } = req.body;
+    const { reviewId } = req.params;
+    const { role } = req.user;
+    const id = role === rolesEnum.admin ? req.body.userId : req.user.userId;
+
+    const { error, result } = await reviewsService.unVoteReview(reviewVoteData)(+reactionId, +reviewId, +id, role);
+
+    if (error === errors.RECORD_NOT_FOUND) {
       res.status(403).send({
-        message: 'You have no rights to update the vote.',
+        message: 'Review is not found.',
       });
     } else {
       res.status(200).send(result);
