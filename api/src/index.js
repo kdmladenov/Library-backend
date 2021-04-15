@@ -12,12 +12,7 @@ import reviewsController from './controllers/reviews-controller.js';
 import booksController from './controllers/book-controller.js';
 import authController from './controllers/auth-controller.js';
 import jwtStrategy from './authentication/strategy.js';
-
-// import transformBody from './middleware/transform-body.js';
-// import validateBody from './middleware/validate-body.js';
-// import createBookScheme from './validator/create-book-schema.js';
-// import updateBookSchema from './validator/update-book-schema.js';
-// import { books, createBook, updateBook } from './data/books.js';
+import recordsController from './controllers/records-controller.js';
 
 const app = express();
 
@@ -33,6 +28,7 @@ app.use('/auth', authController);
 app.use('/users', usersController);
 app.use('/reviews', reviewsController);
 app.use('/books', booksController);
+app.use('/records', recordsController);
 
 // // LEVELING SYSTEM
 

@@ -40,7 +40,7 @@ const getBookById = booksData => async (id) => {
     book,
   };
 };
-// Decide on duplicates
+
 const updateBook = booksData => async (bookId, updatedData) => {
   const existingBook = await booksData.getBy('isbn', +bookId)
                     || await booksData.getBy('book_id', +bookId);
