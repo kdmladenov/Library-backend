@@ -5,14 +5,12 @@ import recordsData from '../data/records-data.js';
 import { authMiddleware } from '../authentication/auth.middleware.js';
 import loggedUserGuard from '../middleware/loggedUserGuard.js';
 
-
 const recordsController = express.Router();
 
-// To Do:  ?
+// To Do:  ?Test SORT
 
 recordsController
   // get all - search, sort, paging
-  //Test SORT
   .get('/', authMiddleware, loggedUserGuard, async (req, res) => {
     const {
       search = '', searchBy = 'title', sort = 'record_id', order = 'ASC',
@@ -29,14 +27,3 @@ recordsController
   });
 
 export default recordsController;
-
-// GET //book/:booksId/records
-// GET /records/:
-
-/**
- * POST   books/bookId/records
- * DELETE books/bookId/records
- * GET    ???/records(userId from authMiddleware) ${if(role !== roleEnum.admin) {
- *                                                'WHERE userId = r.user_id'}}
- *         filter by bookId
- */

@@ -45,10 +45,10 @@ booksController
   })
 
   // delete book
-  .delete('/:id', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), async (req, res) => {
-    const { id } = req.params;
+  .delete('/:bookId', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), async (req, res) => {
+    const { bookId } = req.params;
 
-    const identifier = BOOK.ISBN_REGEX.test(id) ? id : +id;
+    const identifier = BOOK.ISBN_REGEX.test(bookId) ? bookId : +bookId;
     const { error, book } = await booksServices.deleteBook(booksData)(identifier);
 
     if (error === errors.RECORD_NOT_FOUND) {
@@ -61,10 +61,10 @@ booksController
   })
 
   // get by id
-  .get('/:id', authMiddleware, loggedUserGuard, loggedUserGuard, async (req, res) => {
-    const { id } = req.params;
+  .get('/:bookId', authMiddleware, loggedUserGuard, async (req, res) => {
+    const { bookId } = req.params;
 
-    const identifier = BOOK.ISBN_REGEX.test(id) ? id : +id;
+    const identifier = BOOK.ISBN_REGEX.test(bookId) ? bookId : +bookId;
     const { error, book } = await booksServices.getBookById(booksData)(identifier);
 
     if (error === errors.RECORD_NOT_FOUND) {
@@ -76,8 +76,7 @@ booksController
     }
   })
 
-  // get all - search, sort, paging
-  // Hardcoded?
+  // get all books - search, sort, paging
   .get('/', authMiddleware, loggedUserGuard, async (req, res) => {
     const {
       search = '', searchBy = 'title', sort = 'bookId', order = 'ASC',
@@ -208,15 +207,6 @@ booksController
     }
   });
 
-// // read all books
-// .get('/admin/books', (res, req) => {
-
-// });
-
-// // read book by id
-// .get('/admin/books/:id', (req, res) => {
-
-// });
 
 export default booksController;
 
