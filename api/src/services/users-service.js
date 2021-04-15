@@ -18,8 +18,8 @@ const getUser = usersData => async (userId, isProfileOwner, role) => {
   };
 };
 
-const getAllUsers = usersData => async (search, searchBy, sort, order, page, pageSize) => {
-  const result = await usersData.getAll(search, searchBy, sort, order, page, pageSize);
+const getAllUsers = usersData => async (search, searchBy, sort, order, page, pageSize, role) => {
+  const result = await usersData.getAll(search, searchBy, sort, order, page, pageSize, role);
 
   return result;
 };

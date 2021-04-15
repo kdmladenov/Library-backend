@@ -39,6 +39,7 @@ usersController
   })
 
   .get('/', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), async (req, res) => {
+    const { role } = req.user;
     const {
       search = '', searchBy = 'username', sort = 'username', order = 'ASC',
     } = req.query;
@@ -48,14 +49,14 @@ usersController
     if (+pageSize < paging.MIN_USERS_PAGESIZE) pageSize = paging.MIN_USERS_PAGESIZE;
     if (page < paging.DEFAULT_PAGE) page = paging.DEFAULT_PAGE;
 
-    const { result } = await usersService.getAllUsers(usersData)(search, searchBy, sort, order, +page, +pageSize);
-
+    const result = await usersService.getAllUsers(usersData)(search, searchBy, sort, order, +page, +pageSize, role);
+console.log(result);
     res.status(200).send(result);
   })
   // get a single user
   .get('/:userId', authMiddleware, loggedUserGuard, async (req, res) => {
     const { userId } = req.params;
-    const { role } = req.user.role;
+    const { role } = req.user;
     const isProfileOwner = +userId === req.user.userId;
     const { error, result } = await usersService.getUser(usersData)(userId, isProfileOwner, role);
 
