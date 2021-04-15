@@ -9,6 +9,8 @@ import updatePasswordSchema from '../validator/update-password-schema.js';
 import { authMiddleware, roleMiddleware } from '../authentication/auth.middleware.js';
 import rolesEnum from '../common/roles.enum.js';
 import banUserSchema from '../validator/ban-user-schema.js';
+import loggedUserGuard from '../middleware/loggedUserGuard.js';
+import { paging } from '../common/constants.js';
 
 const usersController = express.Router();
 
@@ -31,8 +33,22 @@ usersController
     }
   })
 
+  .get('/', authMiddleware, loggedUserGuard, async (req, res) => {
+    const {
+      search = '', searchBy = 'username', sort = 'username', order = 'ASC',
+    } = req.query;
+    let { pageSize = paging.DEFAULT_USERS_PAGESIZE, page = paging.DEFAULT_PAGE } = req.query;
+
+    if (+pageSize > paging.MAX_USERS_PAGESIZE) pageSize = paging.MAX_USERS_PAGESIZE;
+    if (+pageSize < paging.MIN_USERS_PAGESIZE) pageSize = paging.MIN_USERS_PAGESIZE;
+    if (page < paging.DEFAULT_PAGE) page = paging.DEFAULT_PAGE;
+
+    const { result } = await usersService.getAllUsers(usersData)(search, searchBy, sort, order, +page, +pageSize);
+
+    res.status(200).send(result);
+  })
   // get a single user
-  .get('/:userId', authMiddleware, async (req, res) => {
+  .get('/:userId', authMiddleware, loggedUserGuard, async (req, res) => {
     const { userId } = req.params;
     const { error, result } = await usersService.getUser(usersData)(userId);
 
@@ -46,7 +62,7 @@ usersController
   })
 
   // Change password
-  .patch('/:userId/change-password', authMiddleware, validateBody('user', updatePasswordSchema), async (req, res) => {
+  .patch('/:userId/change-password', authMiddleware, loggedUserGuard, validateBody('user', updatePasswordSchema), async (req, res) => {
     const { userId: loggedUserId, role } = req.user;
     const { userId } = req.params;
     const passwordData = req.body;
@@ -71,7 +87,7 @@ usersController
   })
 
   // Update user
-  .put('/:userId', authMiddleware, validateBody('user', updateUserSchema), async (req, res) => {
+  .put('/:userId', authMiddleware, loggedUserGuard, validateBody('user', updateUserSchema), async (req, res) => {
     const { userId: loggedUserId, role } = req.user;
     const { userId } = req.params;
     const userUpdate = req.body;
@@ -100,7 +116,7 @@ usersController
   })
 
   // Delete user
-  .delete('/:userId', authMiddleware, async (req, res) => {
+  .delete('/:userId', authMiddleware, loggedUserGuard, async (req, res) => {
     const { userId: loggedUserId, role } = req.user;
     const { userId } = req.params;
 
@@ -120,7 +136,7 @@ usersController
   })
 
   // Ban user
-  .post('/:userId/ban', authMiddleware, roleMiddleware(rolesEnum.admin), validateBody('ban', banUserSchema), async (req, res) => {
+  .post('/:userId/ban', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), validateBody('ban', banUserSchema), async (req, res) => {
     const { userId } = req.params;
     const { duration, description } = req.body;
 

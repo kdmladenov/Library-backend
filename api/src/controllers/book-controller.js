@@ -3,7 +3,7 @@ import booksData from '../data/books-data.js';
 import validateBody from '../middleware/validate-body.js';
 import errors from '../services/service-errors.js';
 import createBookSchema from '../validator/create-book-schema.js';
-import { book as BOOK } from '../common/constants.js';
+import { book as BOOK, paging } from '../common/constants.js';
 import booksServices from '../services/books-services.js';
 import bookGenreEnum from '../common/book-genre.enum.js';
 import bookLanguageEnum from '../common/book-language.enum.js';
@@ -22,11 +22,11 @@ import rolesEnum from '../common/roles.enum.js';
 import loggedUserGuard from '../middleware/loggedUserGuard.js';
 
 const booksController = express.Router();
-// To Do: Authorization, Authentication, ?
+// To Do:  ?
 
 booksController
   // create book
-  .post('/', authMiddleware, roleMiddleware(rolesEnum.admin), validateBody('book', createBookSchema), async (req, res) => {
+  .post('/', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), validateBody('book', createBookSchema), async (req, res) => {
     const data = req.body;
 
     data.genre = bookGenreEnum[data.genre];
@@ -45,7 +45,7 @@ booksController
   })
 
   // delete book
-  .delete('/:id', authMiddleware, roleMiddleware(rolesEnum.admin), async (req, res) => {
+  .delete('/:id', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), async (req, res) => {
     const { id } = req.params;
 
     const identifier = BOOK.ISBN_REGEX.test(id) ? id : +id;
@@ -61,7 +61,7 @@ booksController
   })
 
   // get by id
-  .get('/:id', authMiddleware, loggedUserGuard, async (req, res) => {
+  .get('/:id', authMiddleware, loggedUserGuard, loggedUserGuard, async (req, res) => {
     const { id } = req.params;
 
     const identifier = BOOK.ISBN_REGEX.test(id) ? id : +id;
@@ -78,14 +78,15 @@ booksController
 
   // get all - search, sort, paging
   // Hardcoded?
-  .get('/', authMiddleware, async (req, res) => {
-    let {
-      search = '', searchBy = 'title', sort = 'bookId', order = 'ASC', pageSize = 10, page = 1,
+  .get('/', authMiddleware, loggedUserGuard, async (req, res) => {
+    const {
+      search = '', searchBy = 'title', sort = 'bookId', order = 'ASC',
     } = req.query;
+    let { pageSize = paging.DEFAULT_BOOKS_PAGESIZE, page = paging.DEFAULT_PAGE } = req.query;
 
-    if (+pageSize > 15) pageSize = 15;
-    if (+pageSize < 5) pageSize = 5;
-    if (page < 1) page = 1;
+    if (+pageSize > paging.MAX_BOOKS_PAGESIZE) pageSize = paging.MAX_BOOKS_PAGESIZE;
+    if (+pageSize < paging.MIN_BOOKS_PAGESIZE) pageSize = paging.MIN_BOOKS_PAGESIZE;
+    if (page < paging.DEFAULT_PAGE) page = paging.DEFAULT_PAGE;
 
     const book = await booksServices.getAllBooks(booksData)(search, searchBy, sort, order, +pageSize, +page);
 
@@ -93,16 +94,14 @@ booksController
   })
 
   // change book
-  .put('/:bookId', authMiddleware, roleMiddleware(rolesEnum.admin), validateBody('book', createBookSchema), async (req, res) => {
+  .put('/:bookId', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), validateBody('book', createBookSchema), async (req, res) => {
     const { bookId } = req.params;
     const data = req.body;
     data.genre = bookGenreEnum[data.genre];
     data.language = bookLanguageEnum[data.language];
     data.ageRecommendation = bookAgeRecommendationEnum[data.ageRecommendation];
-    console.log(bookId, data, 'c');
 
     const { error, result } = await booksServices.updateBook(booksData)(+bookId, data);
-    console.log(error, result, 'c2');
 
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
@@ -118,9 +117,14 @@ booksController
   })
 
   // read review
-  .get('/:bookId/reviews', authMiddleware, async (req, res) => {
+  .get('/:bookId/reviews', authMiddleware, loggedUserGuard, async (req, res) => {
     const { bookId } = req.params;
-    const { order = 'ASC', page = 1, pageSize = 10 } = req.query;
+    const { order = 'ASC' } = req.query;
+    let { pageSize = paging.DEFAULT_REVIEWS_PAGESIZE, page = paging.DEFAULT_PAGE } = req.query;
+
+    if (+pageSize > paging.MAX_REVIEWS_PAGESIZE) pageSize = paging.MAX_REVIEWS_PAGESIZE;
+    if (+pageSize < paging.MIN_REVIEWS_PAGESIZE) pageSize = paging.MAX_REVIEWS_PAGESIZE;
+    if (page < paging.DEFAULT_PAGE) page = paging.DEFAULT_PAGE;
 
     const { error, result } = await reviewsService.getAllReviews(reviewsData)(+bookId, order, +page, +pageSize);
 
@@ -134,7 +138,7 @@ booksController
   })
 
 // create review
-  .post('/:bookId/reviews', authMiddleware, banGuard, validateBody('review', createReviewSchema), async (req, res) => {
+  .post('/:bookId/reviews', authMiddleware, loggedUserGuard, banGuard, validateBody('review', createReviewSchema), async (req, res) => {
     const { bookId } = req.params;
     const { content } = req.body;
     const { userId } = req.user;
@@ -159,7 +163,7 @@ booksController
   })
 
   // Borrow a book
-  .post('/:bookId/records', authMiddleware, banGuard, validateBody('record', createRecordSchema), async (req, res) => {
+  .post('/:bookId/records', authMiddleware, loggedUserGuard, banGuard, validateBody('record', createRecordSchema), async (req, res) => {
     const { userId } = req.body;
     const { bookId } = req.params;
 
@@ -175,7 +179,7 @@ booksController
   })
 
   // Return a book
-  .delete('/:bookId/records', authMiddleware, async (req, res) => {
+  .delete('/:bookId/records', authMiddleware, loggedUserGuard, async (req, res) => {
     const { bookId } = req.params;
 
     const { error, record } = await recordsServices.deleteRecord(recordsData)(+bookId);
@@ -189,7 +193,7 @@ booksController
     }
   })
   // Rate a book
-  .put('/:bookId/rate', authMiddleware, banGuard, validateBody('rating', rateBookSchema), async (req, res) => {
+  .put('/:bookId/rate', authMiddleware, loggedUserGuard, banGuard, validateBody('rating', rateBookSchema), async (req, res) => {
     const { bookId } = req.params;
     const { rating, userId } = req.body;
 
@@ -214,5 +218,22 @@ booksController
 
 // });
 
-
 export default booksController;
+
+// GET //book/:booksId/records
+// GET /records/:
+
+/**
+ * POST   books/bookId/records
+ * DELETE books/bookId/records
+ * GET    ???/records(userId from authMiddleware) ${if(role !== roleEnum.admin) {
+ *                                                'WHERE userId = r.user_id'}}
+ *         filter by bookId
+ */
+
+/**
+ * POST   books/:bookId/reviews
+ * GET    books/:bookId/reviews
+ * PUT    reviews/:reviewId
+ * DELETE reviews/:reviewId
+ */

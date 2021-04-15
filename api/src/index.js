@@ -7,7 +7,7 @@ import helmet from 'helmet';
 import passport from 'passport';
 
 import usersController from './controllers/users-controller.js';
-import { PORT } from '../../config.js';
+import { PORT } from '../config.js';
 import reviewsController from './controllers/reviews-controller.js';
 import booksController from './controllers/book-controller.js';
 import authController from './controllers/auth-controller.js';

@@ -7,7 +7,6 @@ import validateBody from '../middleware/validate-body.js';
 import loginUserSchema from '../validator/login-user-schema.js';
 import { authMiddleware } from '../authentication/auth.middleware.js';
 
-
 const authController = express.Router();
 
 authController

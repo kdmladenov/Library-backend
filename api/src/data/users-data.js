@@ -26,6 +26,14 @@ const getBy = async (column, value) => {
   return result[0];
 };
 
+const getAll = async (search, searchBy, sort, order, page, pageSize) => {
+  const sql = `
+  
+  `;
+
+  return db.query(sql, [search, searchBy, sort, order, page, pageSize]);
+};
+
 const create = async (user) => {
   const sql = `
     INSERT INTO users (
@@ -164,6 +172,7 @@ const logoutUser = async (token) => {
 
 export default {
   getBy,
+  getAll,
   create,
   getPasswordBy,
   updatePassword,

@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import genderEnum from '../common/gender.enum.js';
 import errors from './service-errors.js';
-import { DEFAULT_USER_ROLE as basicRole } from '../../../config.js';
+import { DEFAULT_USER_ROLE as basicRole } from '../../config.js';
 
 const getUser = usersData => async userId => {
   const user = await usersData.getBy('user_id', userId);
@@ -16,6 +16,12 @@ const getUser = usersData => async userId => {
     error: null,
     result: user,
   };
+};
+
+const getAllUsers = usersData => async (search, searchBy, sort, order, page, pageSize) => {
+  const result = await usersData.getAll(search, searchBy, sort, order, page, pageSize);
+
+  return result;
 };
 
 const createUser = usersData => async user => {
@@ -193,6 +199,7 @@ const logout = usersData => async (token) => {
 };
 export default {
   getUser,
+  getAllUsers,
   createUser,
   login,
   changePassword,
