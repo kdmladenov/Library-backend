@@ -16,9 +16,6 @@ const usersController = express.Router();
 
 usersController
 
-// USERS - LOGOUT
-// GET - all users
-
   // register
   .post('/', validateBody('user', createUserSchema), async (req, res) => {
     const user = req.body;
@@ -38,7 +35,8 @@ usersController
     }
   })
 
-  .get('/', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), async (req, res) => {
+  // get all users
+  .get('/', authMiddleware, loggedUserGuard, async (req, res) => {
     const { role } = req.user;
     const {
       search = '', searchBy = 'username', sort = 'username', order = 'ASC',
@@ -50,9 +48,9 @@ usersController
     if (page < paging.DEFAULT_PAGE) page = paging.DEFAULT_PAGE;
 
     const result = await usersService.getAllUsers(usersData)(search, searchBy, sort, order, +page, +pageSize, role);
-console.log(result);
     res.status(200).send(result);
   })
+
   // get a single user
   .get('/:userId', authMiddleware, loggedUserGuard, async (req, res) => {
     const { userId } = req.params;
@@ -95,7 +93,6 @@ console.log(result);
     const { role } = req.user;
     const userUpdate = req.body;
     const id = role === rolesEnum.admin ? req.body.userId : req.user.userId;
-    console.log(userUpdate);
 
     const { error, result } = await usersService.update(usersData)(userUpdate, +id);
 
