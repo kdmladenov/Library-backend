@@ -1,10 +1,10 @@
 import bcrypt from 'bcrypt';
 import genderEnum from '../common/gender.enum.js';
 import errors from './service-errors.js';
-import { DEFAULT_USER_ROLE as basicRole } from '../../config.js';
+import rolesEnum from '../common/roles.enum.js';
 
-const getUser = usersData => async userId => {
-  const user = await usersData.getBy('user_id', userId);
+const getUser = usersData => async (userId, isProfileOwner, role) => {
+  const user = await usersData.getBy('user_id', userId, isProfileOwner, role);
   if (!user) {
     return {
       error: errors.RECORD_NOT_FOUND,
@@ -24,10 +24,11 @@ const getAllUsers = usersData => async (search, searchBy, sort, order, page, pag
   return result;
 };
 
+// register
 const createUser = usersData => async user => {
   const { username, email } = user;
   const existingUser = await usersData.getBy('username', username)
-                    || await usersData.getBy('email', email);
+                    || await usersData.getBy('email', email, true);
 
   if (existingUser) {
     return {
@@ -39,15 +40,17 @@ const createUser = usersData => async user => {
   const password = await bcrypt.hash(user.password, 10);
   const birthDate = new Date(user.birthDate).toLocaleDateString('af-ZA'); // yyyy/mm/dd
   const gender = +genderEnum[user.gender];
+  const role = rolesEnum.basic;
 
   return {
     error: null,
     result: await usersData.create({
-      ...user, password, birthDate, gender, basicRole,
+      ...user, password, birthDate, gender, role,
     }),
   };
 };
 
+// login
 const login = usersData => async (username, password) => {
   const user = await usersData.loginUser(username);
 
@@ -64,23 +67,8 @@ const login = usersData => async (username, password) => {
   };
 };
 
-const changePassword = usersData => async (userId, passwordData, loggedUserId, role) => {
-  // checks if the user who attempt to update the password is the owner of the user profile
-  if (userId !== loggedUserId && role !== 'admin') {
-    return {
-      error: errors.OPERATION_NOT_PERMITTED,
-      result: null,
-    };
-  }
-
-  const { newPassword, reenteredNewPassword, oldPassword } = passwordData;
-  if (newPassword !== reenteredNewPassword) {
-    return {
-      error: errors.BAD_REQUEST,
-      result: null,
-    };
-  }
-
+// change password
+const changePassword = usersData => async (passwordData, userId, role) => {
   const existingUser = await usersData.getBy('user_id', userId);
   if (!existingUser) {
     return {
@@ -90,9 +78,11 @@ const changePassword = usersData => async (userId, passwordData, loggedUserId, r
   }
 
   const { password } = await usersData.getPasswordBy('user_id', userId);
-  if (!await bcrypt.compare(oldPassword, password)) {
+  const { newPassword, reenteredNewPassword, oldPassword } = passwordData;
+
+  if (newPassword !== reenteredNewPassword || (!await bcrypt.compare(oldPassword, password) && role !== rolesEnum.admin)) {
     return {
-      error: errors.OPERATION_NOT_PERMITTED,
+      error: errors.BAD_REQUEST,
       result: null,
     };
   }
@@ -104,15 +94,9 @@ const changePassword = usersData => async (userId, passwordData, loggedUserId, r
     result: { message: 'The password was successfully changed' },
   };
 };
-const update = usersData => async (userUpdate, userId, loggedUserId, role) => {
-  // checks if the user who attempt to update the profile is the owner of it
-  if (userId !== loggedUserId && role !== 'admin') {
-    return {
-      error: errors.OPERATION_NOT_PERMITTED,
-      result: null,
-    };
-  }
 
+// update profile
+const update = usersData => async (userUpdate, userId) => {
   const { newEmail, reenteredNewEmail } = userUpdate;
   if (newEmail && newEmail !== reenteredNewEmail) {
     return {
@@ -121,7 +105,7 @@ const update = usersData => async (userUpdate, userId, loggedUserId, role) => {
     };
   }
 
-  const existingUser = await usersData.getBy('user_id', userId);
+  const existingUser = await usersData.getBy('user_id', userId, true);
   if (!existingUser) {
     return {
       error: errors.RECORD_NOT_FOUND,
@@ -129,7 +113,7 @@ const update = usersData => async (userUpdate, userId, loggedUserId, role) => {
     };
   }
 
-  if (newEmail && !!(await usersData.getBy('email', newEmail))) {
+  if (newEmail && !!(await usersData.getBy('email', newEmail, true))) {
     return {
       error: errors.DUPLICATE_RECORD,
       result: null,
@@ -142,7 +126,6 @@ const update = usersData => async (userUpdate, userId, loggedUserId, role) => {
 
   const updatedUser = { ...existingUser, ...userUpdate, userId };
   updatedUser.birthDate = new Date(updatedUser.birthDate).toLocaleDateString('af-ZA');
-
   const _ = await usersData.updateData(updatedUser);
 
   return {
@@ -151,15 +134,8 @@ const update = usersData => async (userUpdate, userId, loggedUserId, role) => {
   };
 };
 
-const deleteUser = usersData => async (userId, loggedUserId, role) => {
-  // checks if the user who attempt to delete the profile is the owner of it
-  if (userId !== loggedUserId && role !== 'admin') {
-    return {
-      error: errors.OPERATION_NOT_PERMITTED,
-      result: null,
-    };
-  }
-
+// delete profile
+const deleteUser = usersData => async (userId) => {
   const existingUser = await usersData.getBy('user_id', userId);
   if (!existingUser) {
     return {
@@ -176,6 +152,7 @@ const deleteUser = usersData => async (userId, loggedUserId, role) => {
   };
 };
 
+// ban an user
 const banUser = usersData => async (userId, duration, description) => {
   const user = await usersData.getBy('user_id', userId);
 
@@ -197,6 +174,7 @@ const banUser = usersData => async (userId, duration, description) => {
 const logout = usersData => async (token) => {
   const _ = await usersData.logoutUser(token);
 };
+
 export default {
   getUser,
   getAllUsers,

@@ -1,3 +1,4 @@
+import rolesEnum from '../common/roles.enum.js';
 import db from './pool.js';
 
 const getAll = async (bookId, order, page, pageSize) => {
@@ -25,7 +26,7 @@ const getAll = async (bookId, order, page, pageSize) => {
   return db.query(sql, [+bookId, offset, pageSize]);
 };
 
-const getBy = async (column, value) => {
+const getBy = async (column, value, userId, role) => {
   const sql = `
     SELECT
       r.review_id as reviewId,
@@ -39,9 +40,9 @@ const getBy = async (column, value) => {
     FROM reviews r
     LEFT JOIN users u USING (user_id)
     LEFT JOIN books b USING (book_id)
-    WHERE r.is_deleted = 0 AND ${column} = ?
+    WHERE ${column} = ? ${role === rolesEnum.basic ? 'AND r.is_deleted = 0 AND user_id = ?' : ''}
   `;
-  const result = await db.query(sql, [value]);
+  const result = await db.query(sql, [value, userId]);
 
   return result[0];
 };
@@ -60,23 +61,23 @@ const create = async (content, userId, bookId) => {
   return getBy('review_id', result.insertId);
 };
 
-const update = async (content, reviewId) => {
+const update = async (content, reviewId, userId, role) => {
   const sql = `
     UPDATE reviews SET
       content = ?,
       date_edited = CURRENT_TIMESTAMP()
-    WHERE review_id = ?
+    WHERE review_id = ? ${role === rolesEnum.basic ? 'AND user_id = ?' : ''}
   `;
-  return db.query(sql, [content, reviewId]);
+  return db.query(sql, [content, reviewId, userId]);
 };
 
-const remove = async (reviewId) => {
+const remove = async (reviewId, userId, role) => {
   const sql = `
-  UPDATE reviews SET
-    is_deleted = true
-  WHERE review_id = ?
+    UPDATE reviews SET
+      is_deleted = true
+    WHERE review_id = ? ${role === rolesEnum.basic ? 'AND user_id = ?' : ''}
   `;
-  return db.query(sql, [reviewId]);
+  return db.query(sql, [reviewId, userId, role]);
 };
 
 const getByUserIdAndBookId = async (userId, bookId) => {

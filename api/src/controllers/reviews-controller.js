@@ -25,10 +25,6 @@ reviewsController
       res.status(404).send({
         message: 'The review is not found.',
       });
-    } else if (error === errors.OPERATION_NOT_PERMITTED) {
-      res.status(403).send({
-        message: 'No rights to update the review.',
-      });
     } else {
       res.status(200).send(result);
     }
@@ -45,20 +41,18 @@ reviewsController
       res.status(404).send({
         message: 'The review is not found.',
       });
-    } else if (error === errors.OPERATION_NOT_PERMITTED) {
-      res.status(403).send({
-        message: 'No rights to delete the review.',
-      });
     } else {
       res.status(200).send(result);
     }
   })
+
   // Vote Review - status codes mixed
   .put('/:reviewId/votes', authMiddleware, loggedUserGuard, banGuard, validateBody('vote', voteReviewSchema), async (req, res) => {
-    const { reviewId, role } = req.params;
-    const { userId, reactionId } = req.body;
+    const { reactionId } = req.body;
+    const { reviewId } = req.params;
+    const { userId, role } = req.body.user;
 
-    const { error, result } = await reviewsService.voteReview(reviewVoteData)(+reviewId, +userId, +reactionId, role);
+    const { error, result } = await reviewsService.voteReview(reviewVoteData)(+reactionId, +reviewId, +userId, role);
 
     if (error === errors.OPERATION_NOT_PERMITTED) {
       res.status(403).send({

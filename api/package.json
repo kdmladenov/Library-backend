@@ -35,7 +35,7 @@
     "regenerator-runtime": "^0.13.7"
   },
   "devDependencies": {
-    "eslint": "^7.23.0",
+    "eslint": "^7.24.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-import": "^2.22.1",
