@@ -1,5 +1,4 @@
-import { tokenExists } from '../data/tokens-data.js';
-
+import tokenExists from '../data/tokens-data.js';
 
 export default async (req, res, next) => {
   const token = req.headers.authorization.replace('Bearer ', '');

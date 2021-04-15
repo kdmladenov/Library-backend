@@ -8,12 +8,13 @@ import createReviewSchema from '../validator/create-review-schema.js';
 import { authMiddleware } from '../authentication/auth.middleware.js';
 import voteReviewSchema from '../validator/vote-review-schema.js';
 import banGuard from '../middleware/banGuard.js';
+import loggedUserGuard from '../middleware/loggedUserGuard.js';
 
 const reviewsController = express.Router();
 
 reviewsController
 // update review
-  .patch('/:reviewId', authMiddleware, banGuard, validateBody('review', createReviewSchema), async (req, res) => {
+  .patch('/:reviewId', authMiddleware, loggedUserGuard, banGuard, validateBody('review', createReviewSchema), async (req, res) => {
     const { content } = req.body;
     const { reviewId } = req.params;
     const { userId, role } = req.user;
@@ -34,7 +35,7 @@ reviewsController
   })
 
 // delete review
-  .delete('/:reviewId', authMiddleware, banGuard, async (req, res) => {
+  .delete('/:reviewId', authMiddleware, loggedUserGuard, banGuard, async (req, res) => {
     const { userId, role } = req.user;
     const { reviewId } = req.params;
 
@@ -53,7 +54,7 @@ reviewsController
     }
   })
   // Vote Review - status codes mixed
-  .put('/:reviewId/votes', authMiddleware, banGuard, validateBody('vote', voteReviewSchema), async (req, res) => {
+  .put('/:reviewId/votes', authMiddleware, loggedUserGuard, banGuard, validateBody('vote', voteReviewSchema), async (req, res) => {
     const { reviewId, role } = req.params;
     const { userId, reactionId } = req.body;
 
