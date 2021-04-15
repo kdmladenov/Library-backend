@@ -22,6 +22,11 @@ usersController
   // register
   .post('/', validateBody('user', createUserSchema), async (req, res) => {
     const user = req.body;
+    user.firstName = user.firstName || null;
+    user.lastName = user.lastName || null;
+    user.gender = user.gender || null;
+    user.phone = user.phone || null;
+
     const { error, result } = await usersService.createUser(usersData)(user);
 
     if (error === errors.DUPLICATE_RECORD) {
@@ -33,7 +38,7 @@ usersController
     }
   })
 
-  .get('/', authMiddleware, loggedUserGuard, async (req, res) => {
+  .get('/', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), async (req, res) => {
     const {
       search = '', searchBy = 'username', sort = 'username', order = 'ASC',
     } = req.query;
@@ -50,7 +55,9 @@ usersController
   // get a single user
   .get('/:userId', authMiddleware, loggedUserGuard, async (req, res) => {
     const { userId } = req.params;
-    const { error, result } = await usersService.getUser(usersData)(userId);
+    const { role } = req.user.role;
+    const isProfileOwner = +userId === req.user.userId;
+    const { error, result } = await usersService.getUser(usersData)(userId, isProfileOwner, role);
 
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
@@ -62,24 +69,20 @@ usersController
   })
 
   // Change password
-  .patch('/:userId/change-password', authMiddleware, loggedUserGuard, validateBody('user', updatePasswordSchema), async (req, res) => {
-    const { userId: loggedUserId, role } = req.user;
-    const { userId } = req.params;
+  .patch('/change-password', authMiddleware, loggedUserGuard, validateBody('user', updatePasswordSchema), async (req, res) => {
+    const { role } = req.user;
     const passwordData = req.body;
+    const id = role === rolesEnum.admin ? req.body.userId : req.user.userId;
 
-    const { error, result } = await usersService.changePassword(usersData)(+userId, passwordData, +loggedUserId, role);
+    const { error, result } = await usersService.changePassword(usersData)(passwordData, +id, role);
 
-    if (error === errors.OPERATION_NOT_PERMITTED) {
-      res.status(403).send({
-        message: 'No rights to update the password.',
-      });
-    } else if (error === errors.BAD_REQUEST) {
+    if (error === errors.BAD_REQUEST) {
       res.status(400).send({
         message: 'The request was invalid. Passwords do not match.',
       });
     } else if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
-        message: `User ${userId} is not found.`,
+        message: `User ${id} is not found.`,
       });
     } else {
       res.status(200).send(result);
@@ -87,24 +90,21 @@ usersController
   })
 
   // Update user
-  .put('/:userId', authMiddleware, loggedUserGuard, validateBody('user', updateUserSchema), async (req, res) => {
-    const { userId: loggedUserId, role } = req.user;
-    const { userId } = req.params;
+  .put('/edit-profile', authMiddleware, loggedUserGuard, validateBody('user', updateUserSchema), async (req, res) => {
+    const { role } = req.user;
     const userUpdate = req.body;
+    const id = role === rolesEnum.admin ? req.body.userId : req.user.userId;
+    console.log(userUpdate);
 
-    const { error, result } = await usersService.update(usersData)(userUpdate, +userId, +loggedUserId, role);
+    const { error, result } = await usersService.update(usersData)(userUpdate, +id);
 
-    if (error === errors.OPERATION_NOT_PERMITTED) {
-      res.status(403).send({
-        message: 'No rights to update the password.',
-      });
-    } else if (error === errors.BAD_REQUEST) {
+    if (error === errors.BAD_REQUEST) {
       res.status(400).send({
         message: 'The request was invalid. Emails do not match.',
       });
     } else if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
-        message: `User ${userId} is not found.`,
+        message: `User ${id} is not found.`,
       });
     } else if (error === errors.DUPLICATE_RECORD) {
       res.status(409).send({
@@ -116,19 +116,15 @@ usersController
   })
 
   // Delete user
-  .delete('/:userId', authMiddleware, loggedUserGuard, async (req, res) => {
-    const { userId: loggedUserId, role } = req.user;
-    const { userId } = req.params;
+  .delete('/delete-profile', authMiddleware, loggedUserGuard, async (req, res) => {
+    const { role } = req.user;
+    const id = role === rolesEnum.admin ? req.body.userId : req.user.userId;
 
-    const { error, result } = await usersService.deleteUser(usersData)(+userId, +loggedUserId, role);
+    const { error, result } = await usersService.deleteUser(usersData)(+id);
 
-    if (error === errors.OPERATION_NOT_PERMITTED) {
-      res.status(403).send({
-        message: `No rights to delete user ${userId}.`,
-      });
-    } else if (error === errors.RECORD_NOT_FOUND) {
+    if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
-        message: `User ${userId} is not found.`,
+        message: `User ${id} is not found.`,
       });
     } else {
       res.status(200).send(result);

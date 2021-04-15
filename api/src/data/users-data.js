@@ -1,24 +1,25 @@
+import rolesEnum from '../common/roles.enum.js';
 import db from './pool.js';
 
-const getBy = async (column, value) => {
+const getBy = async (column, value, isProfileOwner, role) => {
   const sql = `
     SELECT 
       u.user_id as userId, 
       u.username as username,
       u.first_name as firstName,
-      u.last_name as lastName,
+      u.reading_points as readingPoints
+      ${role === rolesEnum.admin || isProfileOwner ? `, u.last_name as lastName,
       g.gender as gender,
       DATE_FORMAT(u.birth_date, "%m/%d/%Y") as birthDate,
       u.email as email,
       u.phone as phone,
-      u.reading_points as readingPoints,
       b.ban_date as banDate,
       b.exp_date as banExpDate,
-      b.description as banDescription
+      b.description as banDescription` : ''}
     FROM users u
     LEFT JOIN gender g USING (gender_id)
     LEFT JOIN ban_status b USING (user_id)
-    WHERE u.is_deleted = 0 AND ${column} = ?
+    WHERE ${role === rolesEnum.admin ? `` : `u.is_deleted = 0 AND`} ${column} = ?
   `;
 
   const result = await db.query(sql, value);
@@ -53,12 +54,12 @@ const create = async (user) => {
   const result = await db.query(sql, [
     user.username,
     user.password,
-    user.firstName || null,
-    user.lastName || null,
-    user.gender || null,
+    user.firstName,
+    user.lastName,
+    user.gender,
     user.birthDate,
     user.email,
-    user.phone || null,
+    user.phone,
     user.role,
   ]);
 
