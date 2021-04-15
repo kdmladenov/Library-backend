@@ -35,9 +35,11 @@ const deleteRecord = recordsData => async (bookId) => {
   };
 };
 
-// const getAllRecords = booksData => async (data) => {
+const getAllRecords = recordsData => async (search, searchBy, sort, order, pageSize, page) => {
+  const result = await recordsData.getAllRecords(search, searchBy, sort, order, pageSize, page);
 
-// };
+  return result;
+};
 
 // const updateRecord = booksData => async (id) => {
 
@@ -46,4 +48,5 @@ const deleteRecord = recordsData => async (bookId) => {
 export default {
   createRecord,
   deleteRecord,
+  getAllRecords,
 };

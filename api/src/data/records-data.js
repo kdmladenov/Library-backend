@@ -1,8 +1,43 @@
 import db from './pool.js';
 // Not started
-// const getAllRecords = async () => {
+const getAllRecords = async (search, searchBy, sort, order, pageSize, page) => {
+  const direction = ['ASC', 'asc', 'DESC', 'desc'].includes(order) ? order : 'asc';
+  const searchColumn = [
+    'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary',
+    'record_id', 'date_borrowed', 'bookRating', 'date_returned', 'date_to_return', 'user_id'].includes(searchBy) ? searchBy : 'title';
+  const offset = page ? (page - 1) * pageSize : 0;
 
-// };
+  const sql = `
+    SELECT 
+    rc.record_id as recordId,
+    b.book_id as bookId,
+    rc.user_id as userId,
+    b.title,
+    b.author,
+    b.isbn,
+    r.bookRating,
+    g.genre,
+    b.summary,
+    b.date_published as datePublished,
+    rc.date_borrowed as dateBorrowed,
+    rc.date_to_return as dateToReturned,
+    rc.date_returned as dateReturned,
+    b.is_deleted as isDeleted
+    FROM records rc 
+    LEFT JOIN books b USING (book_id)
+    LEFT JOIN genres g USING(genre_id)
+    LEFT JOIN age_recommendation a USING(age_recommendation_id)
+    LEFT JOIN language l USING(language_id)
+    LEFT JOIN (SELECT AVG(rating) as bookRating, book_id, is_deleted
+                    FROM book_ratings
+                    GROUP BY book_id
+                    HAVING is_deleted = 0) as r using (book_id)
+    WHERE b.is_deleted = 0 AND ${searchColumn} Like '%${search}%'
+    ORDER BY ? ${direction} 
+    LIMIT ? OFFSET ?
+  `;
+  return db.query(sql, [sort, +pageSize, +offset]);
+};
 
 // OK
 const getBorrowedBy = async (column, value) => {
@@ -97,7 +132,7 @@ const getRecordByUserIdAndBookId = async (userId, bookId) => {
 
 export default {
   create,
-  // getAllRecords,
+  getAllRecords,
   remove,
   getBorrowedBy,
   getRecordByUserIdAndBookId,
