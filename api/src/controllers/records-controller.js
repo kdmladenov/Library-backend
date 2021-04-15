@@ -2,6 +2,8 @@ import express from 'express';
 import { paging } from '../common/constants.js';
 import recordsServices from '../services/records-services.js';
 import recordsData from '../data/records-data.js';
+import { authMiddleware } from '../authentication/auth.middleware.js';
+import loggedUserGuard from '../middleware/loggedUserGuard.js';
 
 
 const recordsController = express.Router();
@@ -9,9 +11,9 @@ const recordsController = express.Router();
 // To Do:  ?
 
 recordsController
-  // get all - search, sort
+  // get all - search, sort, paging
   //Test SORT
-  .get('/', pagingauthMiddleware, loggedUserGuard, async (req, res) => {
+  .get('/', authMiddleware, loggedUserGuard, async (req, res) => {
     const {
       search = '', searchBy = 'title', sort = 'record_id', order = 'ASC',
     } = req.query;
