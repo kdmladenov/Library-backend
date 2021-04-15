@@ -27,12 +27,35 @@ const getBy = async (column, value, isProfileOwner, role) => {
   return result[0];
 };
 
-const getAll = async (search, searchBy, sort, order, page, pageSize) => {
+const getAll = async (search, searchBy, sort, order, page, pageSize, role) => {
+  const direction = ['ASC', 'asc', 'DESC', 'desc'].includes(order) ? order : 'asc';
+  const searchColumn = [
+    'user_id', 'username', 'first_name', 'reading_points', 'last_name', 'gender', 'email', 'last_name'].includes(searchBy) ? searchBy : 'title';
+  const offset = page ? (page - 1) * pageSize : 0;
+
   const sql = `
-  
+    SELECT 
+      u.user_id as userId, 
+      u.username as username,
+      u.first_name as firstName,
+      u.reading_points as readingPoints
+      ${role === rolesEnum.admin ? `, u.last_name as lastName,
+      g.gender as gender,
+      DATE_FORMAT(u.birth_date, "%m/%d/%Y") as birthDate,
+      u.email as email,
+      u.phone as phone,
+      b.ban_date as banDate,
+      b.exp_date as banExpDate,
+      b.description as banDescription` : ''}
+    FROM users u
+    LEFT JOIN gender g USING (gender_id)
+    LEFT JOIN ban_status b USING (user_id)
+    WHERE ${role === rolesEnum.admin ? `` : `u.is_deleted = 0 AND`} ${searchColumn} Like '%${search}%'
+    ORDER BY ? ${direction} 
+    LIMIT ? OFFSET ?
   `;
 
-  return db.query(sql, [search, searchBy, sort, order, page, pageSize]);
+  return db.query(sql, [sort, pageSize, offset]);
 };
 
 const create = async (user) => {
@@ -63,7 +86,7 @@ const create = async (user) => {
     user.role,
   ]);
 
-  return getBy('user_id', result.insertId);
+  return getBy('user_id', result.insertId, true);
 };
 
 const getPasswordBy = async (column, value) => {

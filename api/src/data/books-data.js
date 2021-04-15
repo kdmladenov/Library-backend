@@ -92,8 +92,6 @@ const create = async (book) => {
 };
 
 const update = async (updatedBook) => {
-  console.log(updatedBook, 'd1');
-
   const sql = `
         UPDATE books
         SET

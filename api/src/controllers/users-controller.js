@@ -11,21 +11,21 @@ import rolesEnum from '../common/roles.enum.js';
 import banUserSchema from '../validator/ban-user-schema.js';
 import loggedUserGuard from '../middleware/loggedUserGuard.js';
 import { paging } from '../common/constants.js';
+import genderEnum from '../common/gender.enum.js';
 
 const usersController = express.Router();
 
 usersController
-
-// USERS - LOGOUT
-// GET - all users
 
   // register
   .post('/', validateBody('user', createUserSchema), async (req, res) => {
     const user = req.body;
     user.firstName = user.firstName || null;
     user.lastName = user.lastName || null;
-    user.gender = user.gender || null;
     user.phone = user.phone || null;
+    user.birthDate = user.birthDate ? new Date(user.birthDate).toLocaleDateString('af-ZA') : null; // yyyy/mm/dd
+    user.gender = user.gender ? +genderEnum[user.gender] : null;
+    user.role = rolesEnum.basic;
 
     const { error, result } = await usersService.createUser(usersData)(user);
 
@@ -38,7 +38,9 @@ usersController
     }
   })
 
-  .get('/', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), async (req, res) => {
+  // get all users
+  .get('/', authMiddleware, loggedUserGuard, async (req, res) => {
+    const { role } = req.user;
     const {
       search = '', searchBy = 'username', sort = 'username', order = 'ASC',
     } = req.query;
@@ -48,14 +50,14 @@ usersController
     if (+pageSize < paging.MIN_USERS_PAGESIZE) pageSize = paging.MIN_USERS_PAGESIZE;
     if (page < paging.DEFAULT_PAGE) page = paging.DEFAULT_PAGE;
 
-    const { result } = await usersService.getAllUsers(usersData)(search, searchBy, sort, order, +page, +pageSize);
-
+    const result = await usersService.getAllUsers(usersData)(search, searchBy, sort, order, +page, +pageSize, role);
     res.status(200).send(result);
   })
+
   // get a single user
   .get('/:userId', authMiddleware, loggedUserGuard, async (req, res) => {
     const { userId } = req.params;
-    const { role } = req.user.role;
+    const { role } = req.user;
     const isProfileOwner = +userId === req.user.userId;
     const { error, result } = await usersService.getUser(usersData)(userId, isProfileOwner, role);
 
@@ -94,7 +96,6 @@ usersController
     const { role } = req.user;
     const userUpdate = req.body;
     const id = role === rolesEnum.admin ? req.body.userId : req.user.userId;
-    console.log(userUpdate);
 
     const { error, result } = await usersService.update(usersData)(userUpdate, +id);
 

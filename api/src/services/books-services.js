@@ -63,10 +63,7 @@ const updateBook = booksData => async (bookId, updatedData) => {
   }
 
   const updated = { ...existingBook, ...updatedData };
-  console.log(bookId, updated, 's');
-
   const result = await booksData.update(updated);
-  console.log(bookId, result, 's3');
 
   return {
     error: null,

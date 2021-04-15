@@ -1,5 +1,4 @@
 import bcrypt from 'bcrypt';
-import genderEnum from '../common/gender.enum.js';
 import errors from './service-errors.js';
 import rolesEnum from '../common/roles.enum.js';
 
@@ -18,8 +17,8 @@ const getUser = usersData => async (userId, isProfileOwner, role) => {
   };
 };
 
-const getAllUsers = usersData => async (search, searchBy, sort, order, page, pageSize) => {
-  const result = await usersData.getAll(search, searchBy, sort, order, page, pageSize);
+const getAllUsers = usersData => async (search, searchBy, sort, order, page, pageSize, role) => {
+  const result = await usersData.getAll(search, searchBy, sort, order, page, pageSize, role);
 
   return result;
 };
@@ -38,15 +37,10 @@ const createUser = usersData => async user => {
   }
 
   const password = await bcrypt.hash(user.password, 10);
-  const birthDate = new Date(user.birthDate).toLocaleDateString('af-ZA'); // yyyy/mm/dd
-  const gender = +genderEnum[user.gender];
-  const role = rolesEnum.basic;
 
   return {
     error: null,
-    result: await usersData.create({
-      ...user, password, birthDate, gender, role,
-    }),
+    result: await usersData.create({ ...user, password }),
   };
 };
 

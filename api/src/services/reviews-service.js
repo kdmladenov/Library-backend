@@ -92,18 +92,35 @@ const deleteReview = reviewsData => async (reviewId, userId, role) => {
 const voteReview = reviewVoteData => async (reactionId, reviewId, userId, role) => {
   const existingReview = await reviewVoteData.getBy('review_id', reviewId, userId, role);
 
-  if (!existingReview) {
-    const result = await reviewVoteData.update(reactionId, reviewId, userId);
+  if (existingReview) {
+    const result = await reviewVoteData.update(reactionId, reviewId, userId, role);
     return {
       error: null,
       result,
     };
   }
 
-  const result = await reviewVoteData.create(reactionId, reviewId, userId);
+  const result = await reviewVoteData.create(reactionId, reviewId, userId, role);
   return {
     error: null,
     result,
+  };
+};
+
+const unVoteReview = reviewVoteData => async (reviewId, userId, role) => {
+  const existingReview = await reviewVoteData.getBy('review_id', reviewId, userId, role);
+
+  if (!existingReview) {
+    return {
+      error: errors.RECORD_NOT_FOUND,
+      result: null,
+    };
+  }
+
+  const _ = await reviewVoteData.remove(reviewId, userId);
+  return {
+    error: null,
+    result: { message: `Vote was successfully removed.` },
   };
 };
 export default {
@@ -112,4 +129,5 @@ export default {
   updateReview,
   deleteReview,
   voteReview,
+  unVoteReview,
 };

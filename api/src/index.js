@@ -1,6 +1,3 @@
-/* eslint-disable array-bracket-spacing */
-/* eslint-disable object-curly-newline */
-/* eslint-disable max-len */
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
