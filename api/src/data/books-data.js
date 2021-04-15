@@ -1,3 +1,4 @@
+import rolesEnum from '../common/roles.enum.js';
 import db from './pool.js';
 // OK
 const getAllBooks = async (search, searchBy, sort, order, pageSize, page) => {
@@ -27,7 +28,7 @@ const getAllBooks = async (search, searchBy, sort, order, pageSize, page) => {
     LEFT JOIN genres g USING (genre_id)
     LEFT JOIN age_recommendation a USING (age_recommendation_id)
     LEFT JOIN language l USING (language_id)
-    WHERE b.is_deleted = 0 AND ${searchColumn} Like '%${search}%'
+    WHERE ${role === rolesEnum.basic ? 'AND b.is_deleted = 0 AND' : ''} ${searchColumn} Like '%${search}%'
     ORDER BY ? ${direction} 
     LIMIT ? OFFSET ?
   `;

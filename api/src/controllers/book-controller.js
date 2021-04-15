@@ -165,7 +165,8 @@ booksController
   .post('/:bookId/records', authMiddleware, loggedUserGuard, banGuard, validateBody('record', createRecordSchema), async (req, res) => {
     const { userId } = req.body;
     const { bookId } = req.params;
-
+    
+    
     const { error, record } = await recordsServices.createRecord(recordsData)(+userId, +bookId);
 
     if (error === errors.DUPLICATE_RECORD) {

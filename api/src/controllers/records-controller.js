@@ -15,13 +15,15 @@ recordsController
     const {
       search = '', searchBy = 'title', sort = 'record_id', order = 'ASC',
     } = req.query;
+    const { role } = req.user;
+    
     let { pageSize = paging.DEFAULT_BOOKS_PAGESIZE, page = paging.DEFAULT_PAGE } = req.query;
 
     if (+pageSize > paging.MAX_RECORDS_PAGESIZE) pageSize = paging.MAX_RECORDS_PAGESIZE;
     if (+pageSize < paging.MIN_RECORDS_PAGESIZE) pageSize = paging.MAX_RECORDS_PAGESIZE;
     if (page < paging.DEFAULT_PAGE) page = paging.DEFAULT_PAGE;
 
-    const record = await recordsServices.getAllRecords(recordsData)(search, searchBy, sort, order, +pageSize, +page);
+    const record = await recordsServices.getAllRecords(recordsData)(search, searchBy, sort, order, +pageSize, +page, role);
 
     res.status(200).send(record);
   });
