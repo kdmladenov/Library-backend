@@ -1,14 +1,16 @@
 import errors from './service-errors.js';
 
-const getAllReviews = reviewsData => async (bookId, order, page, pageSize) => {
-  const reviews = await reviewsData.getAll(bookId, order, page, pageSize);
+const getAllReviews = (reviewsData, booksData) => async (bookId, order, page, pageSize) => {
+  const existingBook = await booksData.getBy('book_id', bookId);
 
-  if (!reviews) {
+  if (!existingBook) {
     return {
       error: errors.RECORD_NOT_FOUND,
       result: null,
     };
   }
+
+  const reviews = await reviewsData.getAll(bookId, order, page, pageSize);
 
   return {
     error: null,
