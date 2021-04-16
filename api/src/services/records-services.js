@@ -1,3 +1,4 @@
+import { readingPoints } from '../common/constants.js';
 import errors from './service-errors.js';
 // To Do: Gamification, getAllRecords, updateRecord ?
 
@@ -17,7 +18,7 @@ const createRecord = recordsData => async (userId, bookId) => {
   };
 };
 
-const deleteRecord = recordsData => async (bookId) => {
+const deleteRecord = (recordsData, usersData) => async (bookId) => {
   const bookToReturn = await recordsData.getBorrowedBy('book_id', bookId);
 
   if (!bookToReturn) {
@@ -27,7 +28,12 @@ const deleteRecord = recordsData => async (bookId) => {
     };
   }
 
-  const _ = await recordsData.remove(bookToReturn);
+  const { userId, dateToReturn } = bookToReturn;
+  const days = Math.ceil((new Date(dateToReturn) - new Date()) / (24 * 60 * 60 * 1000)) > 0;
+  const points = days > 0 ? 5 : Math.floor(days * readingPoints.RETURN_LATE_MULTIPLIER);
+
+  const p = await usersData.updatePoints(userId, points);
+  const r = await recordsData.remove(bookToReturn);
 
   return {
     error: null,

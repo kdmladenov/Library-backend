@@ -10,6 +10,7 @@ import voteReviewSchema from '../validator/vote-review-schema.js';
 import banGuard from '../middleware/banGuard.js';
 import loggedUserGuard from '../middleware/loggedUserGuard.js';
 import rolesEnum from '../common/roles.enum.js';
+import usersData from '../data/users-data.js';
 
 const reviewsController = express.Router();
 
@@ -64,7 +65,7 @@ reviewsController
     const { role } = req.user;
     const id = role === rolesEnum.admin ? req.body.userId : req.user.userId;
 
-    const { error, result } = await reviewsService.unVoteReview(reviewVoteData)(+reactionId, +reviewId, +id, role);
+    const { error, result } = await reviewsService.unVoteReview(reviewVoteData, usersData)(+reactionId, +reviewId, +id, role);
 
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(403).send({

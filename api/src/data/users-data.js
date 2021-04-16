@@ -194,6 +194,16 @@ const logoutUser = async (token) => {
   return db.query(sql, [token]);
 };
 
+const updatePoints = async (userId, points) => {
+  const sql = `
+    UPDATE users SET
+      reading_points = reading_points + ?
+    WHERE user_id = ?
+  `;
+
+  return db.query(sql, [points, userId]);
+};
+
 export default {
   getBy,
   getAll,
@@ -206,4 +216,5 @@ export default {
   ban,
   getBanRecordsByUserId,
   logoutUser,
+  updatePoints,
 };

@@ -60,3 +60,11 @@ export const paging = {
   DEFAULT_RECORDS_PAGESIZE: 10,
 };
 
+export const readingPoints = {
+  RETURN_ON_TIME: 5,
+  RETURN_LATE_MULTIPLIER: -0.2,
+  POST_REVIEW: 10,
+  DELETE_REVIEW: 10,
+  RATE_BOOK: 2,
+  GET_BANNED_MULTIPLIER: -0.2,
+};

@@ -1,3 +1,4 @@
+import { readingPoints } from '../common/constants.js';
 import errors from './service-errors.js';
 
 const getAllReviews = (reviewsData, booksData) => async (bookId, order, page, pageSize) => {
@@ -18,7 +19,7 @@ const getAllReviews = (reviewsData, booksData) => async (bookId, order, page, pa
   };
 };
 
-const createReview = (booksData, reviewsData, recordsData) => async (content, userId, bookId) => {
+const createReview = (booksData, reviewsData, recordsData, usersData) => async (content, userId, bookId) => {
   // checks if the book exists
   const existingBook = await booksData.getBy('book_id', bookId);
   if (!existingBook) {
@@ -46,6 +47,7 @@ const createReview = (booksData, reviewsData, recordsData) => async (content, us
     };
   }
 
+  const _ = await usersData.updatePoints(userId, readingPoints.POST_REVIEW);
   const review = await reviewsData.create(content, userId, bookId);
 
   return {
@@ -74,7 +76,7 @@ const updateReview = reviewsData => async (content, reviewId, userId, role) => {
   };
 };
 
-const deleteReview = reviewsData => async (reviewId, userId, role) => {
+const deleteReview = (reviewsData, usersData) => async (reviewId, userId, role) => {
   const existingReview = await reviewsData.getBy('review_id', reviewId, userId, role);
   if (!existingReview) {
     return {
@@ -83,7 +85,8 @@ const deleteReview = reviewsData => async (reviewId, userId, role) => {
     };
   }
 
-  const _ = await reviewsData.remove(reviewId, userId, role);
+  const p = await usersData.updatePoints(userId, readingPoints.DELETE_REVIEW);
+  const r = await reviewsData.remove(reviewId, userId, role);
 
   return {
     error: null,
