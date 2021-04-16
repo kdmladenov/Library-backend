@@ -29,7 +29,7 @@ booksController
   // create book
   .post('/', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), validateBody('book', createBookSchema), async (req, res) => {
     const data = req.body;
-    
+
     data.genre = bookGenreEnum[data.genre];
     data.language = bookLanguageEnum[data.language];
     data.ageRecommendation = bookAgeRecommendationEnum[data.ageRecommendation];
@@ -99,7 +99,7 @@ booksController
   .put('/:bookId', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), validateBody('book', updateBookSchema), async (req, res) => {
     const { bookId } = req.params;
     const data = req.body;
-  
+
     if (data.genre) data.genre = bookGenreEnum[data.genre];
     if (data.language) data.language = bookLanguageEnum[data.language];
     if (data.ageRecommendation) data.ageRecommendation = bookAgeRecommendationEnum[data.ageRecommendation];
@@ -129,7 +129,7 @@ booksController
     if (+pageSize < paging.MIN_REVIEWS_PAGESIZE) pageSize = paging.MAX_REVIEWS_PAGESIZE;
     if (page < paging.DEFAULT_PAGE) page = paging.DEFAULT_PAGE;
 
-    const { error, result } = await reviewsService.getAllReviews(reviewsData)(+bookId, order, +page, +pageSize);
+    const { error, result } = await reviewsService.getAllReviews(reviewsData, booksData)(+bookId, order, +page, +pageSize);
 
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
@@ -169,7 +169,7 @@ booksController
   .post('/:bookId/records', authMiddleware, loggedUserGuard, banGuard, async (req, res) => {
     const { userId } = req.user;
     const { bookId } = req.params;
-    
+
     const { error, record } = await recordsServices.createRecord(recordsData)(+userId, +bookId);
 
     if (error === errors.DUPLICATE_RECORD) {

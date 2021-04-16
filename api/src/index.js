@@ -28,7 +28,7 @@ app.use('/books', booksController);
 app.use('/records', recordsController);
 app.use((err, req, res, next) => {
   res.status(500).send({
-    message: 'Ooops....'
+    message: 'Ooops... Something went wrong - please, try again later!',
   });
 });
 // // LEVELING SYSTEM
