@@ -26,7 +26,11 @@ app.use('/users', usersController);
 app.use('/reviews', reviewsController);
 app.use('/books', booksController);
 app.use('/records', recordsController);
-
+app.use((err, req, res, next) => {
+  res.status(500).send({
+    message: 'Ooops....'
+  });
+});
 // // LEVELING SYSTEM
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}...`));
