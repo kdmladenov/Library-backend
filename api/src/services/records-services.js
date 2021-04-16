@@ -35,8 +35,8 @@ const deleteRecord = recordsData => async (bookId) => {
   };
 };
 
-const getAllRecords = recordsData => async (search, searchBy, sort, order, pageSize, page) => {
-  const result = await recordsData.getAllRecords(search, searchBy, sort, order, pageSize, page);
+const getAllRecords = recordsData => async (search, searchBy, sort, order, pageSize, page, role, userId) => {
+  const result = await recordsData.getAllRecords(search, searchBy, sort, order, pageSize, page, role, +userId);
 
   return result;
 };

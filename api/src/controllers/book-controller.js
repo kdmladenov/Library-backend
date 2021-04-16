@@ -20,15 +20,16 @@ import { authMiddleware, roleMiddleware } from '../authentication/auth.middlewar
 import banGuard from '../middleware/banGuard.js';
 import rolesEnum from '../common/roles.enum.js';
 import loggedUserGuard from '../middleware/loggedUserGuard.js';
+import updateBookSchema from '../validator/update-book-schema.js';
 
 const booksController = express.Router();
-// To Do:  ?
+ 
 
 booksController
   // create book
   .post('/', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), validateBody('book', createBookSchema), async (req, res) => {
     const data = req.body;
-
+    
     data.genre = bookGenreEnum[data.genre];
     data.language = bookLanguageEnum[data.language];
     data.ageRecommendation = bookAgeRecommendationEnum[data.ageRecommendation];
@@ -81,24 +82,27 @@ booksController
     const {
       search = '', searchBy = 'title', sort = 'bookId', order = 'ASC',
     } = req.query;
+    const { role } = req.user;
+
     let { pageSize = paging.DEFAULT_BOOKS_PAGESIZE, page = paging.DEFAULT_PAGE } = req.query;
 
     if (+pageSize > paging.MAX_BOOKS_PAGESIZE) pageSize = paging.MAX_BOOKS_PAGESIZE;
     if (+pageSize < paging.MIN_BOOKS_PAGESIZE) pageSize = paging.MIN_BOOKS_PAGESIZE;
     if (page < paging.DEFAULT_PAGE) page = paging.DEFAULT_PAGE;
 
-    const book = await booksServices.getAllBooks(booksData)(search, searchBy, sort, order, +pageSize, +page);
+    const book = await booksServices.getAllBooks(booksData)(search, searchBy, sort, order, +pageSize, +page, role);
 
     res.status(200).send(book);
   })
 
-  // change book
-  .put('/:bookId', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), validateBody('book', createBookSchema), async (req, res) => {
+  // change book To correct
+  .put('/:bookId', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), validateBody('book', updateBookSchema), async (req, res) => {
     const { bookId } = req.params;
     const data = req.body;
-    data.genre = bookGenreEnum[data.genre];
-    data.language = bookLanguageEnum[data.language];
-    data.ageRecommendation = bookAgeRecommendationEnum[data.ageRecommendation];
+  
+    if (data.genre) data.genre = bookGenreEnum[data.genre];
+    if (data.language) data.language = bookLanguageEnum[data.language];
+    if (data.ageRecommendation) data.ageRecommendation = bookAgeRecommendationEnum[data.ageRecommendation];
 
     const { error, result } = await booksServices.updateBook(booksData)(+bookId, data);
 
@@ -108,7 +112,7 @@ booksController
       });
     } else if (error === errors.DUPLICATE_RECORD) {
       res.status(409).send({
-        message: 'A book with this title and/or isbn already exist.',
+        message: 'Another book with this title and/or isbn already exist.',
       });
     } else {
       res.status(200).send(result);
@@ -161,11 +165,11 @@ booksController
     }
   })
 
-  // Borrow a book
-  .post('/:bookId/records', authMiddleware, loggedUserGuard, banGuard, validateBody('record', createRecordSchema), async (req, res) => {
-    const { userId } = req.body;
+  // Borrow a book - no userId validation in body - no body
+  .post('/:bookId/records', authMiddleware, loggedUserGuard, banGuard, async (req, res) => {
+    const { userId } = req.user;
     const { bookId } = req.params;
-
+    
     const { error, record } = await recordsServices.createRecord(recordsData)(+userId, +bookId);
 
     if (error === errors.DUPLICATE_RECORD) {
@@ -194,7 +198,8 @@ booksController
   // Rate a book
   .put('/:bookId/rate', authMiddleware, loggedUserGuard, banGuard, validateBody('rating', rateBookSchema), async (req, res) => {
     const { bookId } = req.params;
-    const { rating, userId } = req.body;
+    const { rating } = req.body;
+    const { userId } = req.user;
 
     const { error, rate } = await booksServices.rateBook(bookRatingData)(+rating, +userId, +bookId);
 

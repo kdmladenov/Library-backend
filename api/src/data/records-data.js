@@ -1,6 +1,7 @@
+import rolesEnum from '../common/roles.enum.js';
 import db from './pool.js';
 // Not started
-const getAllRecords = async (search, searchBy, sort, order, pageSize, page) => {
+const getAllRecords = async (search, searchBy, sort, order, pageSize, page, role, userId) => {
   const direction = ['ASC', 'asc', 'DESC', 'desc'].includes(order) ? order : 'asc';
   const searchColumn = [
     'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary',
@@ -16,13 +17,14 @@ const getAllRecords = async (search, searchBy, sort, order, pageSize, page) => {
       r.bookRating,
       g.genre,
       b.summary,
-      DATE_FORMAT(b.date_published, "%Y-%d-%m")  as datePublished,
-      DATE_FORMAT(rc.date_to_return, "%Y-%d-%m")  as dateExpectedToBeFree,
-      DATE_FORMAT(rc.date_returned, "%Y-%d-%m")  as dateReturned,
-      DATE_FORMAT(rc.date_borrowed, "%Y-%d-%m")  as dateBorrowed,
-      rc.record_id as recordId,
-      rc.user_id as userId,
-      b.is_deleted as isDeleted
+      DATE_FORMAT(b.date_published, "%Y-%m-%d")  as datePublished,
+      DATE_FORMAT(rc.date_to_return, "%Y-%m-%d")  as dateExpectedToBeFree
+      ${(role === rolesEnum.admin) ? `,
+        DATE_FORMAT(rc.date_returned, "%Y-%m-%d")  as dateReturned,
+        DATE_FORMAT(rc.date_borrowed, "%Y-%m-%d")  as dateBorrowed,
+        rc.record_id as recordId,
+        rc.user_id as userId,
+        b.is_deleted as isDeleted ` : ''}
     FROM records rc 
     LEFT JOIN books b USING (book_id)
     LEFT JOIN genres g USING(genre_id)
@@ -31,15 +33,16 @@ const getAllRecords = async (search, searchBy, sort, order, pageSize, page) => {
     LEFT JOIN (SELECT AVG(rating) as bookRating, book_id, is_deleted
                     FROM book_ratings
                     GROUP BY book_id
-                    HAVING is_deleted = 0) as r using (book_id)
-    WHERE b.is_deleted = 0 AND ${searchColumn} Like '%${search}%'
+                    HAVING is_deleted = 0) as r USING (book_id)
+    WHERE ${role === rolesEnum.basic ? `b.is_deleted = 0  AND user_id = ? AND ` : ''} ${searchColumn} Like '%${search}%'
     ORDER BY ? ${direction} 
     LIMIT ? OFFSET ?
   `;
-  return db.query(sql, [sort, +pageSize, +offset]);
+
+  return db.query(sql, [userId, sort, +pageSize, +offset]);
 };
 
-// OK
+// OK no difference admin/basic
 const getBorrowedBy = async (column, value) => {
   const sql = `
     SELECT 
@@ -53,21 +56,26 @@ const getBorrowedBy = async (column, value) => {
     a.age_recommendation as ageRecommendation,
     l.language,
     b.summary,
-    b.pages,      
+    b.pages,
+    rt.bookRating,      
     b.is_borrowed as isBorrowed,
-    DATE_FORMAT(r.date_borrowed, "%Y-%d-%m") as dateBorrowed,
-    DATE_FORMAT(r.date_returned, "%Y-%d-%m") as dateReturned,
-    DATE_FORMAT(r.date_to_return, "%Y-%d-%m") as dateToReturn,
-    DATE_FORMAT(b.date_published, "%Y-%d-%m") as datePublished,
+    DATE_FORMAT(r.date_borrowed, "%Y-%m-%d") as dateBorrowed,
+    DATE_FORMAT(r.date_returned, "%Y-%m-%d") as dateReturned,
+    DATE_FORMAT(r.date_to_return, "%Y-%m-%d") as dateToReturn,
+    DATE_FORMAT(b.date_published, "%Y-%m-%d") as datePublished,
     b.is_deleted as isDeleted
     FROM books b
     LEFT JOIN records r USING(${column})
+    LEFT JOIN (SELECT AVG(rating) as bookRating, book_id, is_deleted
+                FROM book_ratings
+                GROUP BY book_id
+                HAVING is_deleted = 0) as rt using (book_id)
     LEFT JOIN genres g USING (genre_id)
     LEFT JOIN age_recommendation a USING (age_recommendation_id)
     LEFT JOIN language l USING (language_id)
     WHERE ${column} = ${value} 
     AND date_returned IS NULL 
-    AND is_deleted = 0
+    AND b.is_deleted = 0
     AND is_borrowed = 1;
   `;
 
@@ -102,7 +110,7 @@ const remove = async (bookToReturn) => {
   const sql = `
         UPDATE records 
         SET date_returned = CURRENT_TIMESTAMP()
-        WHERE book_id = ${bookToReturn.bookId}
+        WHERE date_returned IS NULL AND book_id = ${bookToReturn.bookId}
     `;
   const _ = await db.query(sql);
 
@@ -120,9 +128,9 @@ const getRecordByUserIdAndBookId = async (userId, bookId) => {
     SELECT 
     user_id as userId,
     book_id as bookId,
-    DATE_FORMAT(date_borrowed, "%Y-%d-%m") as dateBorrowed,
-    DATE_FORMAT(date_returned, "%Y-%d-%m") as dateReturned,
-    DATE_FORMAT(date_to_return, "%Y-%d-%m") as dateToReturn
+    DATE_FORMAT(date_borrowed, "%Y-%m-%d") as dateBorrowed,
+    DATE_FORMAT(date_returned, "%Y-%m-%d") as dateReturned,
+    DATE_FORMAT(date_to_return, "%Y-%m-%d") as dateToReturn
     FROM records
     WHERE user_id = ? AND book_id = ?
   `;
