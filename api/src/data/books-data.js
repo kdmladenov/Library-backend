@@ -97,7 +97,6 @@ const create = async (book) => {
 };
 
 const update = async (updatedBook) => {
-  // console.log(updatedBook);
   const sql = `
         UPDATE books
         SET
@@ -106,9 +105,9 @@ const update = async (updatedBook) => {
           date_published = ?,
           isbn = ?,
           is_deleted = ?,
-          genre_id = ?,
-          age_recommendation_id = ?,
-          language_id = ?,
+          genre_id = (SELECT genre_id FROM genres WHERE genre = ?),
+          age_recommendation_id = (SELECT age_recommendation_id FROM age_recommendation WHERE age_recommendation = ?),
+          language_id = (SELECT language_id FROM language WHERE language = ?),
           summary = ?
         WHERE book_id = ?
     `;
@@ -119,8 +118,8 @@ const update = async (updatedBook) => {
     updatedBook.datePublished,
     updatedBook.isbn,
     +updatedBook.isDeleted,
-    +updatedBook.genre,
-    +updatedBook.ageRecommendation,
+    updatedBook.genre,
+    updatedBook.ageRecommendation,
     updatedBook.language,
     updatedBook.summary,
     +updatedBook.bookId,

@@ -23,7 +23,7 @@ import loggedUserGuard from '../middleware/loggedUserGuard.js';
 import updateBookSchema from '../validator/update-book-schema.js';
 
 const booksController = express.Router();
-// To Do:  ?
+ 
 
 booksController
   // create book
@@ -112,7 +112,7 @@ booksController
       });
     } else if (error === errors.DUPLICATE_RECORD) {
       res.status(409).send({
-        message: 'A book with this title and/or isbn already exist.',
+        message: 'Another book with this title and/or isbn already exist.',
       });
     } else {
       res.status(200).send(result);
