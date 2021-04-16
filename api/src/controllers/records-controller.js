@@ -10,20 +10,20 @@ const recordsController = express.Router();
 // To Do:  ?Test SORT
 
 recordsController
-  // get all - search, sort, paging
+  // get all - search, sort, paging To check 
   .get('/', authMiddleware, loggedUserGuard, async (req, res) => {
     const {
       search = '', searchBy = 'title', sort = 'record_id', order = 'ASC',
     } = req.query;
-    const { role } = req.user;
-    
+    const { role, userId } = req.user;
+
     let { pageSize = paging.DEFAULT_BOOKS_PAGESIZE, page = paging.DEFAULT_PAGE } = req.query;
 
     if (+pageSize > paging.MAX_RECORDS_PAGESIZE) pageSize = paging.MAX_RECORDS_PAGESIZE;
     if (+pageSize < paging.MIN_RECORDS_PAGESIZE) pageSize = paging.MAX_RECORDS_PAGESIZE;
     if (page < paging.DEFAULT_PAGE) page = paging.DEFAULT_PAGE;
 
-    const record = await recordsServices.getAllRecords(recordsData)(search, searchBy, sort, order, +pageSize, +page, role);
+    const record = await recordsServices.getAllRecords(recordsData)(search, searchBy, sort, order, +pageSize, +page, role, +userId);
 
     res.status(200).send(record);
   });

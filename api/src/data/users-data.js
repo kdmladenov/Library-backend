@@ -10,7 +10,7 @@ const getBy = async (column, value, isProfileOwner, role) => {
       u.reading_points as readingPoints
       ${role === rolesEnum.admin || isProfileOwner ? `, u.last_name as lastName,
       g.gender as gender,
-      DATE_FORMAT(u.birth_date, "%m/%d/%Y") as birthDate,
+      DATE_FORMAT(u.birth_date, "%Y-%m-%d") as birthDate,
       u.email as email,
       u.phone as phone,
       b.ban_date as banDate,
@@ -41,7 +41,7 @@ const getAll = async (search, searchBy, sort, order, page, pageSize, role) => {
       u.reading_points as readingPoints
       ${role === rolesEnum.admin ? `, u.last_name as lastName,
       g.gender as gender,
-      DATE_FORMAT(u.birth_date, "%m/%d/%Y") as birthDate,
+      DATE_FORMAT(u.birth_date, "%Y-%m-%d") as birthDate,
       u.email as email,
       u.phone as phone,
       b.ban_date as banDate,

@@ -1,7 +1,7 @@
 import rolesEnum from '../common/roles.enum.js';
 import db from './pool.js';
 // OK
-const getAllBooks = async (search, searchBy, sort, order, pageSize, page) => {
+const getAllBooks = async (search, searchBy, sort, order, pageSize, page, role) => {
   const direction = ['ASC', 'asc', 'DESC', 'desc'].includes(order) ? order : 'asc';
   const searchColumn = [
     'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary'].includes(searchBy) ? searchBy : 'title';
@@ -12,23 +12,28 @@ const getAllBooks = async (search, searchBy, sort, order, pageSize, page) => {
       b.book_id as bookId,
       b.title,
       b.author,
-      DATE_FORMAT(b.date_published, "%Y-%d-%m") as datePublished,
+      DATE_FORMAT(b.date_published, "%Y-%m-%d") as datePublished,
       b.isbn,
       b.is_deleted as isDeleted,
       g.genre,
       a.age_recommendation as ageRecommendation,
       l.language,
       b.summary,
-      r.bookRating
+      r.bookRating,
+      rc.availableOn
     FROM books b
     LEFT JOIN (SELECT AVG(rating) as bookRating, book_id, is_deleted
                 FROM book_ratings
                 GROUP BY book_id
                 HAVING is_deleted = 0) as r using (book_id)
+    LEFT JOIN (SELECT book_id, date_returned, date_to_return as availableOn
+                FROM records
+                GROUP BY record_id
+                HAVING date_returned is Null) as rc using (book_id)
     LEFT JOIN genres g USING (genre_id)
     LEFT JOIN age_recommendation a USING (age_recommendation_id)
     LEFT JOIN language l USING (language_id)
-    WHERE ${role === rolesEnum.basic ? 'AND b.is_deleted = 0 AND' : ''} ${searchColumn} Like '%${search}%'
+    WHERE ${role === rolesEnum.basic ? ' b.is_deleted = 0 AND' : ''} ${searchColumn} Like '%${search}%'
     ORDER BY ? ${direction} 
     LIMIT ? OFFSET ?
   `;
@@ -42,7 +47,7 @@ const getBy = async (column, value) => {
       b.book_id as bookId,
       b.title,
       b.author,
-      DATE_FORMAT(b.date_published, "%Y-%d-%m") as datePublished,
+      DATE_FORMAT(b.date_published, "%Y-%m-%d") as datePublished,
       b.isbn,
       b.is_deleted as isDeleted,
       g.genre,
@@ -92,6 +97,7 @@ const create = async (book) => {
 };
 
 const update = async (updatedBook) => {
+  // console.log(updatedBook);
   const sql = `
         UPDATE books
         SET
@@ -115,14 +121,13 @@ const update = async (updatedBook) => {
     +updatedBook.isDeleted,
     +updatedBook.genre,
     +updatedBook.ageRecommendation,
-    +updatedBook.language,
+    updatedBook.language,
     updatedBook.summary,
-    updatedBook.bookId,
+    +updatedBook.bookId,
   ]);
 
   return getBy('book_id', updatedBook.bookId);
 };
-
 // OK
 const remove = async (bookToDelete) => {
   const sql = `

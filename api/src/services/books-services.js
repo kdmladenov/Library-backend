@@ -18,8 +18,8 @@ const createBook = booksData => async (data) => {
   };
 };
 
-const getAllBooks = booksData => async (search, searchBy, sort, order, pageSize, page) => {
-  const result = await booksData.getAllBooks(search, searchBy, sort, order, pageSize, page);
+const getAllBooks = booksData => async (search, searchBy, sort, order, pageSize, page, role) => {
+  const result = await booksData.getAllBooks(search, searchBy, sort, order, pageSize, page, role);
 
   return result;
 };
@@ -83,23 +83,16 @@ const deleteBook = booksData => async (identifier) => {
   }
 
   const _ = await booksData.remove(bookToDelete);
-  // const isDeleted = {isDeleted: 1,}
+
 
   return {
     error: null,
     book: ({ ...bookToDelete, "isDeleted": 1 }),
   };
 };
-
+//to Test
 const rateBook = bookRatingData => async (rating, userId, bookId) => {
   const existingRating = await bookRatingData.getBy(userId, bookId);
-
-  if (existingRating && userId !== existingRating.userId) {
-    return {
-      error: errors.OPERATION_NOT_PERMITTED,
-      result: null,
-    };
-  }
 
   if (existingRating) {
     const result = await bookRatingData.update(rating, userId, bookId);

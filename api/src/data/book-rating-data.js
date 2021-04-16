@@ -21,7 +21,7 @@ const getBy = async (userId, bookId) => {
   LEFT JOIN age_recommendation a USING (age_recommendation_id)
   LEFT JOIN language l USING (language_id)
   LEFT JOIN users u USING (user_id)
-  WHERE br.user_id = ? AND br.book_id = ? AND br.is_deleted = 0;
+  WHERE br.user_id = ? AND br.book_id = ? AND br.is_deleted = 0 AND b.is_deleted = 0;
   `;
 
   const result = await db.query(sql, [+userId, +bookId]);
