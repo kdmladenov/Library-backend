@@ -5,6 +5,7 @@ import errors from '../services/service-errors.js';
 import usersService from '../services/users-service.js';
 import createUserSchema from '../validator/create-user-schema.js';
 import updateUserSchema from '../validator/update-user-schema.js';
+import deleteUserSchema from '../validator/delete-user-schema.js';
 import updatePasswordSchema from '../validator/update-password-schema.js';
 import { authMiddleware, roleMiddleware } from '../authentication/auth.middleware.js';
 import rolesEnum from '../common/roles.enum.js';
@@ -117,7 +118,7 @@ usersController
   })
 
   // Delete user
-  .delete('/delete-profile', authMiddleware, loggedUserGuard, async (req, res) => {
+  .delete('/delete-profile', authMiddleware, loggedUserGuard, validateBody('user', deleteUserSchema), async (req, res) => {
     const { role } = req.user;
     const id = role === rolesEnum.admin ? req.body.userId : req.user.userId;
 

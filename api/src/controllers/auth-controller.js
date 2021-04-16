@@ -6,11 +6,12 @@ import createToken from '../authentication/create-token.js';
 import validateBody from '../middleware/validate-body.js';
 import loginUserSchema from '../validator/login-user-schema.js';
 import { authMiddleware } from '../authentication/auth.middleware.js';
+import errorHandler from '../middleware/errorHandler.js';
 
 const authController = express.Router();
 
 authController
-  .post('/login', validateBody('user', loginUserSchema), async (req, res) => {
+  .post('/login', validateBody('user', loginUserSchema), errorHandler(async (req, res) => {
     const { username, password } = req.body;
     const { error, result } = await usersService.login(usersData)(username, password);
 
@@ -28,7 +29,7 @@ authController
 
       res.status(200).send({ token });
     }
-  })
+  }))
   .delete('/logout', authMiddleware, async (req, res) => {
     const token = req.headers.authorization.replace('Bearer ', '');
     const _ = await usersService.logout(usersData)(token);

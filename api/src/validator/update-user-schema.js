@@ -9,4 +9,5 @@ export default {
   newEmail: value => typeof value === 'undefined' || (typeof value === 'string' && value.length < user.MAX_EMAIL_LENGTH && value.match(user.EMAIL_REGEX)),
   reenteredNewEmail: value => typeof value === 'undefined' || (typeof value === 'string' && value.length < user.MAX_EMAIL_LENGTH && value.match(user.EMAIL_REGEX)),
   phone: value => typeof value === 'undefined' || (typeof value === 'string' && value.match(user.PHONE_REGEX)),
+  userId: value => typeof value === 'undefined' || (typeof value === 'number' && value > 0),
 };
