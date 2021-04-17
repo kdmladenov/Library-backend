@@ -109,7 +109,6 @@ const create = async (book) => {
 };
 
 const update = async (updatedBook) => {
- 
   const sql = `
         UPDATE books
         SET
