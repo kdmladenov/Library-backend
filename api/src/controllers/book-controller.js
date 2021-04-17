@@ -151,13 +151,13 @@ booksController
       res.status(404).send({
         message: 'The book is not found.',
       });
-    } else if (error === errors.DUPLICATE_RECORD) {
-      res.status(409).send({
-        message: `User with userId ${userId} has already reviewed the book.`,
-      });
     } else if (error === errors.OPERATION_NOT_PERMITTED) {
       res.status(403).send({
         message: `Only an user who has borrowed and returned the book is allowed to write a review.`,
+      });
+    } else if (error === errors.DUPLICATE_RECORD) {
+      res.status(409).send({
+        message: `User with userId ${userId} has already reviewed the book.`,
       });
     } else {
       res.status(201).send(result);

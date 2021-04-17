@@ -7,6 +7,7 @@ const getBy = async (column, value, isProfileOwner, role) => {
       u.user_id as userId, 
       u.username as username,
       u.first_name as firstName,
+      r.type as role,
       u.reading_points as readingPoints
       ${role === rolesEnum.admin || isProfileOwner ? `, u.last_name as lastName,
       g.gender as gender,
@@ -19,6 +20,7 @@ const getBy = async (column, value, isProfileOwner, role) => {
     FROM users u
     LEFT JOIN gender g USING (gender_id)
     LEFT JOIN ban_status b USING (user_id)
+    LEFT JOIN roles r USING(role_id)
     WHERE ${role === rolesEnum.admin ? `` : `u.is_deleted = 0 AND`} ${column} = ?
   `;
 
@@ -37,7 +39,8 @@ const getAll = async (search, searchBy, sort, order, page, pageSize, role) => {
     SELECT 
       u.user_id as userId, 
       u.username as username,
-      u.first_name as firstName,
+      u.first_name as firstName,      
+      r.type as role,
       u.reading_points as readingPoints
       ${role === rolesEnum.admin ? `, u.last_name as lastName,
       g.gender as gender,
@@ -50,6 +53,7 @@ const getAll = async (search, searchBy, sort, order, page, pageSize, role) => {
     FROM users u
     LEFT JOIN gender g USING (gender_id)
     LEFT JOIN ban_status b USING (user_id)
+    LEFT JOIN roles r USING(role_id)
     WHERE ${role === rolesEnum.admin ? `` : `u.is_deleted = 0 AND`} ${searchColumn} Like '%${search}%'
     ORDER BY ? ${direction} 
     LIMIT ? OFFSET ?

@@ -3,6 +3,7 @@ import {
   book as BOOK,
   review as REVIEW,
   record as RECORD,
+  ban,
 } from "./constants.js";
 
 export default {
@@ -11,6 +12,8 @@ export default {
     password: `Expected string with length in the range [${USER.MIN_PASSWORD_LENGTH}-${USER.MAX_PASSWORD_LENGTH}]`,
     newPassword: `Expected string with length in the range [${USER.MIN_PASSWORD_LENGTH}-${USER.MAX_PASSWORD_LENGTH}]`,
     reenteredNewPassword: `Expected string with length in the range [${USER.MIN_PASSWORD_LENGTH}-${USER.MAX_PASSWORD_LENGTH}]`,
+    userId: `Expected a positive number`,
+    oldPassword: `Expected string with length in the range [${USER.MIN_PASSWORD_LENGTH}-${USER.MAX_PASSWORD_LENGTH}]`,
     firstName: `Expected string with length in the range [${USER.MIN_FIRSTNAME_LENGTH}-${USER.MAX_FIRSTNAME_LENGTH}]`,
     lastName: `Expected string with length in the range [${USER.MIN_LASTNAME_LENGTH}-${USER.MAX_LASTNAME_LENGTH}]`,
     email: `Expected valid e-mail string with length in the range [${USER.MIN_EMAIL_LENGTH}-${USER.MAX_EMAIL_LENGTH}]`,
@@ -18,7 +21,7 @@ export default {
     reenteredNewEmail: `Expected valid e-mail string with length in the range [${USER.MIN_EMAIL_LENGTH}-${USER.MAX_EMAIL_LENGTH}]`,
     phone: `Expected string... `,
     birthDate: `Expected a valid date string`,
-    gender: `Expected "male", "female" or "other"`,
+    gender: `Expected 'male', 'female' or 'other'`,
     isBanned: `Expected boolean`,
     isDeleted: `Expected boolean`,
     isAdmin: `Expected boolean`,
@@ -47,5 +50,9 @@ export default {
   vote: {
     userId: `Expected a positive number`,
     reactionId: `Expected a positive number`,
+  },
+  ban: {
+    duration: `Expected number in range [${ban.MIN_BAN_DURATION} - ${ban.MAX_BAN_DURATION}]`,
+    description: `Expected string with length more than ${ban.MIN_DESCRIPTION_LENGTH} characters.`,
   },
 };
