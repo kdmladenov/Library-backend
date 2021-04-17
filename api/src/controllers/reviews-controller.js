@@ -11,6 +11,8 @@ import banGuard from '../middleware/banGuard.js';
 import loggedUserGuard from '../middleware/loggedUserGuard.js';
 import rolesEnum from '../common/roles.enum.js';
 import usersData from '../data/users-data.js';
+import reactionsEnum from '../common/reactions.enum.js';
+import errorHandler from '../middleware/errorHandler.js';
 
 const reviewsController = express.Router();
 
@@ -49,15 +51,16 @@ reviewsController
   })
 
   // Vote Review - status codes mixed
-  .put('/:reviewId/votes', authMiddleware, loggedUserGuard, banGuard, validateBody('vote', voteReviewSchema), async (req, res) => {
-    const { reactionId } = req.body;
+  .put('/:reviewId/votes', authMiddleware, loggedUserGuard, banGuard, validateBody('vote', voteReviewSchema), errorHandler(async (req, res) => {
+    const { reactionName } = req.body;
     const { reviewId } = req.params;
     const { userId, role } = req.user;
 
+    const reactionId = reactionsEnum[reactionName];
     const { result } = await reviewsService.voteReview(reviewVoteData)(+reactionId, +reviewId, +userId, role);
 
     res.status(200).send(result);
-  })
+  }))
 
   .delete('/:reviewId/votes', authMiddleware, loggedUserGuard, banGuard, validateBody('vote', voteReviewSchema), async (req, res) => {
     const { reactionId } = req.body;
