@@ -6,10 +6,14 @@ const getAllRecords = async (search, searchBy, sort, order, pageSize, page, role
   const searchColumn = [
     'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary',
     'record_id', 'date_borrowed', 'bookRating', 'date_returned', 'date_to_return', 'user_id'].includes(searchBy) ? searchBy : 'title';
+  const sortColumn = [
+    'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary',
+    'record_id', 'date_borrowed', 'bookRating', 'date_returned', 'date_to_return', 'user_id'].includes(sort) ? sort : 'rc.record_id';
   const offset = page ? (page - 1) * pageSize : 0;
 
   const sql = `
     SELECT 
+      rc.record_id as recordId,
       b.book_id as bookId,
       b.title,
       b.author,
@@ -22,7 +26,6 @@ const getAllRecords = async (search, searchBy, sort, order, pageSize, page, role
       ${(role === rolesEnum.admin) ? `,
         DATE_FORMAT(rc.date_returned, "%Y-%m-%d")  as dateReturned,
         DATE_FORMAT(rc.date_borrowed, "%Y-%m-%d")  as dateBorrowed,
-        rc.record_id as recordId,
         rc.user_id as userId,
         b.is_deleted as isDeleted ` : ''}
     FROM records rc 
@@ -35,11 +38,11 @@ const getAllRecords = async (search, searchBy, sort, order, pageSize, page, role
                     GROUP BY book_id
                     HAVING is_deleted = 0) as r USING (book_id)
     WHERE ${role === rolesEnum.basic ? `b.is_deleted = 0  AND user_id = ? AND ` : ''} ${searchColumn} Like '%${search}%'
-    ORDER BY ? ${direction} 
+    ORDER BY ${sortColumn} ${direction} 
     LIMIT ? OFFSET ?
   `;
 
-  return db.query(sql, [userId, sort, +pageSize, +offset]);
+  return db.query(sql, [userId, +pageSize, +offset]);
 };
 
 // OK no difference admin/basic

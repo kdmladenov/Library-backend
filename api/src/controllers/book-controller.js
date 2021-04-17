@@ -24,12 +24,13 @@ import uploadCover from '../middleware/upload-cover.js';
 import validateFile from '../middleware/validate-file.js';
 import uploadFileSchema from '../validator/upload-file-schema.js';
 import usersData from '../data/users-data.js';
+import errorHandler from '../middleware/errorHandler.js';
 
 const booksController = express.Router();
 
 booksController
   // create book
-  .post('/', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), validateBody('book', createBookSchema), async (req, res) => {
+  .post('/', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), validateBody('book', createBookSchema), errorHandler(async (req, res) => {
     const data = req.body;
 
     data.genre = bookGenreEnum[data.genre];
@@ -45,10 +46,10 @@ booksController
     } else {
       res.status(201).send(book);
     }
-  })
+  }))
 
   // delete book
-  .delete('/:bookId', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), async (req, res) => {
+  .delete('/:bookId', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), errorHandler(async (req, res) => {
     const { bookId } = req.params;
 
     const identifier = BOOK.ISBN_REGEX.test(bookId) ? bookId : +bookId;
@@ -61,10 +62,10 @@ booksController
     } else {
       res.status(200).send(book);
     }
-  })
+  }))
 
   // get by id
-  .get('/:bookId', authMiddleware, loggedUserGuard, async (req, res) => {
+  .get('/:bookId', authMiddleware, loggedUserGuard, errorHandler(async (req, res) => {
     const { bookId } = req.params;
 
     const identifier = BOOK.ISBN_REGEX.test(bookId) ? bookId : +bookId;
@@ -77,10 +78,10 @@ booksController
     } else {
       res.status(200).send(book);
     }
-  })
+  }))
 
   // get all books - search, sort, paging
-  .get('/', authMiddleware, loggedUserGuard, async (req, res) => {
+  .get('/', authMiddleware, loggedUserGuard, errorHandler(async (req, res) => {
     const {
       search = '', searchBy = 'title', sort = 'bookId', order = 'ASC',
     } = req.query;
@@ -95,16 +96,12 @@ booksController
     const book = await booksServices.getAllBooks(booksData)(search, searchBy, sort, order, +pageSize, +page, role);
 
     res.status(200).send(book);
-  })
+  }))
 
-  // change book To correct
-  .put('/:bookId', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), validateBody('book', updateBookSchema), async (req, res) => {
+  // change book
+  .put('/:bookId', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), validateBody('book', updateBookSchema), errorHandler(async (req, res) => {
     const { bookId } = req.params;
     const data = req.body;
-
-    if (data.genre) data.genre = bookGenreEnum[data.genre];
-    if (data.language) data.language = bookLanguageEnum[data.language];
-    if (data.ageRecommendation) data.ageRecommendation = bookAgeRecommendationEnum[data.ageRecommendation];
 
     const { error, result } = await booksServices.updateBook(booksData)(+bookId, data);
 
@@ -119,7 +116,7 @@ booksController
     } else {
       res.status(200).send(result);
     }
-  })
+  }))
 
   // read review
   .get('/:bookId/reviews', authMiddleware, loggedUserGuard, async (req, res) => {
@@ -167,8 +164,8 @@ booksController
     }
   })
 
-  // Borrow a book - no userId validation in body - no body
-  .post('/:bookId/records', authMiddleware, loggedUserGuard, banGuard, async (req, res) => {
+  // Borrow a book
+  .post('/:bookId/records', authMiddleware, loggedUserGuard, banGuard, errorHandler(async (req, res) => {
     const { userId } = req.user;
     const { bookId } = req.params;
 
@@ -181,25 +178,30 @@ booksController
     } else {
       res.status(201).send(record);
     }
-  })
+  }))
 
   // Return a book
-  .delete('/:bookId/records', authMiddleware, loggedUserGuard, async (req, res) => {
+  .delete('/:bookId/records', authMiddleware, loggedUserGuard, errorHandler(async (req, res) => {
+    const { userId, role } = req.user;
     const { bookId } = req.params;
 
-    const { error, record } = await recordsServices.deleteRecord(recordsData, usersData)(+bookId);
+    const { error, record } = await recordsServices.deleteRecord(recordsData, usersData)(+bookId, +userId, role);
 
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
         message: 'A book with this id is currently not borrowed!',
       });
+    } else if (error === errors.OPERATION_NOT_PERMITTED) {
+      res.status(403).send({
+        message: 'You are not authorized to return this book!',
+      });
     } else {
       res.status(200).send(record);
     }
-  })
+  }))
 
   // Rate a book
-  .put('/:bookId/rate', authMiddleware, loggedUserGuard, banGuard, validateBody('rating', rateBookSchema), async (req, res) => {
+  .put('/:bookId/rate', authMiddleware, loggedUserGuard, banGuard, validateBody('rating', rateBookSchema), errorHandler(async (req, res) => {
     const { bookId } = req.params;
     const { rating } = req.body;
     const { userId } = req.user;
@@ -213,9 +215,9 @@ booksController
     } else {
       res.status(200).send(rate);
     }
-  })
+  }))
   // Update cover
-  .put('/:bookId/cover', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), uploadCover.single('cover'), validateFile('uploads', uploadFileSchema), async (req, res) => {
+  .put('/:bookId/cover', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), uploadCover.single('cover'), validateFile('uploads', uploadFileSchema), errorHandler(async (req, res) => {
     const { path } = req.file;
     const { bookId } = req.params;
 
@@ -228,6 +230,6 @@ booksController
     } else {
       res.status(200).send({ message: 'The cover is changed' });
     }
-  });
+  }));
 
 export default booksController;

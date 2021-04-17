@@ -4,7 +4,9 @@ import db from './pool.js';
 const getAllBooks = async (search, searchBy, sort, order, pageSize, page, role) => {
   const direction = ['ASC', 'asc', 'DESC', 'desc'].includes(order) ? order : 'asc';
   const searchColumn = [
-    'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary'].includes(searchBy) ? searchBy : 'title';
+    'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary', 'bookRating', 'bookedUntil'].includes(searchBy) ? searchBy : 'title';
+  const sortColumn = [
+    'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary', 'bookRating', 'bookedUntil'].includes(sort) ? sort : 'book_id';
   const offset = page ? (page - 1) * pageSize : 0;
 
   const sql = `
@@ -20,13 +22,13 @@ const getAllBooks = async (search, searchBy, sort, order, pageSize, page, role) 
       l.language,
       b.summary,
       r.bookRating,
-      rc.availableOn
+      rc.bookedUntil
     FROM books b
     LEFT JOIN (SELECT AVG(rating) as bookRating, book_id, is_deleted
                 FROM book_ratings
                 GROUP BY book_id
                 HAVING is_deleted = 0) as r using (book_id)
-    LEFT JOIN (SELECT book_id, date_returned, date_to_return as availableOn
+    LEFT JOIN (SELECT book_id, date_returned, date_to_return as bookedUntil
                 FROM records
                 GROUP BY record_id
                 HAVING date_returned is Null) as rc using (book_id)
@@ -34,11 +36,11 @@ const getAllBooks = async (search, searchBy, sort, order, pageSize, page, role) 
     LEFT JOIN age_recommendation a USING (age_recommendation_id)
     LEFT JOIN language l USING (language_id)
     WHERE ${role === rolesEnum.basic ? ' b.is_deleted = 0 AND' : ''} ${searchColumn} Like '%${search}%'
-    ORDER BY ? ${direction} 
+    ORDER BY ${sortColumn} ${direction} 
     LIMIT ? OFFSET ?
   `;
 
-  return db.query(sql, [sort, +pageSize, +offset]);
+  return db.query(sql, [+pageSize, +offset]);
 };
 // OK
 const getBy = async (column, value) => {
@@ -53,12 +55,22 @@ const getBy = async (column, value) => {
       g.genre,
       a.age_recommendation as ageRecommendation,
       l.language,
-      b.summary
+      b.summary,
+      r.bookRating,
+      rc.bookedUntil
     FROM books b
+    LEFT JOIN (SELECT AVG(rating) as bookRating, book_id, is_deleted
+        FROM book_ratings
+        GROUP BY book_id
+        HAVING is_deleted = 0) as r using (book_id)
+    LEFT JOIN (SELECT book_id, date_returned, date_to_return as bookedUntil
+        FROM records
+        GROUP BY record_id
+        HAVING date_returned is Null) as rc using (book_id)
     LEFT JOIN genres g USING (genre_id)
     LEFT JOIN age_recommendation a USING (age_recommendation_id)
     LEFT JOIN language l USING (language_id)
-    WHERE ${column} = ? AND is_deleted = 0;
+    WHERE ${column} = ? AND b.is_deleted = 0;
   `;
 
   const result = await db.query(sql, [value]);
@@ -97,6 +109,7 @@ const create = async (book) => {
 };
 
 const update = async (updatedBook) => {
+ 
   const sql = `
         UPDATE books
         SET
