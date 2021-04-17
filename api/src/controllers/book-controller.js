@@ -125,7 +125,7 @@ booksController
     let { pageSize = paging.DEFAULT_REVIEWS_PAGESIZE, page = paging.DEFAULT_PAGE } = req.query;
 
     if (+pageSize > paging.MAX_REVIEWS_PAGESIZE) pageSize = paging.MAX_REVIEWS_PAGESIZE;
-    if (+pageSize < paging.MIN_REVIEWS_PAGESIZE) pageSize = paging.MAX_REVIEWS_PAGESIZE;
+    if (+pageSize < paging.MIN_REVIEWS_PAGESIZE) pageSize = paging.MIN_REVIEWS_PAGESIZE;
     if (page < paging.DEFAULT_PAGE) page = paging.DEFAULT_PAGE;
 
     const { error, result } = await reviewsService.getAllReviews(reviewsData, booksData)(+bookId, order, +page, +pageSize);

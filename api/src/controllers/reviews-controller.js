@@ -37,7 +37,7 @@ reviewsController
     const { userId, role } = req.user;
     const { reviewId } = req.params;
 
-    const { error, result } = await reviewsService.deleteReview(reviewsData)(+reviewId, +userId, role);
+    const { error, result } = await reviewsService.deleteReview(reviewsData, usersData)(+reviewId, +userId, role);
 
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
