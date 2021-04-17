@@ -3,7 +3,8 @@ import {
   book as BOOK,
   review as REVIEW,
   record as RECORD,
-  ban,
+  ban as BAN,
+  uploads as UPLOADS,
 } from "./constants.js";
 
 export default {
@@ -52,7 +53,11 @@ export default {
     reactionId: `Expected a positive number`,
   },
   ban: {
-    duration: `Expected number in range [${ban.MIN_BAN_DURATION} - ${ban.MAX_BAN_DURATION}]`,
-    description: `Expected string with length more than ${ban.MIN_DESCRIPTION_LENGTH} characters.`,
+    duration: `Expected number in range [${BAN.MIN_BAN_DURATION} - ${BAN.MAX_BAN_DURATION}]`,
+    description: `Expected string with length more than ${BAN.MIN_DESCRIPTION_LENGTH} characters.`,
+  },
+  uploads: {
+    filename: `Expected a file with the following formats ${UPLOADS.VALID_FILE_FORMATS}.`,
+    size: `Expected a non-empty file with a size up to ${UPLOADS.MAX_FILE_SIZE / 100} KB`,
   },
 };

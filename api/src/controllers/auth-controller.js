@@ -30,13 +30,13 @@ authController
       res.status(200).send({ token });
     }
   }))
-  .delete('/logout', authMiddleware, async (req, res) => {
+  .delete('/logout', authMiddleware, errorHandler(async (req, res) => {
     const token = req.headers.authorization.replace('Bearer ', '');
     const _ = await usersService.logout(usersData)(token);
 
     res.status(200).send({
       message: 'You have logged out successfully!',
     });
-  });
+  }));
 
 export default authController;

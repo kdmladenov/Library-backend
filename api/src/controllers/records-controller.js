@@ -12,10 +12,10 @@ const recordsController = express.Router();
 recordsController
   // get all - search, sort, paging To check
   .get('/', authMiddleware, loggedUserGuard, async (req, res) => {
+    const { role, userId } = req.user;
     const {
       search = '', searchBy = 'title', sort = 'record_id', order = 'ASC',
     } = req.query;
-    const { role, userId } = req.user;
 
     let { pageSize = paging.DEFAULT_BOOKS_PAGESIZE, page = paging.DEFAULT_PAGE } = req.query;
 

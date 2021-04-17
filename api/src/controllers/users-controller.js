@@ -13,6 +13,9 @@ import banUserSchema from '../validator/ban-user-schema.js';
 import loggedUserGuard from '../middleware/loggedUserGuard.js';
 import { paging } from '../common/constants.js';
 import genderEnum from '../common/gender.enum.js';
+import validateFile from '../middleware/validate-file.js';
+import uploadFileSchema from '../validator/upload-file-schema.js';
+import uploadAvatar from '../middleware/upload-avatar.js';
 
 const usersController = express.Router();
 
@@ -148,6 +151,14 @@ usersController
     } else {
       res.status(200).send(result);
     }
+  })
+  .put('/avatar', authMiddleware, uploadAvatar.single('avatar'), validateFile('uploads', uploadFileSchema), async (req, res) => {
+    const { userId } = req.user;
+    const { path } = req.file;
+
+    const _ = await usersService.changeAvatar(usersData)(+userId, path);
+
+    res.status(200).send({ message: 'Avatar changed' });
   });
 
 export default usersController;
