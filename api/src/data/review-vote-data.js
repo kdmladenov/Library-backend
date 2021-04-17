@@ -23,28 +23,28 @@ const getBy = async (column, value, userId, role) => {
 };
 
 // Create - OK
-const create = async (reactionId, reviewId, userId, role) => {
+const create = async (reactionName, reviewId, userId, role) => {
   const sql = `
     INSERT INTO review_likes (
       reaction_id,
       review_id,
       user_id
     )
-    VALUES (?, ?, ?)
+    VALUES ((SELECT reaction_id FROM reactions WHERE reaction_name = ?), ?, ?)
   `;
-  const _ = await db.query(sql, [reactionId, reviewId, userId]);
+  const _ = await db.query(sql, [reactionName, reviewId, userId]);
 
   return getBy('review_id', reviewId, userId, role);
 };
 
-const update = async (reactionId, reviewId, userId, role) => {
+const update = async (reactionName, reviewId, userId, role) => {
   const sql = `
         UPDATE review_likes 
-        SET reaction_id  = ?
+        SET reaction_id  = (SELECT reaction_id FROM reactions WHERE reaction_name = ?)
         WHERE review_id = ? AND user_id = ?
     `;
 
-  const _ = await db.query(sql, [reactionId, reviewId, userId]);
+  const _ = await db.query(sql, [reactionName, reviewId, userId]);
 
   return getBy('review_id', reviewId, userId, role);
 };
