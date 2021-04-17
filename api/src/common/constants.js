@@ -60,3 +60,8 @@ export const paging = {
   DEFAULT_RECORDS_PAGESIZE: 10,
 };
 
+export const uploads = {
+  VALID_FILE_FORMATS: ['jpg', 'png', 'jpeg', 'gif', 'bmp'],
+  MAX_FILE_SIZE: 10000, //   divide by 1000 for KB
+  MIN_FILE_SIZE: 0,
+};

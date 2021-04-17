@@ -138,12 +138,23 @@ const remove = async (bookToDelete) => {
   return db.query(sql, [bookToDelete.bookId]);
 };
 
+const coverChange = (path, bookId) => {
+  const sql = `
+    UPDATE books SET
+      front_cover = ?
+    WHERE book_id = ?
+  `;
+
+  return db.query(sql, [path, bookId]);
+};
+
 export default {
   create,
   getAllBooks,
   update,
   remove,
   getBy,
+  coverChange,
 };
 
 // export const updateBook = (id, isBorrowed) => {

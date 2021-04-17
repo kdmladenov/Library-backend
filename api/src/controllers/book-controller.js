@@ -21,6 +21,9 @@ import banGuard from '../middleware/banGuard.js';
 import rolesEnum from '../common/roles.enum.js';
 import loggedUserGuard from '../middleware/loggedUserGuard.js';
 import updateBookSchema from '../validator/update-book-schema.js';
+import uploadCover from '../middleware/upload-cover.js';
+import validateFile from '../middleware/validate-file.js';
+import uploadFileSchema from '../validator/upload-file-schema.js';
 
 const booksController = express.Router();
  
@@ -209,6 +212,21 @@ booksController
       });
     } else {
       res.status(200).send(rate);
+    }
+  })
+  // Update cover
+  .put('/:bookId/cover', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), uploadCover.single('cover'), validateFile('uploads', uploadFileSchema), async (req, res) => {
+    const { path } = req.file;
+    const { bookId } = req.params;
+
+    const { error, _ } = await booksServices.coverChange(booksData)(path, +bookId);
+
+    if (error === errors.RECORD_NOT_FOUND) {
+      res.status(404).send({
+        message: 'A book with this number is not found!',
+      });
+    } else {
+      res.status(200).send({ message: 'The cover is changed' });
     }
   });
 

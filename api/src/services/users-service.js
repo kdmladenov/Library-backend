@@ -169,6 +169,10 @@ const logout = usersData => async (token) => {
   const _ = await usersData.logoutUser(token);
 };
 
+const changeAvatar = usersData => async (userId, path) => {
+  const _ = await usersData.avatarChange(+userId, path);
+};
+
 export default {
   getUser,
   getAllUsers,
@@ -179,4 +183,5 @@ export default {
   deleteUser,
   banUser,
   logout,
+  changeAvatar,
 };

@@ -110,6 +110,25 @@ const rateBook = bookRatingData => async (rating, userId, bookId) => {
     rate: result,
   };
 };
+
+const coverChange = booksData => async (path, bookId) => {
+  const existingBook = await booksData.getBy('isbn', +bookId)
+                    || await booksData.getBy('book_id', +bookId);
+
+  if (!existingBook) {
+    return {
+      error: errors.RECORD_NOT_FOUND,
+      book: null,
+    };
+  }
+
+  const result = await booksData.coverChange(path, bookId);
+
+  return {
+    error: null,
+    result,
+  };
+};
 export default {
   createBook,
   getBookById,
@@ -117,4 +136,5 @@ export default {
   rateBook,
   updateBook,
   deleteBook,
+  coverChange,
 };

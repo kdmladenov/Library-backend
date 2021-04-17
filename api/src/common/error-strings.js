@@ -3,6 +3,7 @@ import {
   book as BOOK,
   review as REVIEW,
   record as RECORD,
+  uploads as UPLOADS,
 } from "./constants.js";
 
 export default {
@@ -47,5 +48,9 @@ export default {
   vote: {
     userId: `Expected a positive number`,
     reactionId: `Expected a positive number`,
+  },
+  uploads: {
+    filename: `Expected a file with the following formats ${UPLOADS.VALID_FILE_FORMATS}.`,
+    size: `Expected a non-empty file with a size up to ${UPLOADS.MAX_FILE_SIZE/100} KB`
   },
 };
