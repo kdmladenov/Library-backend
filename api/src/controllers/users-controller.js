@@ -16,13 +16,14 @@ import genderEnum from '../common/gender.enum.js';
 import validateFile from '../middleware/validate-file.js';
 import uploadFileSchema from '../validator/upload-file-schema.js';
 import uploadAvatar from '../middleware/upload-avatar.js';
+import errorHandler from '../middleware/errorHandler.js';
 
 const usersController = express.Router();
 
 usersController
 
   // register
-  .post('/', validateBody('user', createUserSchema), async (req, res) => {
+  .post('/', validateBody('user', createUserSchema), errorHandler(async (req, res) => {
     const user = req.body;
     user.firstName = user.firstName || null;
     user.lastName = user.lastName || null;
@@ -40,10 +41,10 @@ usersController
     } else {
       res.status(201).send(result);
     }
-  })
+  }))
 
   // get all users
-  .get('/', authMiddleware, loggedUserGuard, async (req, res) => {
+  .get('/', authMiddleware, loggedUserGuard, errorHandler(async (req, res) => {
     const { role } = req.user;
     const {
       search = '', searchBy = 'username', sort = 'username', order = 'ASC',
@@ -56,10 +57,10 @@ usersController
 
     const result = await usersService.getAllUsers(usersData)(search, searchBy, sort, order, +page, +pageSize, role);
     res.status(200).send(result);
-  })
+  }))
 
   // get a single user
-  .get('/:userId', authMiddleware, loggedUserGuard, async (req, res) => {
+  .get('/:userId', authMiddleware, loggedUserGuard, errorHandler(async (req, res) => {
     const { userId } = req.params;
     const { role } = req.user;
     const isProfileOwner = +userId === req.user.userId;
@@ -72,10 +73,10 @@ usersController
     } else {
       res.status(200).send(result);
     }
-  })
+  }))
 
   // Change password
-  .patch('/change-password', authMiddleware, loggedUserGuard, validateBody('user', updatePasswordSchema), async (req, res) => {
+  .patch('/change-password', authMiddleware, loggedUserGuard, validateBody('user', updatePasswordSchema), errorHandler(async (req, res) => {
     const { role } = req.user;
     const passwordData = req.body;
     const id = role === rolesEnum.admin ? req.body.userId : req.user.userId;
@@ -93,10 +94,10 @@ usersController
     } else {
       res.status(200).send(result);
     }
-  })
+  }))
 
   // Update user
-  .put('/edit-profile', authMiddleware, loggedUserGuard, validateBody('user', updateUserSchema), async (req, res) => {
+  .put('/edit-profile', authMiddleware, loggedUserGuard, validateBody('user', updateUserSchema), errorHandler(async (req, res) => {
     const { role } = req.user;
     const userUpdate = req.body;
     const id = role === rolesEnum.admin ? req.body.userId : req.user.userId;
@@ -118,10 +119,10 @@ usersController
     } else {
       res.status(200).send(result);
     }
-  })
+  }))
 
   // Delete user
-  .delete('/delete-profile', authMiddleware, loggedUserGuard, validateBody('user', deleteUserSchema), async (req, res) => {
+  .delete('/delete-profile', authMiddleware, loggedUserGuard, validateBody('user', deleteUserSchema), errorHandler(async (req, res) => {
     const { role } = req.user;
     const id = role === rolesEnum.admin ? req.body.userId : req.user.userId;
 
@@ -134,10 +135,10 @@ usersController
     } else {
       res.status(200).send(result);
     }
-  })
+  }))
 
   // Ban user
-  .post('/:userId/ban', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), validateBody('ban', banUserSchema), async (req, res) => {
+  .post('/:userId/ban', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), validateBody('ban', banUserSchema), errorHandler(async (req, res) => {
     const { userId } = req.params;
     console.log(req.body);
     const { duration, description } = req.body;
@@ -151,14 +152,16 @@ usersController
     } else {
       res.status(200).send(result);
     }
-  })
-  .put('/avatar', authMiddleware, uploadAvatar.single('avatar'), validateFile('uploads', uploadFileSchema), async (req, res) => {
+  }))
+
+  // upload an avatar
+  .put('/avatar', authMiddleware, uploadAvatar.single('avatar'), validateFile('uploads', uploadFileSchema), errorHandler(async (req, res) => {
     const { userId } = req.user;
     const { path } = req.file;
 
     const _ = await usersService.changeAvatar(usersData)(+userId, path);
 
     res.status(200).send({ message: 'Avatar changed' });
-  });
+  }));
 
 export default usersController;

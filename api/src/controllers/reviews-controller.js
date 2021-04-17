@@ -11,12 +11,13 @@ import banGuard from '../middleware/banGuard.js';
 import loggedUserGuard from '../middleware/loggedUserGuard.js';
 import rolesEnum from '../common/roles.enum.js';
 import usersData from '../data/users-data.js';
+import errorHandler from '../middleware/errorHandler.js';
 
 const reviewsController = express.Router();
 
 reviewsController
 // update review
-  .patch('/:reviewId', authMiddleware, loggedUserGuard, banGuard, validateBody('review', createReviewSchema), async (req, res) => {
+  .patch('/:reviewId', authMiddleware, loggedUserGuard, banGuard, validateBody('review', createReviewSchema), errorHandler(async (req, res) => {
     const { content } = req.body;
     const { reviewId } = req.params;
     const { userId, role } = req.user;
@@ -30,10 +31,10 @@ reviewsController
     } else {
       res.status(200).send(result);
     }
-  })
+  }))
 
 // delete review
-  .delete('/:reviewId', authMiddleware, loggedUserGuard, banGuard, async (req, res) => {
+  .delete('/:reviewId', authMiddleware, loggedUserGuard, banGuard, errorHandler(async (req, res) => {
     const { userId, role } = req.user;
     const { reviewId } = req.params;
 
@@ -46,10 +47,10 @@ reviewsController
     } else {
       res.status(200).send(result);
     }
-  })
+  }))
 
   // Vote Review - status codes mixed
-  .put('/:reviewId/votes', authMiddleware, loggedUserGuard, banGuard, validateBody('vote', voteReviewSchema), async (req, res) => {
+  .put('/:reviewId/votes', authMiddleware, loggedUserGuard, banGuard, validateBody('vote', voteReviewSchema), errorHandler(async (req, res) => {
     const { reactionId } = req.body;
     const { reviewId } = req.params;
     const { userId, role } = req.user;
@@ -57,9 +58,9 @@ reviewsController
     const { result } = await reviewsService.voteReview(reviewVoteData)(+reactionId, +reviewId, +userId, role);
 
     res.status(200).send(result);
-  })
+  }))
 
-  .delete('/:reviewId/votes', authMiddleware, loggedUserGuard, banGuard, validateBody('vote', voteReviewSchema), async (req, res) => {
+  .delete('/:reviewId/votes', authMiddleware, loggedUserGuard, banGuard, validateBody('vote', voteReviewSchema), errorHandler(async (req, res) => {
     const { reactionId } = req.body;
     const { reviewId } = req.params;
     const { role } = req.user;
@@ -74,6 +75,6 @@ reviewsController
     } else {
       res.status(200).send(result);
     }
-  });
+  }));
 
 export default reviewsController;
