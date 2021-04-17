@@ -5,7 +5,7 @@ export default async (req, res, next) => {
 
   if (banRecords.length > 0 && new Date(banRecords[0].exp_date).valueOf() > new Date().valueOf()) {
     return res.status(403).send({
-      message: `You are banned!`,
+      message: `You are banned until ${banRecords[0].exp_date}!`,
     });
   }
 

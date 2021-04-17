@@ -78,6 +78,7 @@ const updateReview = reviewsData => async (content, reviewId, userId, role) => {
 
 const deleteReview = (reviewsData, usersData) => async (reviewId, userId, role) => {
   const existingReview = await reviewsData.getBy('review_id', reviewId, userId, role);
+
   if (!existingReview) {
     return {
       error: errors.RECORD_NOT_FOUND,
@@ -85,7 +86,7 @@ const deleteReview = (reviewsData, usersData) => async (reviewId, userId, role) 
     };
   }
 
-  const p = await usersData.updatePoints(userId, readingPoints.DELETE_REVIEW);
+  const p = await usersData.updatePoints(+existingReview.userId, readingPoints.DELETE_REVIEW);
   const r = await reviewsData.remove(reviewId, userId, role);
 
   return {
@@ -94,18 +95,18 @@ const deleteReview = (reviewsData, usersData) => async (reviewId, userId, role) 
   };
 };
 
-const voteReview = reviewVoteData => async (reactionId, reviewId, userId, role) => {
+const voteReview = reviewVoteData => async (reactionName, reviewId, userId, role) => {
   const existingReview = await reviewVoteData.getBy('review_id', reviewId, userId, role);
 
   if (existingReview) {
-    const result = await reviewVoteData.update(reactionId, reviewId, userId, role);
+    const result = await reviewVoteData.update(reactionName, reviewId, userId, role);
     return {
       error: null,
       result,
     };
   }
 
-  const result = await reviewVoteData.create(reactionId, reviewId, userId, role);
+  const result = await reviewVoteData.create(reactionName, reviewId, userId, role);
   return {
     error: null,
     result,

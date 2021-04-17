@@ -20,10 +20,10 @@ const getAll = async (bookId, order, page, pageSize) => {
     LEFT JOIN books b USING (book_id)
     WHERE r.is_deleted = 0 AND b.book_id = ?
     ORDER BY r.date_created ${direction}
-    LIMIT ?, ?
+    LIMIT ? OFFSET ?
   `;
   // paging and sorting !!! Why the ? placeholders are not working !!!!
-  return db.query(sql, [+bookId, offset, pageSize]);
+  return db.query(sql, [+bookId, pageSize, offset]);
 };
 
 const getBy = async (column, value, userId, role) => {
