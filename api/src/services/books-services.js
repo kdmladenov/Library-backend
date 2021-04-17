@@ -1,3 +1,4 @@
+import { readingPoints } from '../common/constants.js';
 import errors from './service-errors.js';
 
 const createBook = booksData => async (data) => {
@@ -84,14 +85,14 @@ const deleteBook = booksData => async (identifier) => {
 
   const _ = await booksData.remove(bookToDelete);
 
-
   return {
     error: null,
     book: ({ ...bookToDelete, "isDeleted": 1 }),
   };
 };
-//to Test
-const rateBook = bookRatingData => async (rating, userId, bookId) => {
+
+// to Test
+const rateBook = (bookRatingData, usersData) => async (rating, userId, bookId) => {
   const existingRating = await bookRatingData.getBy(userId, bookId);
 
   if (existingRating) {
@@ -103,6 +104,7 @@ const rateBook = bookRatingData => async (rating, userId, bookId) => {
     };
   }
 
+  const _ = usersData.updatePoints(userId, readingPoints.RATE_BOOK);
   const result = await bookRatingData.create(rating, userId, bookId);
 
   return {

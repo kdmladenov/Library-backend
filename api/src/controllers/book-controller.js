@@ -13,7 +13,6 @@ import createReviewSchema from '../validator/create-review-schema.js';
 import reviewsService from '../services/reviews-service.js';
 import recordsServices from '../services/records-services.js';
 import recordsData from '../data/records-data.js';
-import createRecordSchema from '../validator/create-record-schema.js';
 import rateBookSchema from '../validator/rate-book-schema.js';
 import bookRatingData from '../data/book-rating-data.js';
 import { authMiddleware, roleMiddleware } from '../authentication/auth.middleware.js';
@@ -24,9 +23,9 @@ import updateBookSchema from '../validator/update-book-schema.js';
 import uploadCover from '../middleware/upload-cover.js';
 import validateFile from '../middleware/validate-file.js';
 import uploadFileSchema from '../validator/upload-file-schema.js';
+import usersData from '../data/users-data.js';
 
 const booksController = express.Router();
- 
 
 booksController
   // create book
@@ -149,7 +148,7 @@ booksController
     const { content } = req.body;
     const { userId } = req.user;
 
-    const { error, result } = await reviewsService.createReview(booksData, reviewsData, recordsData)(content, +userId, +bookId);
+    const { error, result } = await reviewsService.createReview(booksData, reviewsData, recordsData, usersData)(content, +userId, +bookId);
 
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
@@ -188,7 +187,7 @@ booksController
   .delete('/:bookId/records', authMiddleware, loggedUserGuard, async (req, res) => {
     const { bookId } = req.params;
 
-    const { error, record } = await recordsServices.deleteRecord(recordsData)(+bookId);
+    const { error, record } = await recordsServices.deleteRecord(recordsData, usersData)(+bookId);
 
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
@@ -198,13 +197,14 @@ booksController
       res.status(200).send(record);
     }
   })
+
   // Rate a book
   .put('/:bookId/rate', authMiddleware, loggedUserGuard, banGuard, validateBody('rating', rateBookSchema), async (req, res) => {
     const { bookId } = req.params;
     const { rating } = req.body;
     const { userId } = req.user;
 
-    const { error, rate } = await booksServices.rateBook(bookRatingData)(+rating, +userId, +bookId);
+    const { error, rate } = await booksServices.rateBook(bookRatingData, usersData)(+rating, +userId, +bookId);
 
     if (error === errors.OPERATION_NOT_PERMITTED) {
       res.status(403).send({
@@ -230,23 +230,4 @@ booksController
     }
   });
 
-
 export default booksController;
-
-// GET //book/:booksId/records
-// GET /records/:
-
-/**
- * POST   books/bookId/records
- * DELETE books/bookId/records
- * GET    ???/records(userId from authMiddleware) ${if(role !== roleEnum.admin) {
- *                                                'WHERE userId = r.user_id'}}
- *         filter by bookId
- */
-
-/**
- * POST   books/:bookId/reviews
- * GET    books/:bookId/reviews
- * PUT    reviews/:reviewId
- * DELETE reviews/:reviewId
- */

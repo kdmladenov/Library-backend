@@ -10,7 +10,7 @@ const recordsController = express.Router();
 // To Do:  ?Test SORT
 
 recordsController
-  // get all - search, sort, paging To check 
+  // get all - search, sort, paging To check
   .get('/', authMiddleware, loggedUserGuard, async (req, res) => {
     const {
       search = '', searchBy = 'title', sort = 'record_id', order = 'ASC',

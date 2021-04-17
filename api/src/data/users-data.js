@@ -204,6 +204,16 @@ const avatarChange = (userId, path) => {
   return db.query(sql, [path, userId]);
 };
 
+const updatePoints = async (userId, points) => {
+  const sql = `
+    UPDATE users SET
+      reading_points = reading_points + ?
+    WHERE user_id = ?
+  `;
+
+  return db.query(sql, [points, userId]);
+};
+
 export default {
   getBy,
   getAll,
@@ -217,4 +227,5 @@ export default {
   getBanRecordsByUserId,
   logoutUser,
   avatarChange,
+  updatePoints,
 };

@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import errors from './service-errors.js';
 import rolesEnum from '../common/roles.enum.js';
+import { readingPoints } from '../common/constants.js';
 
 const getUser = usersData => async (userId, isProfileOwner, role) => {
   const user = await usersData.getBy('user_id', userId, isProfileOwner, role);
@@ -157,6 +158,8 @@ const banUser = usersData => async (userId, duration, description) => {
     };
   }
 
+  const points = Math.floor(duration * readingPoints.GET_BANNED_MULTIPLIER);
+  const p = await usersData.updatePoints(userId, points);
   const _ = await usersData.ban(userId, duration, description);
 
   return {
