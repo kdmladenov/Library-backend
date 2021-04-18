@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import passport from 'passport';
-
 import usersController from './controllers/users-controller.js';
 import { PORT } from '../config.js';
 import reviewsController from './controllers/reviews-controller.js';
@@ -29,10 +28,8 @@ app.use('/records', recordsController);
 
 app.use((err, req, res, next) => {
   res.status(500).send({
-    message: err.message,
+    message: 'Oops, Something went wrong...',
   });
 });
-
-// // LEVELING SYSTEM
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}...`));

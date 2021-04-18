@@ -11,7 +11,6 @@ import banGuard from '../middleware/banGuard.js';
 import loggedUserGuard from '../middleware/loggedUserGuard.js';
 import rolesEnum from '../common/roles.enum.js';
 import usersData from '../data/users-data.js';
-import reactionsEnum from '../common/reactions.enum.js';
 import errorHandler from '../middleware/errorHandler.js';
 
 const reviewsController = express.Router();

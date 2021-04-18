@@ -119,7 +119,7 @@ booksController
   }))
 
   // read review
-  .get('/:bookId/reviews', authMiddleware, loggedUserGuard, async (req, res) => {
+  .get('/:bookId/reviews', authMiddleware, loggedUserGuard, errorHandler(async (req, res) => {
     const { bookId } = req.params;
     const { order = 'ASC' } = req.query;
     let { pageSize = paging.DEFAULT_REVIEWS_PAGESIZE, page = paging.DEFAULT_PAGE } = req.query;
@@ -137,10 +137,10 @@ booksController
     } else {
       res.status(200).send(result);
     }
-  })
+  }))
 
 // create review
-  .post('/:bookId/reviews', authMiddleware, loggedUserGuard, banGuard, validateBody('review', createReviewSchema), async (req, res) => {
+  .post('/:bookId/reviews', authMiddleware, loggedUserGuard, banGuard, validateBody('review', createReviewSchema), errorHandler(async (req, res) => {
     const { bookId } = req.params;
     const { content } = req.body;
     const { userId } = req.user;
@@ -162,7 +162,7 @@ booksController
     } else {
       res.status(201).send(result);
     }
-  })
+  }))
 
   // Borrow a book
   .post('/:bookId/records', authMiddleware, loggedUserGuard, banGuard, errorHandler(async (req, res) => {

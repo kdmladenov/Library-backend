@@ -140,7 +140,6 @@ usersController
   // Ban user
   .post('/:userId/ban', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), validateBody('ban', banUserSchema), errorHandler(async (req, res) => {
     const { userId } = req.params;
-    console.log(req.body);
     const { duration, description } = req.body;
 
     const { error, result } = await usersService.banUser(usersData)(+userId, +duration, description);
@@ -158,7 +157,6 @@ usersController
   .put('/avatar', authMiddleware, uploadAvatar.single('avatar'), validateFile('uploads', uploadFileSchema), errorHandler(async (req, res) => {
     const { userId } = req.user;
     const { path } = req.file;
-
     const _ = await usersService.changeAvatar(usersData)(+userId, path);
 
     res.status(200).send({ message: 'Avatar changed' });
