@@ -92,7 +92,25 @@ const deleteBook = booksData => async (identifier) => {
 };
 
 // to Test
-const rateBook = (bookRatingData, usersData) => async (rating, userId, bookId) => {
+const rateBook = (bookRatingData, usersData, booksData, recordsData) => async (rating, userId, bookId) => {
+  // checks if the book exists
+  const existingBook = await booksData.getBy('book_id', bookId);
+  if (!existingBook) {
+    return {
+      error: errors.RECORD_NOT_FOUND,
+      result: null,
+    };
+  }
+
+  // checks if the user has borrowed and returned the book
+  const existingRecord = await recordsData.getRecordByUserIdAndBookId(userId, bookId);
+  if (!existingRecord || existingRecord.dateReturned === null) {
+    return {
+      error: errors.OPERATION_NOT_PERMITTED,
+      result: null,
+    };
+  }
+
   const existingRating = await bookRatingData.getBy(userId, bookId);
 
   if (existingRating) {

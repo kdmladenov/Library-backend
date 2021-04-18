@@ -79,7 +79,7 @@ usersController
   .patch('/change-password', authMiddleware, loggedUserGuard, validateBody('user', updatePasswordSchema), errorHandler(async (req, res) => {
     const { role } = req.user;
     const passwordData = req.body;
-    const id = role === rolesEnum.admin ? req.body.userId : req.user.userId;
+    const id = role === rolesEnum.admin ? (req.body.userId || req.user.userId) : req.user.userId;
 
     const { error, result } = await usersService.changePassword(usersData)(passwordData, +id, role);
 
@@ -100,7 +100,7 @@ usersController
   .put('/edit-profile', authMiddleware, loggedUserGuard, validateBody('user', updateUserSchema), errorHandler(async (req, res) => {
     const { role } = req.user;
     const userUpdate = req.body;
-    const id = role === rolesEnum.admin ? req.body.userId : req.user.userId;
+    const id = role === rolesEnum.admin ? (req.body.userId || req.user.userId) : req.user.userId;
 
     const { error, result } = await usersService.update(usersData)(userUpdate, +id);
 
@@ -124,7 +124,7 @@ usersController
   // Delete user
   .delete('/delete-profile', authMiddleware, loggedUserGuard, validateBody('user', deleteUserSchema), errorHandler(async (req, res) => {
     const { role } = req.user;
-    const id = role === rolesEnum.admin ? req.body.userId : req.user.userId;
+    const id = role === rolesEnum.admin ? (req.body.userId || req.user.userId) : req.user.userId;
 
     const { error, result } = await usersService.deleteUser(usersData)(+id);
 
