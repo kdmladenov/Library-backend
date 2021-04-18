@@ -24,6 +24,7 @@
       "sourceType": "module"
   },
   "rules": {
+      "linebreak-style": "off",
       "max-len":"off",
       "arrow-parens": "off",
       "no-return-assign": "off", // disallow use of assignment in return statement
