@@ -28,7 +28,7 @@ app.use('/records', recordsController);
 
 app.use((err, req, res, next) => {
   res.status(500).send({
-    message: 'Oops, Something went wrong...',
+    message: err.message,
   });
 });
 

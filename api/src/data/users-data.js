@@ -29,6 +29,95 @@ const getBy = async (column, value, isProfileOwner, role) => {
   return result[0];
 };
 
+const getTimeline = async (userId) => {
+  const sql = `
+    SELECT 
+      b.book_id as bookId,
+      b.title as title,
+      b.author as author,
+      b.front_cover as front_cover,
+      r.bookRating as bookRating,
+      DATE_FORMAT(rc.date_to_return, "%Y-%m-%d")  as dateToReturn,
+      DATE_FORMAT(rc.date_returned, "%Y-%m-%d")  as date,
+      DATE_FORMAT(rc.date_borrowed, "%Y-%m-%d")  as dateBorrowed,
+      DATEDIFF(rc.date_returned, rc.date_to_return) as overdue,
+      rc.user_id as userId,
+      b.is_deleted as isDeleted,
+      NULL as banDescription,
+      NULL as banDuration,
+      NULL as registration,
+      NULL as points
+    FROM records rc 
+    LEFT JOIN books b USING (book_id)
+    LEFT JOIN (SELECT AVG(rating) as bookRating, book_id, is_deleted
+              FROM book_ratings
+              GROUP BY book_id
+              HAVING is_deleted = 0) as r USING (book_id)
+    WHERE user_id = ${userId}
+    UNION 
+    SELECT 
+      b.book_id as bookId,      
+      b.title as title,
+      b.author as author,
+      b.front_cover as front_cover,
+      NULL as bookRating,
+      NULL as dateToReturn,
+      r.date_created as date,
+      NULL as dateBorrowed,
+      NULL as overdue,
+      r.user_id as userId,
+      r.is_deleted as isDeleted,
+      NULL as banDescription,
+      NULL as banDuration,
+      NULL as registration,
+      NULL as points
+    FROM reviews r
+    LEFT JOIN books b USING (book_id)
+    WHERE user_id = ${userId}
+    UNION
+    SELECT
+      NULL as bookId,      
+      NULL as title,
+      NULL as author,
+      NULL as front_cover,
+      NULL as reviewContent,
+      NULL as dateToReturn,
+      DATE_FORMAT(ban_date, "%Y-%m-%d") as date,
+      NULL as dateBorrowed,
+      NULL as overdue,
+      user_id as userId,
+      NULL as isDeleted,
+      description as banDescription,
+      DATEDIFF(exp_date, ban_date) as banDuration,
+      NULL as registration,
+      NULL as points
+    FROM ban_status
+    WHERE user_id = ${userId}
+    UNION
+    SELECT 
+      NULL as bookId,      
+      NULL as title,
+      NULL as author,
+      NULL as front_cover,
+      NULL as reviewContent,
+      NULL as dateToReturn,
+      DATE_FORMAT(register_date, "%Y-%m-%d") as date,
+      NULL as dateBorrowed,
+      NULL as overdue,
+      user_id as userId,
+      NULL as isDeleted,
+      NULL as banDescription,
+      NULL as banDuration,
+      "successful registration" as registration,
+      reading_points as points
+    FROM users
+    WHERE user_id = ${userId}
+    ORDER BY date desc
+  `;
+
+  return db.query(sql, []);
+};
+
 const getAll = async (search, searchBy, sort, order, page, pageSize, role) => {
   const direction = ['ASC', 'asc', 'DESC', 'desc'].includes(order) ? order : 'asc';
   const searchColumn = [
@@ -220,6 +309,7 @@ const updatePoints = async (userId, points) => {
 
 export default {
   getBy,
+  getTimeline,
   getAll,
   create,
   getPasswordBy,

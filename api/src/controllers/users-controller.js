@@ -59,6 +59,19 @@ usersController
     res.status(200).send(result);
   }))
 
+  .get('/timeline', authMiddleware, loggedUserGuard, errorHandler(async (req, res) => {
+    const { userId } = req.user;
+    const { error, result } = await usersService.getUserTimeline(usersData)(userId);
+
+    if (error === errors.RECORD_NOT_FOUND) {
+      res.status(404).send({
+        message: `User ${userId} is not found.`,
+      });
+    } else {
+      res.status(200).send(result);
+    }
+  }))
+
   // get a single user
   .get('/:userId', authMiddleware, loggedUserGuard, errorHandler(async (req, res) => {
     const { userId } = req.params;
