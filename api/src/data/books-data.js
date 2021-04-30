@@ -21,6 +21,7 @@ const getAllBooks = async (search, searchBy, sort, order, pageSize, page, role) 
       a.age_recommendation as ageRecommendation,
       l.language,
       b.pages,
+      b.summary,
       b.is_borrowed as isBorrowed,
       b.front_cover as frontCover,
       rv.review_count as reviewCount,
@@ -63,6 +64,9 @@ const getBy = async (column, value) => {
       l.language,
       b.summary,
       r.bookRating,
+      b.pages,
+      b.is_borrowed as isBorrowed,
+      b.front_cover as frontCover,
       rc.bookedUntil
     FROM books b
     LEFT JOIN (SELECT AVG(rating) as bookRating, book_id, is_deleted
