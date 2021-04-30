@@ -28,19 +28,29 @@ const getAll = async (bookId, order, page, pageSize) => {
 
 const getBy = async (column, value, userId, role) => {
   const sql = `
-    SELECT
-      r.review_id as reviewId,
-      r.content as content, 
-      r.date_created as dateCreated,
-      u.user_id as userId,
-      u.username as username,
-      b.book_id as bookId,
-      b.title as bookTitle,
-      b.author as bookAuthor
-    FROM reviews r
-    LEFT JOIN users u USING (user_id)
-    LEFT JOIN books b USING (book_id)
-    WHERE ${column} = ? ${role === rolesEnum.basic ? 'AND r.is_deleted = 0 AND user_id = ?' : ''}
+  SELECT
+  r.review_id as reviewId,
+  r.content as content, 
+  r.date_created as dateCreated,
+  r.date_edited as dateEdited,
+  r.title as title,
+  u.user_id as userId,
+  u.avatar as avatar,
+  u.username as username,
+  b.book_id as bookId,
+  b.title as bookTitle,
+  rl.thumbs_up as thumbsUp,
+  rl.thumbs_down as thumbsDown,
+  b.author as bookAuthor
+  FROM reviews r
+  LEFT JOIN users u USING (user_id)
+  LEFT JOIN books b USING (book_id)
+  LEFT JOIN (select review_id, 
+      count(if(reaction_id=1,1,null)) as thumbs_up, 
+      count(if(reaction_id=2,1,null)) as thumbs_down
+      from review_likes
+      group by review_id) rl USING (review_id)
+  WHERE ${column} = ? ${role === rolesEnum.basic ? 'AND r.is_deleted = 0 AND user_id = ?' : ''}
   `;
   const result = await db.query(sql, [value, userId]);
 

@@ -129,6 +129,23 @@ const unVoteReview = reviewVoteData => async (reviewId, userId, role) => {
     result: { message: `Vote was successfully removed.` },
   };
 };
+
+const readReview = reviewsData => async (reviewId, userId, role) => {
+  // checks if the review exists
+  const existingReview = await reviewsData.getBy('review_id', reviewId, userId, role);
+
+  if (!existingReview) {
+    return {
+      error: errors.RECORD_NOT_FOUND,
+      result: null,
+    };
+  }
+
+  return {
+    error: null,
+    result: existingReview,
+  };
+};
 export default {
   getAllReviews,
   createReview,
@@ -136,4 +153,5 @@ export default {
   deleteReview,
   voteReview,
   unVoteReview,
+  readReview,
 };

@@ -75,6 +75,22 @@ reviewsController
     } else {
       res.status(200).send(result);
     }
+  }))
+  // get review by ID 
+  .get('/:reviewId', authMiddleware, loggedUserGuard, banGuard, errorHandler(async (req, res) => {
+    const { reviewId } = req.params;
+    const { userId, role } = req.user;
+
+
+    const { error, result } = await reviewsService.readReview(reviewsData)(+reviewId, +userId, role);
+
+    if (error === errors.RECORD_NOT_FOUND) {
+      res.status(404).send({
+        message: 'The review is not found.',
+      });
+    } else {
+      res.status(200).send(result);
+    }
   }));
 
 export default reviewsController;
