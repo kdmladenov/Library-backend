@@ -13,7 +13,7 @@ import createReviewSchema from '../validator/create-review-schema.js';
 import reviewsService from '../services/reviews-service.js';
 import recordsServices from '../services/records-services.js';
 import recordsData from '../data/records-data.js';
-import rateBookSchema from '../validator/rate-book-schema.js';
+// import rateBookSchema from '../validator/rate-book-schema.js';
 import bookRatingData from '../data/book-rating-data.js';
 import { authMiddleware, roleMiddleware } from '../authentication/auth.middleware.js';
 import banGuard from '../middleware/banGuard.js';
@@ -142,10 +142,10 @@ booksController
 // create review
   .post('/:bookId/reviews', authMiddleware, loggedUserGuard, banGuard, validateBody('review', createReviewSchema), errorHandler(async (req, res) => {
     const { bookId } = req.params;
-    const { content } = req.body;
+    const { content, rating, title } = req.body;
     const { userId } = req.user;
 
-    const { error, result } = await reviewsService.createReview(booksData, reviewsData, recordsData, usersData)(content, +userId, +bookId);
+    const { error, result } = await reviewsService.createReview(booksData, reviewsData, recordsData, usersData)(content, +userId, +bookId, +rating, title);
 
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
@@ -201,25 +201,25 @@ booksController
   }))
 
   // Rate a book
-  .put('/:bookId/rate', authMiddleware, loggedUserGuard, banGuard, validateBody('rating', rateBookSchema), errorHandler(async (req, res) => {
-    const { bookId } = req.params;
-    const { rating } = req.body;
-    const { userId } = req.user;
+  // .put('/:bookId/rate', authMiddleware, loggedUserGuard, banGuard, validateBody('rating', rateBookSchema), errorHandler(async (req, res) => {
+  //   const { bookId } = req.params;
+  //   const { rating } = req.body;
+  //   const { userId } = req.user;
 
-    const { error, rate } = await booksServices.rateBook(bookRatingData, usersData, booksData, recordsData)(+rating, +userId, +bookId);
+  //   const { error, rate } = await booksServices.rateBook(bookRatingData, usersData, booksData, recordsData)(+rating, +userId, +bookId);
 
-    if (error === errors.RECORD_NOT_FOUND) {
-      res.status(404).send({
-        message: 'The book is not found.',
-      });
-    } else if (error === errors.OPERATION_NOT_PERMITTED) {
-      res.status(403).send({
-        message: `Only an user who has borrowed and returned the book is allowed to rate.`,
-      });
-    } else {
-      res.status(200).send(rate);
-    }
-  }))
+  //   if (error === errors.RECORD_NOT_FOUND) {
+  //     res.status(404).send({
+  //       message: 'The book is not found.',
+  //     });
+  //   } else if (error === errors.OPERATION_NOT_PERMITTED) {
+  //     res.status(403).send({
+  //       message: `Only an user who has borrowed and returned the book is allowed to rate.`,
+  //     });
+  //   } else {
+  //     res.status(200).send(rate);
+  //   }
+  // }))
   // Update cover
   .put('/:bookId/cover', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), uploadCover.single('cover'), validateFile('uploads', uploadFileSchema), errorHandler(async (req, res) => {
     const { path } = req.file;

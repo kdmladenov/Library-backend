@@ -30,6 +30,7 @@ const getBy = async (column, value, userId, role) => {
   const sql = `
   SELECT
   r.review_id as reviewId,
+  r.rating,
   r.content as content, 
   r.date_created as dateCreated,
   r.date_edited as dateEdited,
@@ -57,28 +58,32 @@ const getBy = async (column, value, userId, role) => {
   return result[0];
 };
 
-const create = async (content, userId, bookId) => {
+const create = async (content, userId, bookId, rating, title) => {
   const sql = `
     INSERT INTO reviews (
       content,
       user_id,
-      book_id
+      book_id,
+      rating,
+      title
     )
-    VALUES (?, ?, ?)
+    VALUES (?, ?, ?, ?, ?)
   `;
-  const result = await db.query(sql, [content, userId, bookId]);
+  const result = await db.query(sql, [content, userId, bookId, rating, title]);
 
   return getBy('review_id', result.insertId);
 };
 
-const update = async (content, reviewId, userId, role) => {
+const update = async (content, reviewId, userId, role, rating, title) => {
   const sql = `
     UPDATE reviews SET
+      title = ?,
       content = ?,
+      rating = ?,
       date_edited = CURRENT_TIMESTAMP()
     WHERE review_id = ? ${role === rolesEnum.basic ? 'AND user_id = ?' : ''}
   `;
-  return db.query(sql, [content, reviewId, userId]);
+  return db.query(sql, [title, content, rating, reviewId, userId]);
 };
 
 const remove = async (reviewId, userId, role) => {

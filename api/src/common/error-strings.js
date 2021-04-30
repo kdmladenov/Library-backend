@@ -42,12 +42,13 @@ export default {
     userId: `Expected number in the range [${RECORD.MAX_USER_ID_VALUE}-${RECORD.MAX_USER_ID_VALUE}]`,
   },
   review: {
+    title: `Expected string with length in the range [${REVIEW.MIN_TITLE_LENGTH}-${REVIEW.MAX_TITLE_LENGTH}]`,
     content: `Expected string with length more than ${REVIEW.MIN_CONTENT_LENGTH} characters.`,
-  },
-  rating: {
-    userId: `Expected a positive number`,
     rating: `Expected a whole number in the range [0 - 5]`,
   },
+  // rating: {
+  //   userId: `Expected a positive number`,
+  // },
   vote: {
     userId: `Expected a positive number`,
     reactionId: `Expected a positive number`,
