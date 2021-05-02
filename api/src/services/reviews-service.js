@@ -19,7 +19,7 @@ const getAllReviews = (reviewsData, booksData) => async (bookId, order, page, pa
   };
 };
 
-const createReview = (booksData, reviewsData, recordsData, usersData) => async (content, userId, bookId) => {
+const createReview = (booksData, reviewsData, recordsData, usersData) => async (content, userId, bookId, rating, title) => {
   // checks if the book exists
   const existingBook = await booksData.getBy('book_id', bookId);
   if (!existingBook) {
@@ -48,7 +48,7 @@ const createReview = (booksData, reviewsData, recordsData, usersData) => async (
   }
 
   const _ = await usersData.updatePoints(userId, readingPoints.POST_REVIEW);
-  const review = await reviewsData.create(content, userId, bookId);
+  const review = await reviewsData.create(content, userId, bookId, rating, title);
 
   return {
     error: null,
@@ -56,7 +56,7 @@ const createReview = (booksData, reviewsData, recordsData, usersData) => async (
   };
 };
 
-const updateReview = reviewsData => async (content, reviewId, userId, role) => {
+const updateReview = reviewsData => async (content, reviewId, userId, role, rating, title) => {
   // checks if the review exists
   const existingReview = await reviewsData.getBy('review_id', reviewId, userId, role);
 
@@ -67,8 +67,10 @@ const updateReview = reviewsData => async (content, reviewId, userId, role) => {
     };
   }
 
-  const updated = { ...existingReview, content, date_edited: new Date().toLocaleDateString('en-US') };
-  const _ = await reviewsData.update(content, reviewId, userId, role);
+  const updated = {
+    ...existingReview, content, date_edited: new Date().toLocaleDateString('en-US'), rating, title,
+  };
+  const _ = await reviewsData.update(content, reviewId, userId, role, rating, title);
 
   return {
     error: null,
@@ -129,6 +131,23 @@ const unVoteReview = reviewVoteData => async (reviewId, userId, role) => {
     result: { message: `Vote was successfully removed.` },
   };
 };
+
+const readReview = reviewsData => async (reviewId, userId, role) => {
+  // checks if the review exists
+  const existingReview = await reviewsData.getBy('review_id', reviewId, userId, role);
+
+  if (!existingReview) {
+    return {
+      error: errors.RECORD_NOT_FOUND,
+      result: null,
+    };
+  }
+
+  return {
+    error: null,
+    result: existingReview,
+  };
+};
 export default {
   getAllReviews,
   createReview,
@@ -136,4 +155,5 @@ export default {
   deleteReview,
   voteReview,
   unVoteReview,
+  readReview,
 };

@@ -27,6 +27,8 @@ export const book = {
 
 export const review = {
   MIN_CONTENT_LENGTH: 2,
+  MIN_TITLE_LENGTH: 2,
+  MAX_TITLE_LENGTH: 255,
 };
 
 export const record = {

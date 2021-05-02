@@ -18,11 +18,11 @@ const reviewsController = express.Router();
 reviewsController
 // update review
   .patch('/:reviewId', authMiddleware, loggedUserGuard, banGuard, validateBody('review', createReviewSchema), errorHandler(async (req, res) => {
-    const { content } = req.body;
+    const { content, rating, title } = req.body;
     const { reviewId } = req.params;
     const { userId, role } = req.user;
 
-    const { error, result } = await reviewsService.updateReview(reviewsData)(content, +reviewId, +userId, role);
+    const { error, result } = await reviewsService.updateReview(reviewsData)(content, +reviewId, +userId, role, +rating, title);
 
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
@@ -71,6 +71,22 @@ reviewsController
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(403).send({
         message: 'Review is not found.',
+      });
+    } else {
+      res.status(200).send(result);
+    }
+  }))
+  // get review by ID 
+  .get('/:reviewId', authMiddleware, loggedUserGuard, banGuard, errorHandler(async (req, res) => {
+    const { reviewId } = req.params;
+    const { userId, role } = req.user;
+
+
+    const { error, result } = await reviewsService.readReview(reviewsData)(+reviewId, +userId, role);
+
+    if (error === errors.RECORD_NOT_FOUND) {
+      res.status(404).send({
+        message: 'The review is not found.',
       });
     } else {
       res.status(200).send(result);
