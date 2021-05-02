@@ -18,6 +18,22 @@ const getUser = usersData => async (userId, isProfileOwner, role) => {
   };
 };
 
+const getUserTimeline = usersData => async (userId) => {
+  const userTimeline = await usersData.getTimeline(userId);
+
+  if (userTimeline.length === 0) {
+    return {
+      error: errors.RECORD_NOT_FOUND,
+      result: null,
+    };
+  }
+
+  return {
+    error: null,
+    result: userTimeline,
+  };
+};
+
 const getAllUsers = usersData => async (search, searchBy, sort, order, page, pageSize, role) => {
   const result = await usersData.getAll(search, searchBy, sort, order, page, pageSize, role);
 
@@ -178,6 +194,7 @@ const changeAvatar = usersData => async (userId, path) => {
 
 export default {
   getUser,
+  getUserTimeline,
   getAllUsers,
   createUser,
   login,

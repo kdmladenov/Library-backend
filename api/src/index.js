@@ -31,7 +31,7 @@ app.use('/storage/icons', express.static('storage/icons'));
 
 app.use((err, req, res, next) => {
   res.status(500).send({
-    message: 'Oops, Something went wrong...',
+    message: err.message,
   });
 });
 

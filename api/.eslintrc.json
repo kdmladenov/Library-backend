@@ -31,7 +31,8 @@
       "no-plusplus": "off",
       "quotes": "off",
       "consistent-return": "off", // require return statements to either always or never specify values
-      "import/extensions": "off","require-jsdoc": 0,
+      "import/extensions": "off",
+      "require-jsdoc": 0,
       "object-curly-spacing": [
           "error",
           "always"
