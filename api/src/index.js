@@ -27,6 +27,7 @@ app.use('/books', booksController);
 app.use('/records', recordsController);
 app.use('/storage/covers', express.static('storage/covers'));
 app.use('/storage/avatars', express.static('storage/avatars'));
+app.use('/storage/icons', express.static('storage/icons'));
 
 app.use((err, req, res, next) => {
   res.status(500).send({
