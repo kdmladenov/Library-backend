@@ -20,7 +20,7 @@ export default {
     email: `Expected valid e-mail string with length in the range [${USER.MIN_EMAIL_LENGTH}-${USER.MAX_EMAIL_LENGTH}]`,
     newEmail: `Expected valid e-mail string with length in the range [${USER.MIN_EMAIL_LENGTH}-${USER.MAX_EMAIL_LENGTH}]`,
     reenteredNewEmail: `Expected valid e-mail string with length in the range [${USER.MIN_EMAIL_LENGTH}-${USER.MAX_EMAIL_LENGTH}]`,
-    phone: `Expected string... `,
+    phone: `Expected valid phone number`,
     birthDate: `Expected a valid date string`,
     gender: `Expected 'male', 'female' or 'other'`,
     isBanned: `Expected boolean`,

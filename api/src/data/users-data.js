@@ -156,12 +156,7 @@ const create = async (user) => {
     INSERT INTO users (
       username, 
       password, 
-      first_name, 
-      last_name, 
-      gender_id, 
-      birth_date, 
       email, 
-      phone,
       role_id
     )
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, (SELECT role_id FROM roles WHERE type = ?))
@@ -170,12 +165,7 @@ const create = async (user) => {
   const result = await db.query(sql, [
     user.username,
     user.password,
-    user.firstName,
-    user.lastName,
-    user.gender,
-    user.birthDate,
     user.email,
-    user.phone,
     user.role,
   ]);
 

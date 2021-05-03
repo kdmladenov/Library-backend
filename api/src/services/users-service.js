@@ -42,9 +42,15 @@ const getAllUsers = usersData => async (search, searchBy, sort, order, page, pag
 
 // register
 const createUser = usersData => async user => {
-  const { username, email } = user;
-  const existingUser = await usersData.getBy('username', username)
-                    || await usersData.getBy('email', email, true);
+  if (user.password !== user.reenteredPassword) {
+    return {
+      error: errors.BAD_REQUEST,
+      result: null,
+    };
+  }
+
+  const existingUser = await usersData.getBy('username', user.username)
+                    || await usersData.getBy('email', user.email, true);
 
   if (existingUser) {
     return {
@@ -108,8 +114,8 @@ const changePassword = usersData => async (passwordData, userId, role) => {
 
 // update profile
 const update = usersData => async (userUpdate, userId) => {
-  const { newEmail, reenteredNewEmail } = userUpdate;
-  if (newEmail && newEmail !== reenteredNewEmail) {
+  const { email, reenteredEmail } = userUpdate;
+  if (email && email !== reenteredEmail) {
     return {
       error: errors.BAD_REQUEST,
       result: null,
@@ -124,15 +130,14 @@ const update = usersData => async (userUpdate, userId) => {
     };
   }
 
-  if (newEmail && !!(await usersData.getBy('email', newEmail, true))) {
-    return {
-      error: errors.DUPLICATE_RECORD,
-      result: null,
-    };
-  }
-
-  if (newEmail) {
-    existingUser.email = newEmail;
+  if (email) {
+    const user = await usersData.getBy('email', email, true);
+    if (user.userId !== userId) {
+      return {
+        error: errors.DUPLICATE_RECORD,
+        result: null,
+      };
+    }
   }
 
   const updatedUser = { ...existingUser, ...userUpdate, userId };
