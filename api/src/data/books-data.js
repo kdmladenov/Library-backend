@@ -34,6 +34,7 @@ const getAllBooks = async (search, searchBy, sort, order, pageSize, page, role) 
                 HAVING date_returned is Null) as rc using (book_id)
     LEFT JOIN (SELECT count(book_id) as review_count, AVG(rating) as bookRating, book_id
                 FROM reviews
+                WHERE is_deleted = 0
                 GROUP BY book_id) as rv using (book_id)
     LEFT JOIN genres g USING (genre_id)
     LEFT JOIN age_recommendation a USING (age_recommendation_id)
@@ -68,6 +69,7 @@ const getBy = async (column, value) => {
     FROM books b
     LEFT JOIN (SELECT count(book_id) as review_count, AVG(rating) as bookRating, book_id
                 FROM reviews
+                WHERE is_deleted = 0
                 GROUP BY book_id) as rv using (book_id)
     LEFT JOIN (SELECT book_id, date_returned, date_to_return as bookedUntil
         FROM records

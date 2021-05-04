@@ -14,7 +14,7 @@ import reviewsService from '../services/reviews-service.js';
 import recordsServices from '../services/records-services.js';
 import recordsData from '../data/records-data.js';
 // import rateBookSchema from '../validator/rate-book-schema.js';
-import bookRatingData from '../data/book-rating-data.js';
+// import bookRatingData from '../data/book-rating-data.js';
 import { authMiddleware, roleMiddleware } from '../authentication/auth.middleware.js';
 import banGuard from '../middleware/banGuard.js';
 import rolesEnum from '../common/roles.enum.js';
