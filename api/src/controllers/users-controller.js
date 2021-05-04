@@ -67,6 +67,28 @@ usersController
     }
   }))
 
+  // upload an avatar
+  .put('/avatar', authMiddleware, uploadAvatar.single('avatar'), validateFile('uploads', uploadFileSchema), errorHandler(async (req, res) => {
+    const { userId } = req.user;
+    const { path } = req.file;
+    const _ = await usersService.changeAvatar(usersData)(+userId, path);
+
+    res.status(200).send({ message: 'Avatar changed' });
+  }))
+
+  // get an avatar
+  .get('/avatar', authMiddleware, loggedUserGuard, errorHandler(async (req, res) => {
+    const { userId } = req.user;
+    const { error, result } = await usersService.getUserAvatar(usersData)(+userId);
+    if (error === errors.RECORD_NOT_FOUND) {
+      res.status(404).send({
+        message: `User ${userId} is not found.`,
+      });
+    } else {
+      res.status(200).send(result);
+    }
+  }))
+
   // get a single user
   .get('/:userId', authMiddleware, loggedUserGuard, errorHandler(async (req, res) => {
     const { userId } = req.params;
@@ -164,15 +186,6 @@ usersController
     } else {
       res.status(200).send(result);
     }
-  }))
-
-  // upload an avatar
-  .put('/avatar', authMiddleware, uploadAvatar.single('avatar'), validateFile('uploads', uploadFileSchema), errorHandler(async (req, res) => {
-    const { userId } = req.user;
-    const { path } = req.file;
-    const _ = await usersService.changeAvatar(usersData)(+userId, path);
-
-    res.status(200).send({ message: 'Avatar changed' });
   }));
 
 export default usersController;

@@ -50,7 +50,7 @@ const getTimeline = async (userId) => {
     FROM records rc 
     LEFT JOIN books b USING (book_id)
     LEFT JOIN (SELECT AVG(rating) as bookRating, book_id, is_deleted
-              FROM book_ratings
+              FROM reviews
               GROUP BY book_id
               HAVING is_deleted = 0) as r USING (book_id)
     WHERE user_id = ${userId}
@@ -287,6 +287,17 @@ const avatarChange = (userId, path) => {
   return db.query(sql, [path, userId]);
 };
 
+const getAvatar = async (userId) => {
+  const sql = `
+    SELECT avatar
+    FROM users
+    WHERE user_id = ${userId}
+  `;
+
+  const result = await db.query(sql, []);
+  return result[0];
+};
+
 const updatePoints = async (userId, points) => {
   const sql = `
     UPDATE users SET
@@ -311,5 +322,6 @@ export default {
   getBanRecordsByUserId,
   logoutUser,
   avatarChange,
+  getAvatar,
   updatePoints,
 };

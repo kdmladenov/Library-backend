@@ -94,17 +94,20 @@ const changePassword = usersData => async (passwordData, userId, role) => {
     };
   }
 
-  const { password } = await usersData.getPasswordBy('user_id', userId);
-  const { newPassword, reenteredNewPassword, oldPassword } = passwordData;
+  const { password: savedPassword } = await usersData.getPasswordBy('user_id', userId);
+  const { password, reenteredPassword, currentPassword } = passwordData;
 
-  if (newPassword !== reenteredNewPassword || (!await bcrypt.compare(oldPassword, password) && role !== rolesEnum.admin)) {
+  console.log(passwordData);
+  console.log(!await bcrypt.compare(currentPassword, savedPassword));
+
+  if (password !== reenteredPassword || (!await bcrypt.compare(currentPassword, savedPassword) && role !== rolesEnum.admin)) {
     return {
       error: errors.BAD_REQUEST,
       result: null,
     };
   }
 
-  const update = await bcrypt.hash(newPassword, 10);
+  const update = await bcrypt.hash(password, 10);
   const _ = await usersData.updatePassword(userId, update);
   return {
     error: null,
@@ -197,6 +200,22 @@ const changeAvatar = usersData => async (userId, path) => {
   const _ = await usersData.avatarChange(+userId, path);
 };
 
+const getUserAvatar = usersData => async (userId) => {
+  const userAvatar = await usersData.getAvatar(userId);
+
+  if (!userAvatar) {
+    return {
+      error: errors.RECORD_NOT_FOUND,
+      result: null,
+    };
+  }
+
+  return {
+    error: null,
+    result: userAvatar,
+  };
+};
+
 export default {
   getUser,
   getUserTimeline,
@@ -209,4 +228,5 @@ export default {
   banUser,
   logout,
   changeAvatar,
+  getUserAvatar,
 };
