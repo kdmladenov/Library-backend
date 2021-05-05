@@ -205,9 +205,7 @@ booksController
   //   const { bookId } = req.params;
   //   const { rating } = req.body;
   //   const { userId } = req.user;
-
   //   const { error, rate } = await booksServices.rateBook(bookRatingData, usersData, booksData, recordsData)(+rating, +userId, +bookId);
-
   //   if (error === errors.RECORD_NOT_FOUND) {
   //     res.status(404).send({
   //       message: 'The book is not found.',

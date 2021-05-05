@@ -31,7 +31,9 @@ const getBy = async (column, value, isProfileOwner, role) => {
 
 const getTimeline = async (userId) => {
   const sql = `
-    SELECT 
+    SELECT
+      concat('recordId_', record_id, ' bookId_', book_id) as id,
+      "read" as event,
       b.book_id as bookId,
       b.title as title,
       b.author as author,
@@ -44,9 +46,7 @@ const getTimeline = async (userId) => {
       rc.user_id as userId,
       b.is_deleted as isDeleted,
       NULL as banDescription,
-      NULL as banDuration,
-      NULL as registration,
-      NULL as points
+      NULL as banDuration
     FROM records rc 
     LEFT JOIN books b USING (book_id)
     LEFT JOIN (SELECT AVG(rating) as bookRating, book_id, is_deleted
@@ -55,7 +55,9 @@ const getTimeline = async (userId) => {
               HAVING is_deleted = 0) as r USING (book_id)
     WHERE user_id = ${userId}
     UNION 
-    SELECT 
+    SELECT
+      concat('reviewId_', review_id, ' bookId_', book_id) as id,
+      "review" as event,
       b.book_id as bookId,      
       b.title as title,
       b.author as author,
@@ -68,14 +70,14 @@ const getTimeline = async (userId) => {
       r.user_id as userId,
       r.is_deleted as isDeleted,
       NULL as banDescription,
-      NULL as banDuration,
-      NULL as registration,
-      NULL as points
+      NULL as banDuration
     FROM reviews r
     LEFT JOIN books b USING (book_id)
     WHERE user_id = ${userId}
     UNION
     SELECT
+      concat('ban_id', ban_id) as id,
+      "ban" as event,
       NULL as bookId,      
       NULL as title,
       NULL as author,
@@ -88,13 +90,13 @@ const getTimeline = async (userId) => {
       user_id as userId,
       NULL as isDeleted,
       description as banDescription,
-      DATEDIFF(exp_date, ban_date) as banDuration,
-      NULL as registration,
-      NULL as points
+      DATEDIFF(exp_date, ban_date) as banDuration
     FROM ban_status
     WHERE user_id = ${userId}
     UNION
-    SELECT 
+    SELECT
+    concat('readingPoints_', reading_points) as id, 
+      "registration" as event,
       NULL as bookId,      
       NULL as title,
       NULL as author,
@@ -107,9 +109,7 @@ const getTimeline = async (userId) => {
       user_id as userId,
       NULL as isDeleted,
       NULL as banDescription,
-      NULL as banDuration,
-      "successful registration" as registration,
-      reading_points as points
+      NULL as banDuration
     FROM users
     WHERE user_id = ${userId}
     ORDER BY date desc

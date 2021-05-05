@@ -37,7 +37,7 @@ const deleteRecord = (recordsData, usersData) => async (bookId, userId, role) =>
 
   const { dateToReturn } = bookToReturn;
   const days = Math.ceil((new Date(dateToReturn) - new Date()) / (24 * 60 * 60 * 1000)) > 0;
-  const points = days ? 5 : Math.floor(((new Date() - new Date(dateToReturn)) / (24 * 60 * 60 * 1000)) * readingPoints.RETURN_LATE_MULTIPLIER);
+  const points = days ? 5 : 5 + Math.floor(((new Date() - new Date(dateToReturn)) / (24 * 60 * 60 * 1000)) * readingPoints.RETURN_LATE_MULTIPLIER);
 
   const p = await usersData.updatePoints(userId, points);
   const r = await recordsData.remove(bookToReturn);

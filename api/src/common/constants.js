@@ -70,8 +70,8 @@ export const uploads = {
 export const readingPoints = {
   RETURN_ON_TIME: 5,
   RETURN_LATE_MULTIPLIER: -0.2,
-  POST_REVIEW: 10,
-  DELETE_REVIEW: -10,
-  RATE_BOOK: 2,
+  POST_REVIEW: 15,
+  DELETE_REVIEW: -15,
+  RATE_BOOK: 0,
   GET_BANNED_MULTIPLIER: -0.2,
 };
