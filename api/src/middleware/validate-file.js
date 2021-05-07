@@ -3,6 +3,7 @@ import errorStrings from '../common/error-strings.js';
 export default (resource, scheme) => async (req, res, next) => {
   const errors = {};
 
+  console.log(req.file);
   Object.keys(scheme).forEach(key => {
     if (!scheme[key](req.file[key])) {
       errors[key] = errorStrings[resource][key];

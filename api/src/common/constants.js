@@ -64,7 +64,7 @@ export const paging = {
 
 export const uploads = {
   VALID_FILE_FORMATS: ['jpg', 'png', 'jpeg', 'gif', 'bmp'],
-  MAX_FILE_SIZE: 10000, //   divide by 1000 for KB
+  MAX_FILE_SIZE: 102400, //   divide by 1000 for KB
   MIN_FILE_SIZE: 0,
 };
 export const readingPoints = {

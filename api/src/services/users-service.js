@@ -197,6 +197,7 @@ const logout = usersData => async (token) => {
 };
 
 const changeAvatar = usersData => async (userId, path) => {
+  console.log(path);
   const _ = await usersData.avatarChange(+userId, path);
 };
 
