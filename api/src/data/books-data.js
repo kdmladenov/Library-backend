@@ -4,9 +4,9 @@ import db from './pool.js';
 const getAllBooks = async (search, searchBy, sort, order, pageSize, page, role) => {
   const direction = ['ASC', 'asc', 'DESC', 'desc'].includes(order) ? order : 'asc';
   const searchColumn = [
-    'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary', 'bookRating', 'bookedUntil', 'pages', 'reviewCount', 'timesBorrowed'].includes(searchBy) ? searchBy : 'title';
+    'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary', 'bookRating', 'borrowedUntil', 'pages', 'reviewCount', 'timesBorrowed', 'borrowedByUser'].includes(searchBy) ? searchBy : 'title';
   const sortColumn = [
-    'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary', 'bookRating', 'bookedUntil', 'pages', 'reviewCount', 'timesBorrowed'].includes(sort) ? sort : 'book_id';
+    'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary', 'bookRating', 'borrowedUntil', 'pages', 'reviewCount', 'timesBorrowed', 'borrowedByUser'].includes(sort) ? sort : 'book_id';
   const offset = page ? (page - 1) * pageSize : 0;
 
   const sql = `
@@ -26,10 +26,11 @@ const getAllBooks = async (search, searchBy, sort, order, pageSize, page, role) 
       b.front_cover as frontCover,
       rv.review_count as reviewCount,
       rv.bookRating,
-      rc.bookedUntil,
+      rc.borrowedUntil,
+      rc.borrowedByUser,
       rc2.timesBorrowed
     FROM books b
-    LEFT JOIN (SELECT count(record_id) as timesBorrowed, book_id, date_returned, date_to_return as bookedUntil
+    LEFT JOIN (SELECT count(record_id) as timesBorrowed, user_id as borrowedByUser, book_id, date_returned, date_to_return as borrowedUntil
                 FROM records
                 GROUP BY record_id
                 HAVING date_returned is Null) as rc using (book_id)
