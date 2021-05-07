@@ -26,9 +26,10 @@ const getAllBooks = async (search, searchBy, sort, order, pageSize, page, role) 
       b.front_cover as frontCover,
       rv.review_count as reviewCount,
       rv.bookRating,
-      rc.bookedUntil
+      rc.bookedUntil,
+      rc2.timesBorrowed
     FROM books b
-    LEFT JOIN (SELECT book_id, date_returned, date_to_return as bookedUntil
+    LEFT JOIN (SELECT count(record_id) as timesBorrowed, book_id, date_returned, date_to_return as bookedUntil
                 FROM records
                 GROUP BY record_id
                 HAVING date_returned is Null) as rc using (book_id)
@@ -36,6 +37,9 @@ const getAllBooks = async (search, searchBy, sort, order, pageSize, page, role) 
                 FROM reviews
                 WHERE is_deleted = 0
                 GROUP BY book_id) as rv using (book_id)
+    LEFT JOIN (SELECT book_id, count(record_id) as timesBorrowed
+                FROM records
+                GROUP BY book_id) as rc2 using (book_id)
     LEFT JOIN genres g USING (genre_id)
     LEFT JOIN age_recommendation a USING (age_recommendation_id)
     LEFT JOIN language l USING (language_id)
