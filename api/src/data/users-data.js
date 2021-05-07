@@ -31,7 +31,9 @@ const getBy = async (column, value, isProfileOwner, role) => {
 
 const getTimeline = async (userId) => {
   const sql = `
-    SELECT 
+    SELECT
+      concat('recordId_', record_id, ' bookId_', book_id) as id,
+      "read" as event,
       b.book_id as bookId,
       b.title as title,
       b.author as author,
@@ -44,18 +46,18 @@ const getTimeline = async (userId) => {
       rc.user_id as userId,
       b.is_deleted as isDeleted,
       NULL as banDescription,
-      NULL as banDuration,
-      NULL as registration,
-      NULL as points
+      NULL as banDuration
     FROM records rc 
     LEFT JOIN books b USING (book_id)
     LEFT JOIN (SELECT AVG(rating) as bookRating, book_id, is_deleted
-              FROM book_ratings
+              FROM reviews
               GROUP BY book_id
               HAVING is_deleted = 0) as r USING (book_id)
     WHERE user_id = ${userId}
     UNION 
-    SELECT 
+    SELECT
+      concat('reviewId_', review_id, ' bookId_', book_id) as id,
+      "review" as event,
       b.book_id as bookId,      
       b.title as title,
       b.author as author,
@@ -68,14 +70,14 @@ const getTimeline = async (userId) => {
       r.user_id as userId,
       r.is_deleted as isDeleted,
       NULL as banDescription,
-      NULL as banDuration,
-      NULL as registration,
-      NULL as points
+      NULL as banDuration
     FROM reviews r
     LEFT JOIN books b USING (book_id)
     WHERE user_id = ${userId}
     UNION
     SELECT
+      concat('ban_id', ban_id) as id,
+      "ban" as event,
       NULL as bookId,      
       NULL as title,
       NULL as author,
@@ -88,13 +90,13 @@ const getTimeline = async (userId) => {
       user_id as userId,
       NULL as isDeleted,
       description as banDescription,
-      DATEDIFF(exp_date, ban_date) as banDuration,
-      NULL as registration,
-      NULL as points
+      DATEDIFF(exp_date, ban_date) as banDuration
     FROM ban_status
     WHERE user_id = ${userId}
     UNION
-    SELECT 
+    SELECT
+    concat('readingPoints_', reading_points) as id, 
+      "registration" as event,
       NULL as bookId,      
       NULL as title,
       NULL as author,
@@ -107,9 +109,7 @@ const getTimeline = async (userId) => {
       user_id as userId,
       NULL as isDeleted,
       NULL as banDescription,
-      NULL as banDuration,
-      "successful registration" as registration,
-      reading_points as points
+      NULL as banDuration
     FROM users
     WHERE user_id = ${userId}
     ORDER BY date desc
@@ -156,12 +156,7 @@ const create = async (user) => {
     INSERT INTO users (
       username, 
       password, 
-      first_name, 
-      last_name, 
-      gender_id, 
-      birth_date, 
       email, 
-      phone,
       role_id
     )
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, (SELECT role_id FROM roles WHERE type = ?))
@@ -170,12 +165,7 @@ const create = async (user) => {
   const result = await db.query(sql, [
     user.username,
     user.password,
-    user.firstName,
-    user.lastName,
-    user.gender,
-    user.birthDate,
     user.email,
-    user.phone,
     user.role,
   ]);
 
@@ -297,6 +287,17 @@ const avatarChange = (userId, path) => {
   return db.query(sql, [path, userId]);
 };
 
+const getAvatar = async (userId) => {
+  const sql = `
+    SELECT avatar
+    FROM users
+    WHERE user_id = ${userId}
+  `;
+
+  const result = await db.query(sql, []);
+  return result[0];
+};
+
 const updatePoints = async (userId, points) => {
   const sql = `
     UPDATE users SET
@@ -321,5 +322,6 @@ export default {
   getBanRecordsByUserId,
   logoutUser,
   avatarChange,
+  getAvatar,
   updatePoints,
 };

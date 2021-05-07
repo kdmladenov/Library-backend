@@ -25,11 +25,6 @@ usersController
   // register
   .post('/', validateBody('user', createUserSchema), errorHandler(async (req, res) => {
     const user = req.body;
-    user.firstName = user.firstName || null;
-    user.lastName = user.lastName || null;
-    user.phone = user.phone || null;
-    user.birthDate = user.birthDate ? new Date(user.birthDate).toLocaleDateString('af-ZA') : null; // yyyy/mm/dd
-    user.gender = user.gender ? +genderEnum[user.gender] : null;
     user.role = rolesEnum.basic;
 
     const { error, result } = await usersService.createUser(usersData)(user);
@@ -63,6 +58,28 @@ usersController
     const { userId } = req.user;
     const { error, result } = await usersService.getUserTimeline(usersData)(userId);
 
+    if (error === errors.RECORD_NOT_FOUND) {
+      res.status(404).send({
+        message: `User ${userId} is not found.`,
+      });
+    } else {
+      res.status(200).send(result);
+    }
+  }))
+
+  // upload an avatar
+  .put('/avatar', authMiddleware, uploadAvatar.single('avatar'), validateFile('uploads', uploadFileSchema), errorHandler(async (req, res) => {
+    const { userId } = req.user;
+    const { path } = req.file;
+    const _ = await usersService.changeAvatar(usersData)(+userId, path);
+
+    res.status(200).send({ message: 'Avatar changed' });
+  }))
+
+  // get an avatar
+  .get('/avatar', authMiddleware, loggedUserGuard, errorHandler(async (req, res) => {
+    const { userId } = req.user;
+    const { error, result } = await usersService.getUserAvatar(usersData)(+userId);
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
         message: `User ${userId} is not found.`,
@@ -112,14 +129,19 @@ usersController
   // Update user
   .put('/edit-profile', authMiddleware, loggedUserGuard, validateBody('user', updateUserSchema), errorHandler(async (req, res) => {
     const { role } = req.user;
-    const userUpdate = req.body;
+    const update = req.body;
+    update.firstName = update.firstName || null;
+    update.lastName = update.lastName || null;
+    update.phone = update.phone || null;
+    update.birthDate = update.birthDate ? new Date(update.birthDate).toLocaleDateString('af-ZA') : null; // yyyy/mm/dd
+    update.gender = update.gender ? +genderEnum[update.gender] : null;
     const id = role === rolesEnum.admin ? (req.body.userId || req.user.userId) : req.user.userId;
 
-    const { error, result } = await usersService.update(usersData)(userUpdate, +id);
+    const { error, result } = await usersService.update(usersData)(update, +id);
 
     if (error === errors.BAD_REQUEST) {
       res.status(400).send({
-        message: 'The request was invalid. Emails do not match.',
+        message: 'The request was invalid. Emails are required or do not match.',
       });
     } else if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
@@ -164,15 +186,6 @@ usersController
     } else {
       res.status(200).send(result);
     }
-  }))
-
-  // upload an avatar
-  .put('/avatar', authMiddleware, uploadAvatar.single('avatar'), validateFile('uploads', uploadFileSchema), errorHandler(async (req, res) => {
-    const { userId } = req.user;
-    const { path } = req.file;
-    const _ = await usersService.changeAvatar(usersData)(+userId, path);
-
-    res.status(200).send({ message: 'Avatar changed' });
   }));
 
 export default usersController;
