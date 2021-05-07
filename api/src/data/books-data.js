@@ -4,9 +4,9 @@ import db from './pool.js';
 const getAllBooks = async (search, searchBy, sort, order, pageSize, page, role) => {
   const direction = ['ASC', 'asc', 'DESC', 'desc'].includes(order) ? order : 'asc';
   const searchColumn = [
-    'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary', 'bookRating', 'bookedUntil', 'pages', 'reviewCount'].includes(searchBy) ? searchBy : 'title';
+    'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary', 'bookRating', 'bookedUntil', 'pages', 'reviewCount', 'timesBorrowed'].includes(searchBy) ? searchBy : 'title';
   const sortColumn = [
-    'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary', 'bookRating', 'bookedUntil', 'pages', 'reviewCount'].includes(sort) ? sort : 'book_id';
+    'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary', 'bookRating', 'bookedUntil', 'pages', 'reviewCount', 'timesBorrowed'].includes(sort) ? sort : 'book_id';
   const offset = page ? (page - 1) * pageSize : 0;
 
   const sql = `
