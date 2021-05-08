@@ -60,13 +60,13 @@ reviewsController
     res.status(200).send(result);
   }))
 
-  .delete('/:reviewId/votes', authMiddleware, loggedUserGuard, banGuard, validateBody('vote', voteReviewSchema), errorHandler(async (req, res) => {
-    const { reactionId } = req.body;
+  .delete('/:reviewId/votes', authMiddleware, loggedUserGuard, banGuard, errorHandler(async (req, res) => {
+    // const { reactionId } = req.body;
     const { reviewId } = req.params;
     const { role } = req.user;
     const id = role === rolesEnum.admin ? req.body.userId : req.user.userId;
 
-    const { error, result } = await reviewsService.unVoteReview(reviewVoteData, usersData)(+reactionId, +reviewId, +id, role);
+    const { error, result } = await reviewsService.unVoteReview(reviewVoteData, usersData)(+reviewId, +id, role);
 
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(403).send({
