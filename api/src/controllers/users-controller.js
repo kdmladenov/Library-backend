@@ -71,7 +71,7 @@ usersController
   .put('/avatar', authMiddleware, uploadAvatar.single('avatar'), validateFile('uploads', uploadFileSchema), errorHandler(async (req, res) => {
     const { userId } = req.user;
     const { path } = req.file;
-    const _ = await usersService.changeAvatar(usersData)(+userId, path);
+    const _ = await usersService.changeAvatar(usersData)(+userId, path.replace(/\\/g, '/'));
 
     res.status(200).send({ message: 'Avatar changed' });
   }))
@@ -134,7 +134,7 @@ usersController
     update.lastName = update.lastName || null;
     update.phone = update.phone || null;
     update.birthDate = update.birthDate ? new Date(update.birthDate).toLocaleDateString('af-ZA') : null; // yyyy/mm/dd
-    update.gender = update.gender ? +genderEnum[update.gender] : null;
+    update.gender = update.gender || null;
     const id = role === rolesEnum.admin ? (req.body.userId || req.user.userId) : req.user.userId;
 
     const { error, result } = await usersService.update(usersData)(update, +id);

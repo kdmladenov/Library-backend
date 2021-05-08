@@ -223,7 +223,7 @@ booksController
     const { path } = req.file;
     const { bookId } = req.params;
 
-    const { error, _ } = await booksServices.coverChange(booksData)(path, +bookId);
+    const { error, _ } = await booksServices.coverChange(booksData)(path.replace(/\\/g, '/'), +bookId);
 
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
