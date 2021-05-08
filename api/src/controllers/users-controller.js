@@ -130,11 +130,7 @@ usersController
   .put('/edit-profile', authMiddleware, loggedUserGuard, validateBody('user', updateUserSchema), errorHandler(async (req, res) => {
     const { role } = req.user;
     const update = req.body;
-    update.firstName = update.firstName || null;
-    update.lastName = update.lastName || null;
-    update.phone = update.phone || null;
     update.birthDate = update.birthDate ? new Date(update.birthDate).toLocaleDateString('af-ZA') : null; // yyyy/mm/dd
-    update.gender = update.gender || null;
     const id = role === rolesEnum.admin ? (req.body.userId || req.user.userId) : req.user.userId;
 
     const { error, result } = await usersService.update(usersData)(update, +id);

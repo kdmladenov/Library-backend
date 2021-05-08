@@ -97,9 +97,6 @@ const changePassword = usersData => async (passwordData, userId, role) => {
   const { password: savedPassword } = await usersData.getPasswordBy('user_id', userId);
   const { password, reenteredPassword, currentPassword } = passwordData;
 
-  console.log(passwordData);
-  console.log(!await bcrypt.compare(currentPassword, savedPassword));
-
   if (password !== reenteredPassword || (!await bcrypt.compare(currentPassword, savedPassword) && role !== rolesEnum.admin)) {
     return {
       error: errors.BAD_REQUEST,
@@ -135,7 +132,7 @@ const update = usersData => async (userUpdate, userId) => {
 
   if (email) {
     const user = await usersData.getBy('email', email, true);
-    if (user.userId !== userId) {
+    if (user && user.userId !== userId) {
       return {
         error: errors.DUPLICATE_RECORD,
         result: null,
@@ -197,7 +194,6 @@ const logout = usersData => async (token) => {
 };
 
 const changeAvatar = usersData => async (userId, path) => {
-  console.log(path);
   const _ = await usersData.avatarChange(+userId, path);
 };
 

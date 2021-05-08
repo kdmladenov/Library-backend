@@ -160,7 +160,7 @@ const create = async (user) => {
       email, 
       role_id
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, (SELECT role_id FROM roles WHERE type = ?))
+    VALUES (?, ?, ?, (SELECT role_id FROM roles WHERE type = ?))
   `;
 
   const result = await db.query(sql, [
