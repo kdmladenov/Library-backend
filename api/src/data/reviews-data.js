@@ -22,14 +22,19 @@ const getAll = async (bookId, order, page, pageSize) => {
     b.title as bookTitle,
     rl.thumbs_up as thumbsUp,
     rl.thumbs_down as thumbsDown,
+    rl.userThumbsUpList,
+    rl.userThumbsDownList,
     b.author as bookAuthor
     FROM reviews r
     LEFT JOIN users u USING (user_id)
     LEFT JOIN books b USING (book_id)
     LEFT JOIN (select review_id, 
         count(if(reaction_id=1,1,null)) as thumbs_up, 
-        count(if(reaction_id=2,1,null)) as thumbs_down
+        count(if(reaction_id=2,1,null)) as thumbs_down,
+        GROUP_CONCAT(if(reaction_id=1,user_id,null)) as userThumbsUpList,
+        GROUP_CONCAT(if(reaction_id=2,user_id,null)) as userThumbsDownList
         from review_likes
+        WHERE is_deleted = 0
         group by review_id) rl USING (review_id)
     WHERE r.is_deleted = 0 AND b.book_id = ?
     ORDER BY r.date_created ${direction}
@@ -55,18 +60,23 @@ const getBy = async (column, value, userId, role) => {
   b.title as bookTitle,
   rl.thumbs_up as thumbsUp,
   rl.thumbs_down as thumbsDown,
+  rl.userThumbsUpList,
+  rl.userThumbsDownList,
   b.author as bookAuthor
   FROM reviews r
   LEFT JOIN users u USING (user_id)
   LEFT JOIN books b USING (book_id)
   LEFT JOIN (select review_id, 
       count(if(reaction_id=1,1,null)) as thumbs_up, 
-      count(if(reaction_id=2,1,null)) as thumbs_down
+      count(if(reaction_id=2,1,null)) as thumbs_down,
+      GROUP_CONCAT(if(reaction_id=1,user_id,null)) as userThumbsUpList,
+      GROUP_CONCAT(if(reaction_id=2,user_id,null)) as userThumbsDownList
       from review_likes
+      WHERE is_deleted = 0
       group by review_id) rl USING (review_id)
   WHERE ${column} = ? ${
-    role === rolesEnum.basic ? "AND r.is_deleted = 0 AND user_id = ?" : ""
-  }
+  role === rolesEnum.basic ? "AND r.is_deleted = 0 AND user_id = ?" : ""
+}
   `;
   const result = await db.query(sql, [value, userId]);
 
@@ -103,8 +113,8 @@ const update = async (content, reviewId, userId, role, rating, title) => {
 
 const remove = async (reviewId, userId, role) => {
   const sql = `
-    UPDATE reviews SET
-      is_deleted = true
+    UPDATE reviews
+    SET is_deleted = true
     WHERE review_id = ? ${role === rolesEnum.basic ? "AND user_id = ?" : ""}
   `;
   return db.query(sql, [reviewId, userId, role]);

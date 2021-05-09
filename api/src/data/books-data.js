@@ -4,9 +4,9 @@ import db from './pool.js';
 const getAllBooks = async (search, searchBy, sort, order, pageSize, page, role) => {
   const direction = ['ASC', 'asc', 'DESC', 'desc'].includes(order) ? order : 'asc';
   const searchColumn = [
-    'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary', 'bookRating', 'bookedUntil', 'pages', 'reviewCount', 'timesBorrowed'].includes(searchBy) ? searchBy : 'title';
+    'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary', 'bookRating', 'borrowedUntil', 'pages', 'reviewCount', 'timesBorrowed', 'borrowedByUser', 'dateReturned'].includes(searchBy) ? searchBy : 'title';
   const sortColumn = [
-    'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary', 'bookRating', 'bookedUntil', 'pages', 'reviewCount', 'timesBorrowed'].includes(sort) ? sort : 'book_id';
+    'book_id', 'title', 'author', 'date_published', 'isbn', 'genre', 'language', 'summary', 'bookRating', 'borrowedUntil', 'pages', 'reviewCount', 'timesBorrowed', 'borrowedByUser', 'dateReturned'].includes(sort) ? sort : 'book_id';
   const offset = page ? (page - 1) * pageSize : 0;
 
   const sql = `
@@ -26,10 +26,12 @@ const getAllBooks = async (search, searchBy, sort, order, pageSize, page, role) 
       b.front_cover as frontCover,
       rv.review_count as reviewCount,
       rv.bookRating,
-      rc.bookedUntil,
+      rc.borrowedUntil,
+      rc.dateReturned,
+      rc.borrowedByUser,
       rc2.timesBorrowed
     FROM books b
-    LEFT JOIN (SELECT count(record_id) as timesBorrowed, book_id, date_returned, date_to_return as bookedUntil
+    LEFT JOIN (SELECT count(record_id) as timesBorrowed, user_id as borrowedByUser, book_id, date_returned as dateReturned, date_to_return as borrowedUntil
                 FROM records
                 GROUP BY record_id
                 HAVING date_returned is Null) as rc using (book_id)
@@ -69,16 +71,18 @@ const getBy = async (column, value) => {
       b.pages,
       b.is_borrowed as isBorrowed,
       b.front_cover as frontCover,
-      rc.bookedUntil
+      rc.dateReturned,
+      rc.borrowedByUser,
+      rc.borrowedUntil
     FROM books b
     LEFT JOIN (SELECT count(book_id) as review_count, AVG(rating) as bookRating, book_id
                 FROM reviews
                 WHERE is_deleted = 0
                 GROUP BY book_id) as rv using (book_id)
-    LEFT JOIN (SELECT book_id, date_returned, date_to_return as bookedUntil
-        FROM records
-        GROUP BY record_id
-        HAVING date_returned is Null) as rc using (book_id)
+    LEFT JOIN (SELECT user_id as borrowedByUser, book_id, date_returned as dateReturned, date_to_return as borrowedUntil
+                FROM records
+                GROUP BY record_id
+                HAVING date_returned is Null) as rc using (book_id)
     LEFT JOIN genres g USING (genre_id)
     LEFT JOIN age_recommendation a USING (age_recommendation_id)
     LEFT JOIN language l USING (language_id)
