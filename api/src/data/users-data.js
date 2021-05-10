@@ -290,7 +290,7 @@ const avatarChange = (userId, path) => {
 
 const getAvatar = async (userId) => {
   const sql = `
-    SELECT avatar
+    SELECT avatar, username
     FROM users
     WHERE user_id = ${userId}
   `;

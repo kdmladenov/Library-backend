@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import errors from './service-errors.js';
 import rolesEnum from '../common/roles.enum.js';
-import { readingPoints } from '../common/constants.js';
+import { readingPoints, user as userConstants } from '../common/constants.js';
 
 const getUser = usersData => async (userId, isProfileOwner, role) => {
   const user = await usersData.getBy('user_id', userId, isProfileOwner, role);
@@ -213,6 +213,23 @@ const getUserAvatar = usersData => async (userId) => {
   };
 };
 
+const deleteUserAvatar = usersData => async (userId) => {
+  const userAvatar = await usersData.getAvatar(userId);
+
+  if (!userAvatar) {
+    return {
+      error: errors.RECORD_NOT_FOUND,
+      result: null,
+    };
+  }
+
+  const _ = await usersData.avatarChange(+userId, userConstants.DEFAULT_AVATAR);
+  return {
+    error: null,
+    result: { message: `Avatar successfully deleted.` },
+  };
+};
+
 export default {
   getUser,
   getUserTimeline,
@@ -226,4 +243,5 @@ export default {
   logout,
   changeAvatar,
   getUserAvatar,
+  deleteUserAvatar,
 };
