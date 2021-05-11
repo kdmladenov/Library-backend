@@ -219,7 +219,9 @@ const updateData = async (user) => {
 const remove = async userId => {
   const sql = `
     UPDATE users SET
-      is_deleted = 1
+      is_deleted = 1,
+      username = 'DELETED USER',
+      email = 'DELETED USER EMAIL'
     WHERE user_id = ?
   `;
 

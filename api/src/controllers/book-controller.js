@@ -33,6 +33,8 @@ booksController
   .post('/', authMiddleware, loggedUserGuard, roleMiddleware(rolesEnum.admin), validateBody('book', createBookSchema), errorHandler(async (req, res) => {
     const data = req.body;
 
+    console.log(data);
+
     data.genre = bookGenreEnum[data.genre];
     data.language = bookLanguageEnum[data.language];
     data.ageRecommendation = bookAgeRecommendationEnum[data.ageRecommendation];
