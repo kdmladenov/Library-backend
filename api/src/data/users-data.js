@@ -127,29 +127,24 @@ const getAll = async (search, searchBy, sort, order, page, pageSize, role) => {
 
   const sql = `
     SELECT 
+      u.avatar,
       u.user_id as userId, 
       u.username as username,
       u.first_name as firstName,      
       r.type as role,
-      u.reading_points as readingPoints
-      ${role === rolesEnum.admin ? `, u.last_name as lastName,
+      u.reading_points as readingPoints,
+      u.last_name as lastName,
       g.gender as gender,
       DATE_FORMAT(u.birth_date, "%Y-%m-%d") as birthDate,
       u.email as email,
-      u.phone as phone,
-      b.ban_date as banDate,
-      b.exp_date as banExpDate,
-      b.description as banDescription` : ''}
+      u.phone as phone
     FROM users u
     LEFT JOIN gender g USING (gender_id)
-    LEFT JOIN ban_status b USING (user_id)
     LEFT JOIN roles r USING(role_id)
-    WHERE ${role === rolesEnum.admin ? `` : `u.is_deleted = 0 AND`} ${searchColumn} Like '%${search}%'
-    ORDER BY ? ${direction} 
     LIMIT ? OFFSET ?
   `;
 
-  return db.query(sql, [sort, pageSize, offset]);
+  return db.query(sql, [pageSize, offset]);
 };
 
 const create = async (user) => {
