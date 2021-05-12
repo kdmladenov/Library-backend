@@ -149,6 +149,12 @@ const coverChange = booksData => async (path, bookId) => {
     result,
   };
 };
+
+const getAllPublicBooks = booksData => async (sort, order, limit) => {
+  const result = await booksData.getAllPublicBooks(sort, order, limit);
+
+  return result;
+};
 export default {
   createBook,
   getBookById,
@@ -157,4 +163,5 @@ export default {
   updateBook,
   deleteBook,
   coverChange,
+  getAllPublicBooks,
 };
