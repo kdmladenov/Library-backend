@@ -177,6 +177,41 @@ const coverChange = (path, bookId) => {
   return db.query(sql, [path, bookId]);
 };
 
+const getAllPublicBooks = async (sort, order, limit) => {
+  const direction = ['DESC', 'desc'].includes(order) ? order : 'desc';
+  const sortColumn = [
+    'book_id', 'bookRating', 'timesBorrowed'].includes(sort) ? sort : 'book_id';
+
+  const sql = `
+    SELECT 
+      b.book_id as bookId,
+      b.title,
+      b.author,
+      b.is_deleted as isDeleted,
+      b.front_cover as frontCover,
+      rv.review_count as reviewCount,
+      rv.bookRating,
+      rc2.timesBorrowed
+    FROM books b
+    LEFT JOIN (SELECT count(record_id) as timesBorrowed, user_id as borrowedByUser, book_id, date_returned as dateReturned, date_to_return as borrowedUntil
+                FROM records
+                GROUP BY record_id
+                HAVING date_returned is Null) as rc using (book_id)
+    LEFT JOIN (SELECT count(book_id) as review_count, AVG(rating) as bookRating, book_id
+                FROM reviews
+                WHERE is_deleted = 0
+                GROUP BY book_id) as rv using (book_id)       
+    LEFT JOIN (SELECT book_id, count(record_id) as timesBorrowed
+                FROM records
+                GROUP BY book_id) as rc2 using (book_id)
+    WHERE b.is_deleted = 0 
+    ORDER BY ${sortColumn} ${direction} 
+    LIMIT ?
+  `;
+
+  return db.query(sql, [+limit]);
+};
+
 export default {
   create,
   getAllBooks,
@@ -184,6 +219,7 @@ export default {
   remove,
   getBy,
   coverChange,
+  getAllPublicBooks,
 };
 
 // export const updateBook = (id, isBorrowed) => {

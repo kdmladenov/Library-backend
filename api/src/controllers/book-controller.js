@@ -234,6 +234,28 @@ booksController
     } else {
       res.status(200).send({ message: 'The cover is changed' });
     }
+  })) // get Public - all books - search, sort, paging
+  .get('/public/:type', errorHandler(async (req, res) => {
+    let sort = '';
+    const order = "desc";
+    const limit = 20;
+    const { type } = req.params;
+    switch (type) {
+      case "newreleases":
+        sort = 'bookId';
+        break;
+      case "toprated":
+        sort = 'bookRating';
+        break;
+      case "mostpopular":
+        sort = 'timesBorrowed';
+        break;
+      default:
+        sort = "bookId";
+    }
+    const book = await booksServices.getAllPublicBooks(booksData)(sort, order, limit);
+
+    res.status(200).send(book);
   }));
 
 export default booksController;
