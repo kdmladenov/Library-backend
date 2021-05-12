@@ -4,7 +4,6 @@ import reviewsData from '../data/reviews-data.js';
 import validateBody from '../middleware/validate-body.js';
 import reviewsService from '../services/reviews-service.js';
 import errors from '../services/service-errors.js';
-import createReviewSchema from '../validator/create-review-schema.js';
 import { authMiddleware } from '../authentication/auth.middleware.js';
 import voteReviewSchema from '../validator/vote-review-schema.js';
 import banGuard from '../middleware/banGuard.js';
@@ -12,12 +11,13 @@ import loggedUserGuard from '../middleware/loggedUserGuard.js';
 import rolesEnum from '../common/roles.enum.js';
 import usersData from '../data/users-data.js';
 import errorHandler from '../middleware/errorHandler.js';
+import updateReviewSchema from '../validator/update-review-schema.js';
 
 const reviewsController = express.Router();
 
 reviewsController
 // update review
-  .patch('/:reviewId', authMiddleware, loggedUserGuard, banGuard, validateBody('review', createReviewSchema), errorHandler(async (req, res) => {
+  .patch('/:reviewId', authMiddleware, loggedUserGuard, banGuard, validateBody('review', updateReviewSchema), async (req, res) => {
     const { content, rating, title } = req.body;
     const { reviewId } = req.params;
     const { userId, role } = req.user;
@@ -31,7 +31,7 @@ reviewsController
     } else {
       res.status(200).send(result);
     }
-  }))
+  })
 
 // delete review
   .delete('/:reviewId', authMiddleware, loggedUserGuard, banGuard, errorHandler(async (req, res) => {
