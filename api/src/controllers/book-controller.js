@@ -121,7 +121,7 @@ booksController
   // read review
   .get('/:bookId/reviews', authMiddleware, loggedUserGuard, errorHandler(async (req, res) => {
     const { bookId } = req.params;
-    const { order = 'ASC' } = req.query;
+    const { order = 'DESC' } = req.query;
     let { pageSize = paging.DEFAULT_REVIEWS_PAGESIZE, page = paging.DEFAULT_PAGE } = req.query;
 
     if (+pageSize > paging.MAX_REVIEWS_PAGESIZE) pageSize = paging.MAX_REVIEWS_PAGESIZE;
