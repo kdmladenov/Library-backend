@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { readingPoints } from '../common/constants.js';
 import errors from './service-errors.js';
 
@@ -66,12 +67,19 @@ const updateReview = reviewsData => async (content, reviewId, userId, role, rati
       result: null,
     };
   }
-
+  if (!content) {
+    content = existingReview.content;
+  }
+  if (!title) {
+    title = existingReview.title;
+  }
+  if (!rating) {
+    rating = existingReview.rating;
+  }
   const updated = {
     ...existingReview, content, date_edited: new Date().toLocaleDateString('en-US'), rating, title,
   };
   const _ = await reviewsData.update(content, reviewId, userId, role, rating, title);
-
   return {
     error: null,
     result: updated,
