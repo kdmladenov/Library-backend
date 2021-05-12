@@ -54,7 +54,7 @@ usersController
   }))
 
   .get('/:userId/timeline', authMiddleware, loggedUserGuard, errorHandler(async (req, res) => {
-    const { role } = req.params;
+    const { role } = req.user;
     const id = role === rolesEnum.admin ? req.params.userId : req.user.userId;
     const { error, result } = await usersService.getUserTimeline(usersData)(+id);
 
@@ -69,7 +69,7 @@ usersController
 
   // upload avatar
   .put('/:userId/avatar', authMiddleware, uploadAvatar.single('avatar'), validateFile('uploads', uploadFileSchema), errorHandler(async (req, res) => {
-    const { role } = req.params;
+    const { role } = req.user;
     const id = role === rolesEnum.admin ? req.params.userId : req.user.userId;
     const { path } = req.file;
     const _ = await usersService.changeAvatar(usersData)(+id, path.replace(/\\/g, '/'));
@@ -79,7 +79,7 @@ usersController
 
   // get avatar
   .get('/:userId/avatar', authMiddleware, loggedUserGuard, errorHandler(async (req, res) => {
-    const { role } = req.params;
+    const { role } = req.user;
     const id = role === rolesEnum.admin ? req.params.userId : req.user.userId;
     const { error, result } = await usersService.getUserAvatar(usersData)(+id);
     if (error === errors.RECORD_NOT_FOUND) {
@@ -93,7 +93,7 @@ usersController
 
   // delete avatar
   .delete('/:userId/avatar', authMiddleware, loggedUserGuard, errorHandler(async (req, res) => {
-    const { role } = req.params;
+    const { role } = req.user;
     const id = role === rolesEnum.admin ? req.params.userId : req.user.userId;
     const { error, result } = await usersService.deleteUserAvatar(usersData)(+id);
     if (error === errors.RECORD_NOT_FOUND) {
@@ -123,7 +123,7 @@ usersController
 
   // Change password
   .patch('/:userId/change-password', authMiddleware, loggedUserGuard, validateBody('user', updatePasswordSchema), errorHandler(async (req, res) => {
-    const { role } = req.params;
+    const { role } = req.user;
     const id = role === rolesEnum.admin ? req.params.userId : req.user.userId;
     const passwordData = req.body;
 
@@ -144,7 +144,7 @@ usersController
 
   // Update user
   .put('/:userId/edit-profile', authMiddleware, loggedUserGuard, validateBody('user', updateUserSchema), errorHandler(async (req, res) => {
-    const { role } = req.params;
+    const { role } = req.user;
     const id = role === rolesEnum.admin ? req.params.userId : req.user.userId;
     const update = req.body;
     update.birthDate = update.birthDate ? new Date(update.birthDate).toLocaleDateString('af-ZA') : null; // yyyy/mm/dd
@@ -170,13 +170,14 @@ usersController
 
   // Delete user
   .delete('/:userId/delete-profile', authMiddleware, loggedUserGuard, validateBody('user', deleteUserSchema), errorHandler(async (req, res) => {
-    const { userId } = req.user;
+    const { role } = req.user;
+    const id = role === rolesEnum.admin ? req.params.userId : req.user.userId;
 
-    const { error, result } = await usersService.deleteUser(usersData)(+userId);
+    const { error, result } = await usersService.deleteUser(usersData)(+id);
 
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({
-        message: `User ${userId} is not found.`,
+        message: `User ${id} is not found.`,
       });
     } else {
       res.status(200).send(result);
