@@ -53,7 +53,7 @@ const getAllBooks = async (search, searchBy, sort, order, pageSize, page, role) 
   return db.query(sql, [+pageSize, +offset]);
 };
 // OK
-const getBy = async (column, value) => {
+const getBy = async (column, value, role) => {
   const sql = `
     SELECT 
       b.book_id as bookId,
@@ -86,7 +86,7 @@ const getBy = async (column, value) => {
     LEFT JOIN genres g USING (genre_id)
     LEFT JOIN age_recommendation a USING (age_recommendation_id)
     LEFT JOIN language l USING (language_id)
-    WHERE ${column} = ? AND b.is_deleted = 0;
+    WHERE ${column} = ? ${role === rolesEnum.basic ? ' AND b.is_deleted = 0' : ''};
   `;
 
   const result = await db.query(sql, [value]);

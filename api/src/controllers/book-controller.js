@@ -69,9 +69,10 @@ booksController
   // get by id
   .get('/:bookId', authMiddleware, loggedUserGuard, errorHandler(async (req, res) => {
     const { bookId } = req.params;
+    const { role } = req.user;
 
     const identifier = BOOK.ISBN_REGEX.test(bookId) ? bookId : +bookId;
-    const { error, book } = await booksServices.getBookById(booksData)(identifier);
+    const { error, book } = await booksServices.getBookById(booksData)(identifier, role);
 
     if (error === errors.RECORD_NOT_FOUND) {
       res.status(404).send({

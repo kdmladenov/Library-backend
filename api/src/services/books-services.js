@@ -25,9 +25,9 @@ const getAllBooks = booksData => async (search, searchBy, sort, order, pageSize,
   return result;
 };
 
-const getBookById = booksData => async (identifier) => {
-  const book = await booksData.getBy('isbn', identifier)
-            || await booksData.getBy('book_id', identifier);
+const getBookById = booksData => async (identifier, role) => {
+  const book = await booksData.getBy('isbn', identifier, role)
+            || await booksData.getBy('book_id', identifier, role);
 
   if (!book) {
     return {
